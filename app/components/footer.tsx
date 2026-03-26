@@ -1,0 +1,81 @@
+'use client'
+
+import { Heart } from 'lucide-react'
+
+export default function Footer() {
+  return (
+    <footer className="bg-gradient-to-b from-gray-900 to-black text-white py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          {/* Branding */}
+          <div>
+            <h3 className="font-heading text-2xl font-bold gradient-text mb-4">
+              Studernheim
+            </h3>
+            <p className="text-gray-400 leading-relaxed">
+              Ein Dorf voller Leben, Tradition und Gemeinschaft in der schönen Pfalz.
+            </p>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="font-heading font-bold text-lg mb-4">Schnellzugriff</h4>
+            <ul className="space-y-2">
+              {['SAG', 'Feste', 'Vereine', 'Ortsverwaltung'].map((item) => (
+                <li key={item}>
+                  <button
+                    onClick={() => {
+                      const element = document.getElementById(item.toLowerCase())
+                      element?.scrollIntoView({ behavior: 'smooth' })
+                    }}
+                    className="text-gray-400 hover:text-green-400 transition-colors"
+                  >
+                    {item}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 className="font-heading font-bold text-lg mb-4">Kontakt</h4>
+            <ul className="space-y-2 text-gray-400">
+              <li>Hauptstraße 1</li>
+              <li>67376 Studernheim</li>
+              <li>
+                <a href="tel:063441234" className="hover:text-green-400 transition-colors">
+                  06344 / 1234
+                </a>
+              </li>
+              <li>
+                <a href="mailto:info@studernheim.de" className="hover:text-green-400 transition-colors">
+                  info@studernheim.de
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Image Credits */}
+        <div className="border-t border-gray-800 pt-8 mb-8">
+          <p className="text-xs text-gray-500 text-center mb-2">
+            Bildnachweis: Alle Bilder von Unsplash und Pexels
+          </p>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-gray-400 text-sm">
+            © {new Date().getFullYear()} Studernheim. Alle Rechte vorbehalten.
+          </p>
+          
+          <p className="flex items-center gap-2 text-gray-400 text-sm">
+            Gemacht mit <Heart size={16} className="text-red-500" /> für unser Dorf
+          </p>
+        </div>
+      </div>
+    </footer>
+  )
+}
