@@ -38,21 +38,21 @@ export interface Testimonial {
 
 export const feste: Fest[] = [
   {
-    id: '1',
-    name: 'Studernheimer Kerwe',
-    region: 'Dorfplatz',
-    vibe: 'Tradition trifft Lebensfreude',
-    description: 'Das Highlight des Jahres! Unsere traditionelle Kerwe bringt das ganze Dorf zusammen. Mit Festzelt, Live-Musik, regionalen Spezialitäten und einem bunten Programm für die ganze Familie.',
-    date: 'August',
-    image: 'https://cdn.abacus.ai/images/fc78cafa-3d03-432b-8c30-62b049441408.png',
-    organizer: 'SAG Studernheim',
-    quickFacts: [
-      'Festzelt mit 500+ Plätzen',
-      'Live-Bands am Wochenende',
-      'Traditioneller Kerwetanz',
-      'Kinderkarussell & Buden'
-    ]
-  },
+  id: '1',
+  name: 'Studernheimer Kerwe',
+  region: 'Festplatz Studernheim',
+  vibe: 'Live-Musik • Festzelt • Dorfgemeinschaft',
+  description: 'Die Kerwe ist das absolute Highlight des Jahres in Studernheim. Im festlich geschmückten Festzelt sorgt Live-Musik für beste Stimmung, während sich Freunde, Familien und Vereine zum gemeinsamen Feiern treffen. Hier erlebt man echte Dorfgemeinschaft und unvergessliche Abende.',
+  date: 'August',
+  image: '/images/kerwe.jpg',
+  organizer: 'SAG Studernheim',
+  quickFacts: [
+    'Großes Festzelt mit Live-Bands',
+    'Mehrere Tage Programm',
+    'Treffpunkt für das ganze Dorf',
+    'Stimmung bis spät in die Nacht'
+   ]
+ },
   {
     id: '2',
     name: 'Weinprobe im Wingert',
