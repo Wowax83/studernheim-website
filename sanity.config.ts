@@ -7,7 +7,7 @@ export default defineConfig({
   name: 'default',
   title: 'Studernheim CMS',
 
-  projectId: agl5pbdz, // 👈 hier einsetzen!
+  projectId: 'agl5pbdz', // 👈 hier einsetzen!
   dataset: 'production',
 
   plugins: [structureTool(), visionTool()],
