@@ -18,54 +18,125 @@ export default function FesteClient({ feste }: any) {
     <section id="feste" className="py-20 sm:py-28 bg-gradient-to-b from-green-50/30 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div ref={ref} className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-6">
+        {/* Header */}
+        <motion.div
+          ref={ref}
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h2 className="font-heading text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             Unsere <span className="text-green-600">Feste</span>
           </h2>
-        </div>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Das ganze Jahr über feiern wir gemeinsam – traditionell, gesellig und mit viel Herzblut.
+          </p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {feste.map((fest: any, index: number) => (
-            <div
+        {/* Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {feste?.map((fest: any, index: number) => (
+            <motion.div
               key={fest._id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
               onMouseEnter={() => setHoveredCard(fest._id)}
               onMouseLeave={() => setHoveredCard(null)}
-              className="bg-white rounded-xl shadow-lg overflow-hidden"
+              className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
             >
-              <div className="relative h-48">
-                <Image
-                  src={fest.image}
-                  alt={fest.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
 
-              <div className="p-4">
-                <h3 className="text-xl font-bold">{fest.name}</h3>
-                <p className="text-sm text-gray-500">{fest.region}</p>
-                <p className="text-sm mt-2">{fest.description}</p>
+              {/* Image */}
+              {fest.image && (
+                <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                  <Image
+                    src={fest.image}
+                    alt={fest.name}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
 
-                <p className="text-green-600 text-sm mt-2">
-                  {fest.vibe}
-                </p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-                {hoveredCard === fest._id && (
-                  <ul className="mt-2 text-xs">
-                    {fest.quickFacts?.map((fact: string, i: number) => (
-                      <li key={i}>• {fact}</li>
-                    ))}
-                  </ul>
+                  {/* Date Badge */}
+                  {fest.date && (
+                    <div className="absolute top-4 right-4 px-3 py-1 text-white text-sm bg-black/50 rounded-full flex items-center gap-1">
+                      <Calendar size={14} />
+                      {fest.date}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Content */}
+              <div className="p-6">
+
+                {/* Region */}
+                {fest.region && (
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                    <MapPin size={14} />
+                    {fest.region}
+                  </div>
                 )}
 
-                <p className="text-xs mt-2 text-gray-500">
-                  {fest.organizer}
-                </p>
+                {/* Title */}
+                <h3 className="font-heading text-2xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
+                  {fest.name}
+                </h3>
+
+                {/* Vibe */}
+                {fest.vibe && (
+                  <p className="text-green-600 font-medium text-sm mb-3">
+                    {fest.vibe}
+                  </p>
+                )}
+
+                {/* Description */}
+                {fest.description && (
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    {fest.description}
+                  </p>
+                )}
+
+                {/* Quick Facts */}
+                {hoveredCard === fest._id && fest.quickFacts && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="border-t border-gray-200 pt-4 mt-4 space-y-2"
+                  >
+                    <div className="flex items-start gap-2 text-sm">
+                      <Info size={16} className="text-green-600 mt-0.5" />
+                      <div>
+                        <p className="font-semibold text-gray-900 mb-1">
+                          Highlights:
+                        </p>
+                        <ul className="space-y-1 text-gray-600">
+                          {fest.quickFacts.map((fact: string, i: number) => (
+                            <li key={i} className="text-xs">• {fact}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Organizer */}
+                {fest.organizer && (
+                  <div className="text-xs text-gray-500 mt-4">
+                    Veranstalter: {fest.organizer}
+                  </div>
+                )}
+
               </div>
-            </div>
+
+              {/* Hover Effekt */}
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+
+            </motion.div>
           ))}
         </div>
-
       </div>
     </section>
   )
