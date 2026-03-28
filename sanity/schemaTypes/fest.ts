@@ -8,7 +8,13 @@ export default {
     { name: 'description', type: 'text', title: 'Beschreibung' },
     { name: 'date', type: 'string', title: 'Datum' },
     { name: 'region', type: 'string', title: 'Ort' },
+
+    // 👇 NEU
+    { name: 'vibe', type: 'string', title: 'Stimmung / Vibe' },
+    { name: 'organizer', type: 'string', title: 'Veranstalter' },
+
     { name: 'image', type: 'image', title: 'Bild' },
+
     {
       name: 'quickFacts',
       type: 'array',
