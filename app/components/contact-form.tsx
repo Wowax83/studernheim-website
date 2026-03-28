@@ -202,26 +202,6 @@ export default function ContactForm() {
                 </div>
               </div>
 
-              {/* Budget */}
-              <div>
-                <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
-                  Budget (optional)
-                </label>
-                <div className="relative">
-                  <DollarSign size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <select
-                    id="budget"
-                    name="budget"
-                    className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all appearance-none bg-white"
-                  >
-                    <option value="">Bitte wählen</option>
-                    <option value="low">Bis 500€</option>
-                    <option value="medium">500€ - 1.000€</option>
-                    <option value="high">1.000€ - 2.500€</option>
-                    <option value="luxury">Über 2.500€</option>
-                  </select>
-                </div>
-              </div>
 
               {/* Message */}
               <div>
