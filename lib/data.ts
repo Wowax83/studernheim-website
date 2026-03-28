@@ -16,6 +16,7 @@ export interface Verein {
   description: string
   category: string
   contact?: string
+  quickFacts: string[]
 }
 
 export interface Termin {
