@@ -144,24 +144,47 @@ export const vereine: Verein[] = [
     contact: 'sag@studernheim.de'
   },
   {
-    id: '2',
-    name: 'SV Studernheim 1920',
-    description: 'Unser Sportverein bietet Fußball, Gymnastik, Wandern und vieles mehr für alle Altersklassen.',
-    category: 'Sport',
-    contact: 'info@sv-studernheim.de'
-  },
+  id: '2',
+  name: 'SV Studernheim 1920',
+  description: 'Der SV Studernheim 1920 ist ein zentraler Bestandteil des Dorflebens und bietet ein vielseitiges Sportangebot für alle Generationen. Ob Fußball, Gymnastik oder gemeinsames Wandern – hier stehen Bewegung, Teamgeist und Gemeinschaft im Mittelpunkt. Besonders die Jugendarbeit hat einen hohen Stellenwert und fördert früh den Spaß am Sport und das Miteinander.',
+  category: 'Sport',
+  contact: 'info@sv-studernheim.de',
+  quickFacts: [
+    'Traditionsverein seit 1920',
+    'Fußball für Kinder, Jugendliche & Erwachsene',
+    'Breitensport: Gymnastik & Wandern',
+    'Starke Jugendarbeit und Nachwuchsförderung',
+    'Aktives Vereinsleben & regelmäßige Veranstaltungen'
+  ]
+  }
   {
-    id: '3',
-    name: 'Gesangverein Harmonie',
-    description: 'Tradition seit über 100 Jahren - wir pflegen das deutsche Liedgut und moderne Chormusik.',
-    category: 'Musik & Kultur'
-  },
+  id: '3',
+  name: 'KG Royal Studernheim',
+  description: 'Die KG Royal Studernheim steht für gelebte Fastnacht, ausgelassene Stimmung und kreative Vereinsarbeit. Mit Sitzungen, Auftritten und Umzügen sorgt der Verein jedes Jahr für unvergessliche Momente in der fünften Jahreszeit. Besonders die Tanzgruppen und aktiven Mitglieder prägen das bunte Vereinsleben und begeistern das Publikum.',
+  category: 'Kultur & Fastnacht',
+  contact: 'info@kg-royal-studernheim.de',
+  quickFacts: [
+    'Traditionelle Fastnachtsveranstaltungen',
+    'Tanzgruppen & Showauftritte',
+    'Teilnahme an Umzügen',
+    'Aktives Vereinsleben das ganze Jahr',
+    'Förderung von Nachwuchs im Karneval'
+  ]
+  }
   {
-    id: '4',
-    name: 'Freiwillige Feuerwehr',
-    description: 'Rund um die Uhr für Ihre Sicherheit im Einsatz. Mit moderner Ausrüstung und engagierten Mitgliedern.',
-    category: 'Sicherheit'
-  },
+  id: '4',
+  name: 'Landfrauen Studernheim',
+  description: 'Die Landfrauen Studernheim engagieren sich aktiv für Gemeinschaft, Tradition und Bildung im Dorf. Mit vielfältigen Angeboten wie Kochkursen, Vorträgen und gemeinsamen Aktivitäten schaffen sie einen Treffpunkt für Austausch und Zusammenhalt. Dabei stehen regionale Kultur, Kreativität und das Miteinander im Mittelpunkt.',
+  category: 'Gemeinschaft',
+  contact: 'landfrauen@studernheim.de',
+  quickFacts: [
+    'Gemeinschaft und Austausch im Dorf',
+    'Koch- und Backkurse',
+    'Vorträge und Workshops',
+    'Pflege von Tradition und Brauchtum',
+    'Regelmäßige Treffen und Veranstaltungen'
+  ]
+  }
   {
     id: '5',
     name: 'Landfrauenverein',
