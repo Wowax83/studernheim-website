@@ -230,13 +230,13 @@ export const termine: Termin[] = [
 export const testimonials: Testimonial[] = [
   {
     id: '1',
-    name: 'Maria Schmidt',
-    role: 'Einwohnerin seit 40 Jahren',
-    content: 'Studernheim ist mehr als nur ein Dorf - es ist eine Familie. Die Gemeinschaft hier ist einzigartig, und man spürt bei jedem Fest, wie sehr die Menschen zusammenhalten.'
+    name: 'Karl',
+    role: 'Einwohner seit 40 Jahren',
+    content: 'Studernheim ist mehr als nur ein Dorf. Die Gemeinschaft hier ist einzigartig, und man spürt bei jedem Fest, wie sehr die Menschen zusammenhalten.'
   },
   {
     id: '2',
-    name: 'Thomas Wagner',
+    name: 'Thomas',
     role: 'Zugezogen 2015',
     content: 'Als wir nach Studernheim kamen, wurden wir sofort herzlich aufgenommen. Die Mischung aus Tradition und Moderne macht das Dorfleben hier so besonders.'
   },
