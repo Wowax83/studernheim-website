@@ -185,18 +185,6 @@ export const vereine: Verein[] = [
       'Pflege von Tradition und Brauchtum',
       'Regelmäßige Treffen und Veranstaltungen'
     ]
-  },
-  {
-    id: '5',
-    name: 'Landfrauenverein',
-    description: 'Kulinarik, Handwerk und Geselligkeit - wir fördern Tradition und zeitgemäßes Landleben.',
-    category: 'Tradition'
-  },
-  {
-    id: '6',
-    name: 'Jugendtreff Studernheim',
-    description: 'Raum für junge Menschen mit Veranstaltungen, Projekten und offenen Treffs.',
-    category: 'Jugend'
   }
 ]
 
