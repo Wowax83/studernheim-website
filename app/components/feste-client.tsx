@@ -5,7 +5,7 @@ import { useInView } from 'react-intersection-observer'
 import { Calendar, MapPin, Info } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
-import { feste } from '@/lib/data'
+export default function FesteClient({ feste }: any) {
 
 export default function Feste() {
   const [ref, inView] = useInView({
@@ -36,7 +36,7 @@ export default function Feste() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {feste.map((fest, index) => (
             <motion.div
-              key={fest.id}
+              key={fest._id}
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.1 }}
