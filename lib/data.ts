@@ -54,20 +54,20 @@ export const feste: Fest[] = [
    ]
  },
   {
-    id: '2',
-    name: 'Weinprobe im Wingert',
-    region: 'Weinberge',
-    vibe: 'Genuss in den Reben',
-    description: 'Erleben Sie die Vielfalt pfälzischer Weine direkt in unseren Weinbergen. Eine gesellige Veranstaltung mit Winzern aus der Region, begleitet von kulinarischen Köstlichkeiten.',
-    date: 'Juni & September',
-    image: 'https://cdn.abacus.ai/images/06d1f19a-f1b9-4e95-8563-3e304b882613.png',
-    organizer: 'Winzergemeinschaft',
-    quickFacts: [
-      'Über 20 Weine zur Verkostung',
-      'Regionale Winzer vor Ort',
-      'Pfälzer Spezialitäten',
-      'Sonnenuntergang-Atmosphäre'
-    ]
+  id: '2',
+  name: 'Winterverbrennung',
+  region: 'Festplatz Studernheim',
+  vibe: 'Feuer • Tradition • Gemeinschaft',
+  description: 'Mit der Winterverbrennung wird in Studernheim symbolisch der Winter verabschiedet und der Frühling begrüßt. Beim großen Feuer versammeln sich Jung und Alt, um gemeinsam diesen alten Brauch zu feiern. In gemütlicher Atmosphäre mit Essen, Getränken und guter Gesellschaft entsteht ein besonderes Erlebnis für das ganze Dorf.',
+  date: 'Februar / März',
+  image: '/images/winterverbrennung.jpg',
+  organizer: 'SAG Studernheim',
+  quickFacts: [
+    'Großes traditionelles Feuer',
+    'Brauchtum zum Winteraustreiben',
+    'Treffpunkt für Jung und Alt',
+    'Gemütliche Atmosphäre mit Verpflegung'
+  ]
   },
   {
     id: '3',
