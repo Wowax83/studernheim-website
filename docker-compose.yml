@@ -3,7 +3,7 @@ services:
     build: .
     container_name: studernheim-web
     ports:
-      - "3500:3000"
+      - "3501:3000"
     restart: unless-stopped
     environment:
       - NODE_ENV=production
