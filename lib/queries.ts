@@ -45,13 +45,20 @@ export async function getAllEvents() {
       ...*[_type == "fest" && date >= now()]{
         _id,
         name,
+        description,
         date,
+        location,
+        organizer,
         "type": "fest"
       },
       ...*[_type == "termine" && date >= now()]{
         _id,
         title,
+        description,
         date,
+        location,
+        organizer,
+        time,
         "type": "termin"
       }
     ] | order(date asc)[0...6]`,
