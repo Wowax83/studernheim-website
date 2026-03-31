@@ -13,6 +13,12 @@ export default {
       title: 'Datum',
       type: 'date',
     },
+
+    {
+      name: 'time',
+      title: 'Uhrzeit',
+      type: 'string',
+    },
     {
       name: 'description',
       title: 'Beschreibung',
