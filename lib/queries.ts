@@ -8,7 +8,7 @@ export async function getFeste() {
       name,
       description,
       date,
-      region,
+      "location": region,
       vibe,
       organizer,
       "image": image.asset->url,
