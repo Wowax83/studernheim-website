@@ -1,53 +1,137 @@
 'use client'
 
+import { motion } from 'framer-motion'
+import { Calendar, Clock, MapPin, User } from 'lucide-react'
+import { useInView } from 'react-intersection-observer'
+
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString('de-DE')
+}
+
 export default function TermineClient({ events }: { events: any[] }) {
+  const { ref, inView } = useInView({ triggerOnce: true })
+
   return (
-    <section className="py-20 px-6 max-w-5xl mx-auto">
-      <h2 className="text-3xl font-bold mb-8">Termine</h2>
+    <section id="termine" className="py-20 sm:py-28 bg-gradient-to-b from-emerald-50/30 to-white">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Header */}
+        <motion.div
+          ref={ref}
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h2 className="font-heading text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            Aktuelle <span className="gradient-text">Termine</span>
+          </h2>
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+            Verpassen Sie keine Veranstaltung - hier finden Sie alle kommenden Termine auf einen Blick.
+          </p>
+        </motion.div>
 
-      <div className="space-y-4">
-        {events.map((event) => {
-          const dateObj = new Date(event.date)
+        {/* Liste */}
+        <div className="space-y-4">
+          {events.map((event, index) => {
+            const dateObj = new Date(event.date)
 
-          const day = dateObj.toLocaleDateString('de-DE', { day: '2-digit' })
-          const month = dateObj.toLocaleDateString('de-DE', { month: 'short' })
+            return (
+              <motion.div
+                key={event._id}
+                initial={{ opacity: 0, x: -30 }}
+                animate={inView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
+              >
+                <div className="flex flex-col md:flex-row gap-6">
 
-          return (
-            <div
-              key={event._id}
-              className="flex items-center gap-6 p-5 rounded-2xl bg-white shadow-md hover:shadow-lg transition"
-            >
-              {/* Datum Box */}
-              <div className="bg-green-600 text-white rounded-xl px-4 py-3 text-center min-w-[70px]">
-                <div className="text-2xl font-bold">{day}</div>
-                <div className="text-xs uppercase">{month}</div>
-              </div>
+                  {/* Datum Box */}
+                  <div className="flex-shrink-0 w-24 h-24 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex flex-col items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+                    <div className="text-3xl font-bold">
+                      {dateObj.getDate()}
+                    </div>
+                    <div className="text-xs uppercase">
+                      {dateObj.toLocaleDateString('de-DE', { month: 'short' })}
+                    </div>
+                  </div>
 
-              {/* Inhalt */}
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">
-                  {event.name || event.title}
-                </h3>
+                  {/* Content */}
+                  <div className="flex-1">
+                    
+                    {/* Titel + Typ */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <h3 className="font-heading text-2xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">
+                        {event.name || event.title}
+                      </h3>
 
-                <p className="text-gray-500 text-sm mt-1">
-                  {event.description || ''}
-                </p>
+                      <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
+                        {event.type === 'fest' ? '🎉 Fest' : '📅 Termin'}
+                      </span>
+                    </div>
 
-                <div className="flex gap-6 text-sm text-gray-500 mt-2 flex-wrap">
-                  <span>
-                    📅 {dateObj.toLocaleDateString('de-DE')}
-                  </span>
+                    {/* Beschreibung */}
+                    {event.description && (
+                      <p className="text-gray-600 leading-relaxed mb-4">
+                        {event.description}
+                      </p>
+                    )}
 
-                  {event.type === 'fest' ? (
-                    <span>🎉 Fest</span>
-                  ) : (
-                    <span>📅 Termin</span>
-                  )}
+                    {/* Details */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Calendar size={16} className="text-green-600" />
+                        <span>{formatDate(event.date)}</span>
+                      </div>
+
+                      {event.time && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Clock size={16} className="text-green-600" />
+                          <span>{event.time}</span>
+                        </div>
+                      )}
+
+                      {event.location && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <MapPin size={16} className="text-green-600" />
+                          <span>{event.location}</span>
+                        </div>
+                      )}
+
+                      {event.organizer && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <User size={16} className="text-green-600" />
+                          <span>{event.organizer}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )
-        })}
+              </motion.div>
+            )
+          })}
+        </div>
+
+        {/* Footer CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="mt-12 text-center"
+        >
+          <p className="text-gray-600 mb-4">
+            Sie möchten keine Termine verpassen?
+          </p>
+          <button
+            onClick={() =>
+              document.getElementById('kontakt')?.scrollIntoView({ behavior: 'smooth' })
+            }
+            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
+          >
+            Newsletter abonnieren
+          </button>
+        </motion.div>
       </div>
     </section>
   )
