@@ -39,3 +39,25 @@ export async function getVereine() {
     }
   )
 }
+export async function getAllEvents() {
+  return await client.fetch(
+    `[
+      ...*[_type == "fest" && date >= now()]{
+        _id,
+        name,
+        date,
+        "type": "fest"
+      },
+      ...*[_type == "termine" && date >= now()]{
+        _id,
+        title,
+        date,
+        "type": "termin"
+      }
+    ] | order(date asc)[0...6]`,
+    {},
+    {
+      cache: "no-store"
+    }
+  )
+}
