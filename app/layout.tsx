@@ -41,7 +41,7 @@ export default function RootLayout({
       <head>
         <script src="https://apps.abacus.ai/chatllm/appllm-lib.js"></script>
       </head>
-      <body className="font-body antialiased">
+   <body className="font-body antialiased">
         {children}
       </body>
     </html>
