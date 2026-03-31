@@ -14,6 +14,21 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   images: { unoptimized: true },
+
+  async rewrites() {
+    return [
+      {
+        source: '/',
+        has: [
+          {
+            type: 'host',
+            value: 'admin.studrum.de',
+          },
+        ],
+        destination: '/studio',
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
