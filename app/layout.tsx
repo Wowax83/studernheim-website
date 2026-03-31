@@ -1,20 +1,12 @@
 import type { Metadata } from 'next'
-import { Space_Grotesk, Inter } from 'next/font/google'
+// import { Space_Grotesk, Inter } from 'next/font/google'
 import './globals.css'
 
 export const dynamic = 'force-dynamic'
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-heading',
-  display: 'swap',
-})
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-body',
-  display: 'swap',
-})
+// ❌ Fonts deaktiviert (wegen Build Problem)
+// const spaceGrotesk = Space_Grotesk({...})
+// const inter = Inter({...})
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXTAUTH_URL ?? 'http://localhost:3000'),
@@ -49,7 +41,7 @@ export default function RootLayout({
       <head>
         <script src="https://apps.abacus.ai/chatllm/appllm-lib.js"></script>
       </head>
-      <body className={`${spaceGrotesk.variable} ${inter.variable} font-body antialiased`}>
+      <body className="font-body antialiased">
         {children}
       </body>
     </html>
