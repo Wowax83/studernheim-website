@@ -6,7 +6,7 @@ export default {
     { name: 'name', type: 'string', title: 'Name' },
     { name: 'slug', type: 'slug', options: { source: 'name' } },
     { name: 'description', type: 'text', title: 'Beschreibung' },
-    { name: 'date', type: 'string', title: 'Datum' },
+    { name: 'date', title: 'Datum', type: 'date', },
     { name: 'region', type: 'string', title: 'Ort' },
 
     // 👇 NEU
