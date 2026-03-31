@@ -42,16 +42,16 @@ export async function getVereine() {
 export async function getAllEvents() {
   return await client.fetch(
     `[
-      ...*[_type == "fest" && date >= now()]{
+      ...*[_type == "fest" && date >= string::split(now(), "T")[0]]{
         _id,
         name,
         description,
         date,
-        location,
+        "location": region,
         organizer,
         "type": "fest"
       },
-      ...*[_type == "termine" && date >= now()]{
+      ...*[_type == "termine" && date >= string::split(now(), "T")[0]]{
         _id,
         title,
         description,
