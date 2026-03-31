@@ -18,14 +18,14 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/',
+        source: '/:path*',
         has: [
           {
             type: 'host',
             value: 'admin.studrum.de',
           },
         ],
-        destination: '/studio',
+        destination: '/studio/:path*',
       },
     ];
   },
