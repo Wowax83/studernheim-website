@@ -6,7 +6,7 @@ export default {
     { name: 'name', type: 'string', title: 'Name' },
     { name: 'slug', type: 'slug', options: { source: 'name' } },
     { name: 'description', type: 'text', title: 'Beschreibung' },
-    { name: 'date', title: 'Datum', type: 'date', },
+    { name: 'date', title: 'Datum', type: 'date' },
     { name: 'region', type: 'string', title: 'Ort' },
 
     // 👇 NEU
@@ -16,10 +16,26 @@ export default {
     { name: 'image', type: 'image', title: 'Bild' },
 
     {
-      name: 'quickFacts',
-      type: 'array',
+      name: 'highlights',
       title: 'Highlights',
-      of: [{ type: 'string' }]
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'text',
+              title: 'Text',
+              type: 'string'
+            },
+            {
+              name: 'url',
+              title: 'Link',
+              type: 'url'
+            }
+          ]
+        }
+      ]
     }
   ]
 }
