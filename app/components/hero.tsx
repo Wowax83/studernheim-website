@@ -60,29 +60,6 @@ export default function Hero() {
           Ein Dorf voller Leben, Tradition und Gemeinschaft
         </motion.p>
 
-        {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-4"
-        >
-          <button
-            onClick={() => document.getElementById('sag')?.scrollIntoView({ behavior: 'smooth' })}
-            className="group relative px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-heading font-bold text-lg overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-300"
-          >
-            <span className="relative z-10">Entdecke die SAG</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-green-700 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
-          
-          <button
-            onClick={() => document.getElementById('feste')?.scrollIntoView({ behavior: 'smooth' })}
-            className="px-8 py-4 glass text-white rounded-lg font-heading font-bold text-lg hover:bg-white/30 hover:scale-105 transition-all duration-300"
-          >
-            Unsere Feste
-          </button>
-        </motion.div>
-
         {/* Scroll Indicator */}
         <motion.button
           onClick={scrollToNext}
