@@ -52,7 +52,7 @@ export default function VereineClient({ vereine }: any) {
                 <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
                   <Image
                     src={verein.image}
-                    alt={verein.name}
+                    alt={verein.title}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                   />
@@ -64,7 +64,7 @@ export default function VereineClient({ vereine }: any) {
 
                 {/* Title */}
                 <h3 className="font-heading text-2xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
-                  {verein.name}
+                  {verein.title}
                 </h3>
 
                 {/* Category */}
@@ -108,7 +108,18 @@ export default function VereineClient({ vereine }: any) {
                 {verein.contact && (
                   <div className="flex items-center gap-2 text-xs text-gray-500 mt-4">
                     <Users size={14} />
-                    {verein.contact}
+                    <div className="flex flex-col">
+                      {verein.contact.name && <span>{verein.contact.name}</span>}
+                      {verein.contact.email && (
+                        <a
+                          href={`mailto:${verein.contact.email}`}
+                          className="text-green-600 hover:underline"
+                        >
+                          {verein.contact.email}
+                        </a>
+                      )}
+                      {verein.contact.phone && <span>{verein.contact.phone}</span>}
+                    </div>
                   </div>
                 )}
 
@@ -116,6 +127,7 @@ export default function VereineClient({ vereine }: any) {
             </motion.div>
           ))}
         </div>
+
       </div>
     </section>
   )
