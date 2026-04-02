@@ -9,26 +9,17 @@ export default function Impressum() {
           <h2 className="text-xl font-semibold">Angaben gemäß § 5 TMG</h2>
           <p>
             Studernheim Webseite<br />
-            (z. B. Ortsgemeinschaft / Verein)<br />
-            Musterstraße 1<br />
-            67227 Frankenthal (Pfalz)<br />
-            Deutschland
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-semibold">Vertreten durch</h2>
-          <p>
             Waldemar Merdian<br />
-            (oder offizieller Ansprechpartner)
+            Musterstraße 1<br />
+            67227 Frankenthal<br />
+            Deutschland
           </p>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold">Kontakt</h2>
           <p>
-            E-Mail: info@studernheim.de<br />
-            Telefon: optional
+            E-Mail: info@studernheim.de
           </p>
         </section>
 
@@ -44,15 +35,15 @@ export default function Impressum() {
         <section>
           <h2 className="text-xl font-semibold">Haftung für Links</h2>
           <p>
-            Unsere Website enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben.
-            Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen.
+            Unsere Website enthält Links zu externen Websites Dritter.
+            Auf deren Inhalte haben wir keinen Einfluss.
           </p>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold">Urheberrecht</h2>
           <p>
-            Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht.
+            Die Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht.
           </p>
         </section>
 
