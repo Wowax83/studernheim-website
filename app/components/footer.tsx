@@ -6,8 +6,10 @@ export default function Footer() {
   return (
     <footer className="bg-gradient-to-b from-gray-900 to-black text-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+
           {/* Branding */}
           <div>
             <h3 className="font-heading text-2xl font-bold gradient-text mb-4">
@@ -56,6 +58,24 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+
+          {/* 👉 NEU: Rechtliches */}
+          <div>
+            <h4 className="font-heading font-bold text-lg mb-4">Rechtliches</h4>
+            <ul className="space-y-2">
+              <li>
+                <a href="/impressum" className="text-gray-400 hover:text-green-400 transition-colors">
+                  Impressum
+                </a>
+              </li>
+              <li>
+                <a href="/datenschutz" className="text-gray-400 hover:text-green-400 transition-colors">
+                  Datenschutz
+                </a>
+              </li>
+            </ul>
+          </div>
+
         </div>
 
         {/* Image Credits */}
