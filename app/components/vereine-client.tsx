@@ -14,7 +14,7 @@ threshold: 0.05
 
 const [hoveredCard, setHoveredCard] = useState<string | null>(null)
 
-// 👉 Funktion: erkennt URLs im Text und macht sie klickbar
+
 const renderTextWithLinks = (text: string) => {
 const urlRegex = /(https?://[^\s]+)/g
 
