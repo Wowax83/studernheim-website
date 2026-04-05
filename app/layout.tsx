@@ -40,13 +40,7 @@ export default function RootLayout({
         {children}
 
         {/* ✅ Cookie Banner */}
-        <CookieBanner />
-
-        {/* ⚠️ Externes Script DSGVO sicher laden */}
-        <script
-          src="https://apps.abacus.ai/chatllm/appllm-lib.js"
-          async
-        ></script>
+        <CookieBanner />   
       </body>
     </html>
   )
