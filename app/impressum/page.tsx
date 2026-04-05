@@ -8,18 +8,33 @@ export default function Impressum() {
         <section>
           <h2 className="text-xl font-semibold">Angaben gemäß § 5 TMG</h2>
           <p>
-            Studernheim Webseite<br />
-            Waldemar Merdian<br />
-            Musterstraße 1<br />
+            Studernheimer Arbeitsgemeinschaft (SAG) e.V.<br />
+            Oggersheimer Str. 14<br />
             67227 Frankenthal<br />
             Deutschland
           </p>
         </section>
 
         <section>
+          <h2 className="text-xl font-semibold">Registereintrag</h2>
+          <p>
+            Eingetragen im Vereinsregister<br />
+            Registergericht: Amtsgericht Ludwigshafen<br />
+            Registernummer: VR 61466
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold">Vertreten durch</h2>
+          <p>
+            Der Vorstand
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-xl font-semibold">Kontakt</h2>
           <p>
-            E-Mail: info@studernheim.de
+            E-Mail: studernheim.ag@gmail.com
           </p>
         </section>
 
@@ -37,6 +52,7 @@ export default function Impressum() {
           <p>
             Unsere Website enthält Links zu externen Websites Dritter.
             Auf deren Inhalte haben wir keinen Einfluss.
+            Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter verantwortlich.
           </p>
         </section>
 
@@ -44,6 +60,7 @@ export default function Impressum() {
           <h2 className="text-xl font-semibold">Urheberrecht</h2>
           <p>
             Die Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht.
+            Vervielfältigung, Bearbeitung und Verwertung bedürfen der Zustimmung des jeweiligen Autors.
           </p>
         </section>
 
