@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import CookieBanner from '@/components/cookie-banner'
+import Navbar from '@/components/Navbar'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,10 +38,18 @@ export default function RootLayout({
   return (
     <html lang="de" className="scroll-smooth">
       <body className="font-body antialiased">
-        {children}
+
+        {/* ✅ Navbar */}
+        <Navbar />
+
+        {/* ✅ Seiteninhalt */}
+        <main className="pt-20">
+          {children}
+        </main>
 
         {/* ✅ Cookie Banner */}
-        <CookieBanner />   
+        <CookieBanner />
+
       </body>
     </html>
   )
