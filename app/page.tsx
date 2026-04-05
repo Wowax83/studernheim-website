@@ -1,4 +1,3 @@
-import Navbar from './components/navbar'
 import Hero from './components/hero'
 import SAG from './components/sag'
 import Feste from './components/feste'
