@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import CookieBanner from '@/components/cookie-banner'
-import Navbar from '@/components/navbar'
+import Navbar from '@/app/components/navbar'
 
 export const dynamic = 'force-dynamic'
 
