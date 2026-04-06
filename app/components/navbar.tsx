@@ -22,7 +22,6 @@ export default function Navbar() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
 
-      // Nur auf Startseite Sections checken
       if (window.location.pathname !== '/') return
 
       const sections = navigation.map(item => item.href.split('#')[1])
@@ -31,13 +30,15 @@ export default function Navbar() {
         const element = document.getElementById(section)
         if (element) {
           const rect = element.getBoundingClientRect()
-          return rect.top <= 100 && rect.bottom >= 100
+          return rect.top <= 120 && rect.bottom >= 120
         }
         return false
       })
 
       if (current) {
         setActiveSection(current)
+      } else {
+        setActiveSection('')
       }
     }
 
@@ -45,16 +46,23 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const handleClick = (href: string) => {
+  const scrollToSection = (href: string) => {
     setIsMobileMenuOpen(false)
 
-    // Wenn nicht auf Startseite → normal navigieren
     if (window.location.pathname !== '/') return
 
-    // Smooth scroll nur auf Startseite
     const id = href.split('#')[1]
     const element = document.getElementById(id)
-    element?.scrollIntoView({ behavior: 'smooth' })
+
+    if (element) {
+      const yOffset = -80
+      const y =
+        element.getBoundingClientRect().top +
+        window.pageYOffset +
+        yOffset
+
+      window.scrollTo({ top: y, behavior: 'smooth' })
+    }
   }
 
   return (
@@ -62,32 +70,39 @@ export default function Navbar() {
       <nav
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-          isScrolled ? 'glass shadow-lg' : 'bg-transparent'
+          isScrolled
+            ? 'glass backdrop-blur-xl shadow-xl'
+            : 'bg-transparent'
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div
+            className={cn(
+              'flex justify-between items-center transition-all duration-300',
+              isScrolled ? 'h-14' : 'h-16'
+            )}
+          >
 
             {/* Logo */}
             <Link
               href="/"
-              className="font-heading text-2xl font-bold gradient-text hover:scale-105 transition-transform"
+              className="font-heading text-2xl font-bold gradient-text hover:scale-110 transition-all duration-300"
             >
               Studernheim
             </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-1">
+            {/* Desktop */}
+            <div className="hidden md:flex items-center space-x-2">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => handleClick(item.href)}
+                  onClick={() => scrollToSection(item.href)}
                   className={cn(
-                    'px-4 py-2 rounded-lg font-medium transition-all duration-200',
+                    'nav-item nav-glow',
                     activeSection === item.href.split('#')[1]
-                      ? 'text-green-600 bg-green-50'
-                      : 'text-gray-700 hover:text-green-600 hover:bg-gray-50'
+                      ? 'text-green-600 bg-white/60 shadow-sm'
+                      : 'text-gray-700 hover:text-green-600'
                   )}
                 >
                   {item.name}
@@ -96,17 +111,17 @@ export default function Navbar() {
 
               <Link
                 href="/#kontakt"
-                onClick={() => handleClick('/#kontakt')}
-                className="ml-4 px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
+                onClick={() => scrollToSection('/#kontakt')}
+                className="ml-3 px-5 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full font-medium shadow-lg hover:scale-105 hover:shadow-xl transition-all"
               >
                 Kontakt
               </Link>
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -116,19 +131,14 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden glass border-t border-gray-200">
+          <div className="md:hidden glass backdrop-blur-xl border-t border-white/20">
             <div className="px-4 py-4 space-y-2">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => handleClick(item.href)}
-                  className={cn(
-                    'block w-full text-left px-4 py-3 rounded-lg font-medium transition-all',
-                    activeSection === item.href.split('#')[1]
-                      ? 'text-green-600 bg-green-50'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  )}
+                  onClick={() => scrollToSection(item.href)}
+                  className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-white/50 transition"
                 >
                   {item.name}
                 </Link>
@@ -136,19 +146,20 @@ export default function Navbar() {
 
               <Link
                 href="/#kontakt"
-                onClick={() => handleClick('/#kontakt')}
-                className="block w-full px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+                onClick={() => scrollToSection('/#kontakt')}
+                className="block px-4 py-3 bg-green-600 text-white rounded-lg text-center font-medium"
               >
                 Kontakt
               </Link>
 
-              {/* Zusatz Links */}
-              <Link href="/impressum" className="block px-4 py-2 text-sm text-gray-500">
-                Impressum
-              </Link>
-              <Link href="/datenschutz" className="block px-4 py-2 text-sm text-gray-500">
-                Datenschutz
-              </Link>
+              <div className="pt-2 border-t border-gray-200">
+                <Link href="/impressum" className="block px-4 py-2 text-sm text-gray-500">
+                  Impressum
+                </Link>
+                <Link href="/datenschutz" className="block px-4 py-2 text-sm text-gray-500">
+                  Datenschutz
+                </Link>
+              </div>
             </div>
           </div>
         )}
@@ -157,7 +168,7 @@ export default function Navbar() {
       {/* Floating Mobile CTA */}
       <Link
         href="/#kontakt"
-        onClick={() => handleClick('/#kontakt')}
+        onClick={() => scrollToSection('/#kontakt')}
         className="md:hidden fixed bottom-6 right-6 z-40 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full font-medium shadow-2xl hover:scale-110 transition-transform"
       >
         Kontakt
