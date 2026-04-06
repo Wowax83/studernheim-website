@@ -9,7 +9,10 @@ export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null)
   const { scrollY } = useScroll()
 
+  // 🔥 Parallax + Drift + Zoom
   const y = useTransform(scrollY, [0, 500], [0, 120])
+  const x = useTransform(scrollY, [0, 500], [0, 50]) // 👉 seitlicher Drift
+  const scale = useTransform(scrollY, [0, 500], [1, 1.05]) // 👉 leichter Zoom
   const opacity = useTransform(scrollY, [0, 300], [1, 0])
 
   const scrollToNext = () => {
@@ -20,7 +23,10 @@ export default function Hero() {
     <section ref={containerRef} className="relative h-screen w-full overflow-hidden">
       
       {/* Background Image */}
-      <motion.div style={{ y }} className="absolute inset-0">
+      <motion.div
+        style={{ y, x, scale, willChange: 'transform' }} // 🔥 HIER geändert
+        className="absolute inset-0"
+      >
         <Image
           src="/hero.webp"
           alt="Studernheim Landschaft"
@@ -31,11 +37,11 @@ export default function Hero() {
           className="object-cover"
         />
 
-        {/* 🔥 Besseres Overlay */}
+        {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/70" />
       </motion.div>
 
-      {/* Optional Aurora (kann bleiben) */}
+      {/* Aurora */}
       <div className="absolute inset-0 aurora pointer-events-none" />
 
       {/* Content */}
