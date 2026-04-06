@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import {
   motion,
   useScroll,
@@ -15,31 +15,54 @@ export default function Hero() {
 
   const { scrollY } = useScroll()
 
-  // 🔥 Scroll Effects
-  const y = useTransform(scrollY, [0, 500], [0, 120])
-  const x = useTransform(scrollY, [0, 500], [0, 50])
-  const scale = useTransform(scrollY, [0, 500], [1, 1.05])
-  const blur = useTransform(scrollY, [0, 300], [0, 6])
+  // 🔥 Scroll Effects (dezenter)
+  const y = useTransform(scrollY, [0, 500], [0, 100])
+  const x = useTransform(scrollY, [0, 500], [0, 40])
+  const scale = useTransform(scrollY, [0, 500], [1, 1.04])
+  const blur = useTransform(scrollY, [0, 300], [0, 2]) // 👈 reduziert
   const blurPx = useTransform(blur, (v) => `blur(${v}px)`)
   const opacity = useTransform(scrollY, [0, 300], [1, 0])
 
-  // 🔥 Mouse Movement
+  // 🔥 Mouse Movement (dezenter)
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const { innerWidth, innerHeight } = window
 
-    const moveX = (e.clientX / innerWidth - 0.5) * 30
-    const moveY = (e.clientY / innerHeight - 0.5) * 30
+    const moveX = (e.clientX / innerWidth - 0.5) * 20
+    const moveY = (e.clientY / innerHeight - 0.5) * 20
 
     mouseX.set(moveX)
     mouseY.set(moveY)
   }
 
-  // 🔥 Combine Scroll + Mouse (Type-safe)
-  const xTotal = useTransform([x, mouseX], (values: number[]) => values[0] + values[1])
-  const yTotal = useTransform([y, mouseY], (values: number[]) => values[0] + values[1])
+  // 🔥 Idle Movement (immer Bewegung)
+  const idleX = useMotionValue(0)
+  const idleY = useMotionValue(0)
+
+  useEffect(() => {
+    let direction = 1
+
+    const interval = setInterval(() => {
+      direction *= -1
+      idleX.set(direction * 8)
+      idleY.set(direction * 4)
+    }, 4000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // 🔥 Combine Scroll + Mouse + Idle
+  const xTotal = useTransform(
+    [x, mouseX, idleX],
+    (v: number[]) => v[0] + v[1] + v[2]
+  )
+
+  const yTotal = useTransform(
+    [y, mouseY, idleY],
+    (v: number[]) => v[0] + v[1] + v[2]
+  )
 
   const scrollToNext = () => {
     document.getElementById('sag')?.scrollIntoView({ behavior: 'smooth' })
@@ -72,14 +95,47 @@ export default function Hero() {
           className="object-cover"
         />
 
-        {/* 🌅 Cinematic Gradient */}
+        {/* 🌅 Grund Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/70" />
 
-        {/* 🌞 Light Glow */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-yellow-300/10 via-transparent to-transparent" />
+        {/* 🌞 BEWEGTE LICHTQUELLE 🔥 */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          animate={{
+            x: [0, 40, -30, 0],
+            y: [0, -20, 30, 0]
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+          style={{
+            background:
+              'radial-gradient(circle at 30% 30%, rgba(255, 220, 120, 0.25), transparent 60%)'
+          }}
+        />
+
+        {/* 🌞 zweites Licht für Tiefe */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          animate={{
+            x: [0, -20, 20, 0],
+            y: [0, 30, -20, 0]
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+          style={{
+            background:
+              'radial-gradient(circle at 70% 70%, rgba(255, 200, 100, 0.15), transparent 70%)'
+          }}
+        />
       </motion.div>
 
-      {/* Optional Aurora */}
+      {/* Aurora optional */}
       <div className="absolute inset-0 aurora pointer-events-none" />
 
       {/* Content */}
