@@ -29,16 +29,16 @@ export default function Hero() {
   const handleMouseMove = (e: React.MouseEvent) => {
     const { innerWidth, innerHeight } = window
 
-    const x = (e.clientX / innerWidth - 0.5) * 30
-    const y = (e.clientY / innerHeight - 0.5) * 30
+    const moveX = (e.clientX / innerWidth - 0.5) * 30
+    const moveY = (e.clientY / innerHeight - 0.5) * 30
 
-    mouseX.set(x)
-    mouseY.set(y)
+    mouseX.set(moveX)
+    mouseY.set(moveY)
   }
 
-  // 🔥 Combine Scroll + Mouse
-  const xTotal = useTransform([x, mouseX], ([scrollX, mouseX]) => scrollX + mouseX)
-  const yTotal = useTransform([y, mouseY], ([scrollY, mouseY]) => scrollY + mouseY)
+  // 🔥 Combine Scroll + Mouse (SAFE VERSION)
+  const xTotal = useTransform([x, mouseX], (values) => values[0] + values[1])
+  const yTotal = useTransform([y, mouseY], (values) => values[0] + values[1])
 
   const scrollToNext = () => {
     document.getElementById('sag')?.scrollIntoView({ behavior: 'smooth' })
@@ -56,7 +56,7 @@ export default function Hero() {
           x: xTotal,
           y: yTotal,
           scale,
-          filter: blur.to(v => `blur(${v}px)`),
+          filter: blur.to((v) => `blur(${v}px)`),
           willChange: 'transform'
         }}
         className="absolute inset-0"
