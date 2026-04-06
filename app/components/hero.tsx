@@ -37,8 +37,8 @@ export default function Hero() {
   }
 
   // 🔥 Combine Scroll + Mouse (SAFE VERSION)
-  const xTotal = useTransform([x, mouseX], (values) => values[0] + values[1])
-  const yTotal = useTransform([y, mouseY], (values) => values[0] + values[1])
+  const xTotal = useTransform([x, mouseX], (values: number[]) => values[0] + values[1])
+  const yTotal = useTransform([y, mouseY], (values: number[]) => values[0] + values[1])
 
   const scrollToNext = () => {
     document.getElementById('sag')?.scrollIntoView({ behavior: 'smooth' })
