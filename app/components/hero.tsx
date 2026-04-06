@@ -1,11 +1,12 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import {
   motion,
   useScroll,
   useTransform,
-  useMotionValue
+  useMotionValue,
+  useSpring
 } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
@@ -15,15 +16,18 @@ export default function Hero() {
 
   const { scrollY } = useScroll()
 
-  // 🔥 Scroll Effects (dezenter)
+  // 🔥 Scroll Effects (dezent & smooth)
   const y = useTransform(scrollY, [0, 500], [0, 100])
   const x = useTransform(scrollY, [0, 500], [0, 40])
   const scale = useTransform(scrollY, [0, 500], [1, 1.04])
-  const blur = useTransform(scrollY, [0, 300], [0, 2]) // 👈 reduziert
+
+  // 🔥 Blur (dezent)
+  const blur = useTransform(scrollY, [0, 300], [0, 2])
   const blurPx = useTransform(blur, (v) => `blur(${v}px)`)
+
   const opacity = useTransform(scrollY, [0, 300], [1, 0])
 
-  // 🔥 Mouse Movement (dezenter)
+  // 🔥 Mouse Movement (weich)
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
@@ -37,32 +41,13 @@ export default function Hero() {
     mouseY.set(moveY)
   }
 
-  // 🔥 Idle Movement (immer Bewegung)
-  const idleX = useMotionValue(0)
-  const idleY = useMotionValue(0)
+  // 🔥 Combine Scroll + Mouse
+  const xTotal = useTransform([x, mouseX], (v: number[]) => v[0] + v[1])
+  const yTotal = useTransform([y, mouseY], (v: number[]) => v[0] + v[1])
 
-  useEffect(() => {
-    let direction = 1
-
-    const interval = setInterval(() => {
-      direction *= -1
-      idleX.set(direction * 8)
-      idleY.set(direction * 4)
-    }, 4000)
-
-    return () => clearInterval(interval)
-  }, [])
-
-  // 🔥 Combine Scroll + Mouse + Idle
-  const xTotal = useTransform(
-    [x, mouseX, idleX],
-    (v: number[]) => v[0] + v[1] + v[2]
-  )
-
-  const yTotal = useTransform(
-    [y, mouseY, idleY],
-    (v: number[]) => v[0] + v[1] + v[2]
-  )
+  // 🔥 Smooth easing (kein Ruckeln)
+  const smoothX = useSpring(xTotal, { stiffness: 40, damping: 20 })
+  const smoothY = useSpring(yTotal, { stiffness: 40, damping: 20 })
 
   const scrollToNext = () => {
     document.getElementById('sag')?.scrollIntoView({ behavior: 'smooth' })
@@ -74,16 +59,25 @@ export default function Hero() {
       onMouseMove={handleMouseMove}
       className="relative h-screen w-full overflow-hidden"
     >
-      {/* 🎬 Background Image */}
+      {/* 🎬 Background */}
       <motion.div
+        animate={{
+          x: [0, 10, -10, 0],
+          y: [0, -5, 5, 0]
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
         style={{
-          x: xTotal,
-          y: yTotal,
+          x: smoothX,
+          y: smoothY,
           scale,
           filter: blurPx,
           willChange: 'transform'
         }}
-        className="absolute inset-0"
+        className="absolute -inset-10" // 🔥 verhindert weiße Ränder
       >
         <Image
           src="/hero.webp"
@@ -98,30 +92,12 @@ export default function Hero() {
         {/* 🌅 Grund Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/70" />
 
-        {/* 🌞 BEWEGTE LICHTQUELLE 🔥 */}
+        {/* 🌞 Bewegte Lichtquelle */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
           animate={{
             x: [0, 40, -30, 0],
             y: [0, -20, 30, 0]
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: 'easeInOut'
-          }}
-          style={{
-            background:
-              'radial-gradient(circle at 30% 30%, rgba(255, 220, 120, 0.25), transparent 60%)'
-          }}
-        />
-
-        {/* 🌞 zweites Licht für Tiefe */}
-        <motion.div
-          className="absolute inset-0 pointer-events-none"
-          animate={{
-            x: [0, -20, 20, 0],
-            y: [0, 30, -20, 0]
           }}
           transition={{
             duration: 25,
@@ -130,7 +106,25 @@ export default function Hero() {
           }}
           style={{
             background:
-              'radial-gradient(circle at 70% 70%, rgba(255, 200, 100, 0.15), transparent 70%)'
+              'radial-gradient(circle at 30% 30%, rgba(255,220,120,0.2), transparent 60%)'
+          }}
+        />
+
+        {/* 🌞 zweite Lichtquelle */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          animate={{
+            x: [0, -20, 20, 0],
+            y: [0, 30, -20, 0]
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+          style={{
+            background:
+              'radial-gradient(circle at 70% 70%, rgba(255,200,100,0.12), transparent 70%)'
           }}
         />
       </motion.div>
@@ -161,11 +155,10 @@ export default function Hero() {
           Ein Dorf voller Leben, Tradition und Gemeinschaft
         </motion.p>
 
-        {/* Scroll Indicator */}
+        {/* Scroll */}
         <motion.button
           onClick={scrollToNext}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/80 hover:text-white transition"
-          aria-label="Scroll down"
         >
           <motion.div
             animate={{ y: [0, 10, 0] }}
