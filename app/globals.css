@@ -2,58 +2,89 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================
+   🌍 BASE COLORS
+========================= */
 @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
     --primary: 142 76% 36%;
-    --primary-foreground: 144 76% 96%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 142 76% 36%;
     --radius: 0.5rem;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
+/* =========================
+   ✨ UTILITIES
+========================= */
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  
+
+  /* 🧊 GLASS EFFECT (Premium) */
   .glass {
-    @apply bg-white/80 backdrop-blur-xl border border-white/20;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
   }
-  
+
+  /* 🌙 Dark Mode */
+  @media (prefers-color-scheme: dark) {
+    .glass {
+      background: rgba(20, 20, 20, 0.6);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  /* 💎 NAV ITEMS */
+  .nav-item {
+    @apply relative px-4 py-2 rounded-lg font-medium transition-all duration-300;
+  }
+
+  .nav-item::after {
+    content: '';
+    position: absolute;
+    left: 10%;
+    bottom: 4px;
+    width: 0%;
+    height: 2px;
+    background: linear-gradient(to right, #22c55e, #10b981);
+    transition: width 0.3s ease;
+  }
+
+  .nav-item:hover::after {
+    width: 80%;
+  }
+
+  /* 🔥 Glow Hover */
+  .nav-glow:hover {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  }
+
+  /* 🌈 Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-green-600 via-emerald-500 to-teal-600 bg-clip-text text-transparent;
+  }
+
+  /* 💫 Glow Ring */
   .glow-ring {
     @apply ring-2 ring-primary/20 hover:ring-primary/40 transition-all duration-300;
   }
-  
+
+  /* 🔳 Animated Border */
   .animated-border {
     position: relative;
     border-radius: 0.5rem;
   }
-  
+
   .animated-border::before {
     content: '';
     position: absolute;
@@ -66,24 +97,22 @@
     mask-composite: exclude;
     animation: rotate 3s linear infinite;
   }
-  
+
   @keyframes rotate {
     to {
       transform: rotate(360deg);
     }
   }
-  
-  .gradient-text {
-    @apply bg-gradient-to-r from-green-600 via-emerald-500 to-teal-600 bg-clip-text text-transparent;
-  }
-  
+
+  /* 🌌 Aurora Background */
   .aurora {
-    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34, 197, 94, 0.3), transparent),
-                radial-gradient(ellipse 60% 50% at 90% 50%, rgba(59, 130, 246, 0.2), transparent),
-                radial-gradient(ellipse 60% 50% at 10% 50%, rgba(168, 85, 247, 0.2), transparent);
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34, 197, 94, 0.3), transparent),
+      radial-gradient(ellipse 60% 50% at 90% 50%, rgba(59, 130, 246, 0.2), transparent),
+      radial-gradient(ellipse 60% 50% at 10% 50%, rgba(168, 85, 247, 0.2), transparent);
     animation: aurora-animation 10s ease-in-out infinite;
   }
-  
+
   @keyframes aurora-animation {
     0%, 100% {
       opacity: 1;
@@ -94,8 +123,13 @@
       transform: scale(1.1);
     }
   }
-  
-  /* Hide hydration errors */
+
+  /* 🧠 Text Balance */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* 🚫 Hydration Fix */
   [data-hydration-error] {
     display: none !important;
   }
