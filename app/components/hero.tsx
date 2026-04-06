@@ -1,30 +1,64 @@
 'use client'
 
 import { useRef } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useMotionValue
+} from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null)
+
   const { scrollY } = useScroll()
 
-  // 🔥 Parallax + Drift + Zoom
+  // 🔥 Scroll Effects
   const y = useTransform(scrollY, [0, 500], [0, 120])
-  const x = useTransform(scrollY, [0, 500], [0, 50]) // 👉 seitlicher Drift
-  const scale = useTransform(scrollY, [0, 500], [1, 1.05]) // 👉 leichter Zoom
+  const x = useTransform(scrollY, [0, 500], [0, 50])
+  const scale = useTransform(scrollY, [0, 500], [1, 1.05])
+  const blur = useTransform(scrollY, [0, 300], [0, 6])
   const opacity = useTransform(scrollY, [0, 300], [1, 0])
+
+  // 🔥 Mouse Movement
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const { innerWidth, innerHeight } = window
+
+    const x = (e.clientX / innerWidth - 0.5) * 30
+    const y = (e.clientY / innerHeight - 0.5) * 30
+
+    mouseX.set(x)
+    mouseY.set(y)
+  }
+
+  // 🔥 Combine Scroll + Mouse
+  const xTotal = useTransform([x, mouseX], ([scrollX, mouseX]) => scrollX + mouseX)
+  const yTotal = useTransform([y, mouseY], ([scrollY, mouseY]) => scrollY + mouseY)
 
   const scrollToNext = () => {
     document.getElementById('sag')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
-    <section ref={containerRef} className="relative h-screen w-full overflow-hidden">
-      
-      {/* Background Image */}
+    <section
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className="relative h-screen w-full overflow-hidden"
+    >
+      {/* 🎬 Background Image */}
       <motion.div
-        style={{ y, x, scale, willChange: 'transform' }} // 🔥 HIER geändert
+        style={{
+          x: xTotal,
+          y: yTotal,
+          scale,
+          filter: blur.to(v => `blur(${v}px)`),
+          willChange: 'transform'
+        }}
         className="absolute inset-0"
       >
         <Image
@@ -37,11 +71,14 @@ export default function Hero() {
           className="object-cover"
         />
 
-        {/* Overlay */}
+        {/* 🌅 Cinematic Gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/70" />
+
+        {/* 🌞 Light Glow */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-yellow-300/10 via-transparent to-transparent" />
       </motion.div>
 
-      {/* Aurora */}
+      {/* Optional Aurora */}
       <div className="absolute inset-0 aurora pointer-events-none" />
 
       {/* Content */}
