@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Users, Info } from 'lucide-react'
+import { Users } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 
@@ -13,30 +13,6 @@ export default function VereineClient({ vereine }: any) {
   })
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-
-  // ✅ FIXED: Links korrekt erkennen
-  const renderTextWithLinks = (text: string) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g
-    const parts = text.split(urlRegex)
-
-    const isUrl = (str: string) => /^https?:\/\/[^\s]+$/.test(str)
-
-    return parts.map((part, index) =>
-      isUrl(part) ? (
-        <a
-          key={index}
-          href={part}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-green-600 underline break-all"
-        >
-          {part}
-        </a>
-      ) : (
-        part
-      )
-    )
-  }
 
   return (
     <section id="vereine" className="py-20 sm:py-28 bg-white">
@@ -79,6 +55,7 @@ export default function VereineClient({ vereine }: any) {
                     alt={verein.title}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                   />
                 </div>
               )}
@@ -88,7 +65,7 @@ export default function VereineClient({ vereine }: any) {
 
                 {/* Title */}
                 <h3 className="font-heading text-2xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
-                  {verein.title}
+                  {verein.title || 'Kein Name'}
                 </h3>
 
                 {/* Category */}
@@ -105,28 +82,33 @@ export default function VereineClient({ vereine }: any) {
                   </p>
                 )}
 
-                {/* Quick Facts */}
-                {hoveredCard === verein._id && verein.quickFacts && (
+                {/* 🔥 Highlights (nur bei Hover) */}
+                {hoveredCard === verein._id && verein.highlights && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="border-t border-gray-200 pt-4 mt-4 space-y-2"
+                    className="border-t border-gray-200 pt-4 mt-4 flex flex-wrap gap-2"
                   >
-                    <div className="flex items-start gap-2 text-sm">
-                      <Info size={16} className="text-green-600 mt-0.5" />
-                      <div>
-                        <p className="font-semibold text-gray-900 mb-1">
-                          Details:
-                        </p>
-                        <ul className="space-y-1 text-gray-600">
-                          {verein.quickFacts.map((fact: string, i: number) => (
-                            <li key={i} className="text-xs">
-                              • {renderTextWithLinks(fact)}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
+                    {verein.highlights.map((item: any, i: number) =>
+                      item.url ? (
+                        <a
+                          key={i}
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition"
+                        >
+                          {item.text}
+                        </a>
+                      ) : (
+                        <span
+                          key={i}
+                          className="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full"
+                        >
+                          {item.text}
+                        </span>
+                      )
+                    )}
                   </motion.div>
                 )}
 
