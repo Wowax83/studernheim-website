@@ -24,14 +24,14 @@ export async function getFeste() {
 // 🔥 Vereine holen
 export async function getVereine() {
   return await client.fetch(
-    `*[_type == "verein"] | order(name asc){
+    `*[_type == "verein"] | order(title asc){
       _id,
-      name,
+      title,
       description,
       category,
       contact,
       "image": image.asset->url,
-      quickFacts
+      highlights
     }`,
     {},
     {
