@@ -20,6 +20,7 @@ export default function Hero() {
   const x = useTransform(scrollY, [0, 500], [0, 50])
   const scale = useTransform(scrollY, [0, 500], [1, 1.05])
   const blur = useTransform(scrollY, [0, 300], [0, 6])
+  const blurPx = useTransform(blur, (v) => `blur(${v}px)`)
   const opacity = useTransform(scrollY, [0, 300], [1, 0])
 
   // 🔥 Mouse Movement
@@ -36,7 +37,7 @@ export default function Hero() {
     mouseY.set(moveY)
   }
 
-  // 🔥 Combine Scroll + Mouse (SAFE VERSION)
+  // 🔥 Combine Scroll + Mouse (Type-safe)
   const xTotal = useTransform([x, mouseX], (values: number[]) => values[0] + values[1])
   const yTotal = useTransform([y, mouseY], (values: number[]) => values[0] + values[1])
 
@@ -56,7 +57,7 @@ export default function Hero() {
           x: xTotal,
           y: yTotal,
           scale,
-          filter: blur.to((v) => `blur(${v}px)`),
+          filter: blurPx,
           willChange: 'transform'
         }}
         className="absolute inset-0"
