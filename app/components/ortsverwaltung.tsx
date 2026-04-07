@@ -92,8 +92,7 @@ export default function Ortsverwaltung() {
                 </p>
 
                 <p className="text-white/80 max-w-xl leading-relaxed">
-                  Seit der Kommunalwahl im Juni 2024 im Amt. Gewählt mit 59,6 % der Stimmen 
-                  und erster Ortsvorsteher der FWG in Studernheim.
+                  Seit der Kommunalwahl im Juni 2024 im Amt.
                 </p>
 
                 <div className="mt-5 flex flex-wrap gap-3 justify-center md:justify-start">
