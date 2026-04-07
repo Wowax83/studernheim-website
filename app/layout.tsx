@@ -6,27 +6,71 @@ import Navbar from '@/app/components/navbar'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXTAUTH_URL ?? 'http://localhost:3000'),
-  title: 'Studernheim - Ein Dorf',
+  metadataBase: new URL(process.env.NEXTAUTH_URL ?? 'https://studrum.de'),
+
+  title: {
+    default: 'Studernheim – Feste, Vereine & Dorfleben',
+    template: '%s | Studernheim',
+  },
+
   description:
-    'Entdecken Sie Studernheim - ein lebendiges Dorf mit Tradition, Gemeinschaft und Charme in der Pfalz.',
+    'Alle Feste, Veranstaltungen und Vereine in Studernheim. Entdecke Kerwe, Maibaumstellen und das Dorfleben in der Pfalz.',
+
+  keywords: [
+    'Studernheim',
+    'Feste Studernheim',
+    'Kerwe Studernheim',
+    'Maibaumstellen',
+    'Veranstaltungen Frankenthal',
+    'Dorfleben Pfalz'
+  ],
+
+  authors: [{ name: 'Studernheim' }],
+  creator: 'Studernheim',
+  publisher: 'Studernheim',
+
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
   },
+
   openGraph: {
-    title: 'Studernheim - Ein Dorf',
+    title: 'Studernheim – Feste & Dorfleben',
     description:
-      'Entdecken Sie Studernheim - ein lebendiges Dorf mit Tradition, Gemeinschaft und Charme in der Pfalz.',
+      'Alle Veranstaltungen, Feste und Vereine in Studernheim. Jetzt entdecken!',
     type: 'website',
+    locale: 'de_DE',
+    url: 'https://studrum.de',
+    siteName: 'Studernheim',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Studernheim - Ein Dorf',
+        alt: 'Studernheim Dorfleben',
       },
     ],
+  },
+
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Studernheim – Feste & Dorfleben',
+    description:
+      'Alle Veranstaltungen und Feste in Studernheim auf einen Blick.',
+    images: ['/og-image.png'],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+
+  alternates: {
+    canonical: 'https://studrum.de',
   },
 }
 
@@ -37,17 +81,49 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de" className="scroll-smooth">
-      <body className="font-body antialiased">
+      <body className="font-body antialiased bg-white text-gray-900">
 
-        {/* ✅ Navbar */}
+        {/* 🔥 STRUCTURED DATA (SEO BOOST) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Place",
+              "name": "Studernheim",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Frankenthal",
+                "addressCountry": "DE"
+              },
+              "url": "https://studrum.de"
+            })
+          }}
+        />
+
+        {/* 🔥 ORGANIZATION SCHEMA (NEU → sehr stark) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Studernheim",
+              "url": "https://studrum.de",
+              "logo": "https://studrum.de/og-image.png"
+            })
+          }}
+        />
+
+        {/* Navbar */}
         <Navbar />
 
-        {/* ✅ Seiteninhalt */}
+        {/* Inhalt */}
         <main className="pt-20">
           {children}
         </main>
 
-        {/* ✅ Cookie Banner */}
+        {/* Cookie Banner */}
         <CookieBanner />
 
       </body>
