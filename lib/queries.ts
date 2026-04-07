@@ -1,6 +1,8 @@
 import { client } from './sanity'
 
-// 🔥 Feste holen
+/**
+ * 🔥 FESTE (mit mehreren Bildern + Fallback)
+ */
 export async function getFeste() {
   return await client.fetch(
     `*[_type == "fest"] | order(date asc){
@@ -8,20 +10,49 @@ export async function getFeste() {
       name,
       description,
       date,
-      "location": region,
+      "region": region,
       vibe,
       organizer,
-      "image": image.asset->url,
+
+      // 🔥 NEU: mehrere Bilder + Fallback für alte Daten
+      "images": coalesce(images[].asset->url, [image.asset->url]),
+
       quickFacts
     }`,
     {},
     {
-      cache: "no-store" // 🔥 verhindert alten Cache
+      cache: "no-store"
     }
   )
 }
 
-// 🔥 Vereine holen
+/**
+ * 🔥 OPTIONAL: nur zukünftige Feste (z. B. für Homepage)
+ */
+export async function getUpcomingFeste(limit = 4) {
+  return await client.fetch(
+    `*[_type == "fest" && date >= string::split(now(), "T")[0]]
+      | order(date asc)[0...${limit}]{
+      _id,
+      name,
+      description,
+      date,
+      "region": region,
+      vibe,
+      organizer,
+      "images": coalesce(images[].asset->url, [image.asset->url]),
+      quickFacts
+    }`,
+    {},
+    {
+      cache: "no-store"
+    }
+  )
+}
+
+/**
+ * 🔥 VEREINE
+ */
 export async function getVereine() {
   return await client.fetch(
     `*[_type == "verein"] | order(title asc){
@@ -39,10 +70,15 @@ export async function getVereine() {
     }
   )
 }
-export async function getAllEvents() {
+
+/**
+ * 🔥 ALLE EVENTS (Feste + Termine kombiniert)
+ */
+export async function getAllEvents(limit = 4) {
   return await client.fetch(
     `{
       "events": [
+        // 🔥 FESTE
         ...*[_type == "fest" && date >= string::split(now(), "T")[0]]{
           _id,
           name,
@@ -50,8 +86,11 @@ export async function getAllEvents() {
           date,
           "location": region,
           organizer,
-          "type": "fest"
+          "type": "fest",
+          "images": coalesce(images[].asset->url, [image.asset->url])
         },
+
+        // 🔥 TERMINE
         ...*[_type == "termine" && date >= string::split(now(), "T")[0]]{
           _id,
           title,
@@ -63,7 +102,7 @@ export async function getAllEvents() {
           "type": "termin"
         }
       ]
-    }.events | order(date asc)[0...4]`,
+    }.events | order(date asc)[0...${limit}]`,
     {},
     {
       cache: "no-store"
