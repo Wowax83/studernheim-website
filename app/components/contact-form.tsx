@@ -30,7 +30,6 @@ export default function ContactForm() {
     )
   }
 
-  // ✅ HIER IST DER WICHTIGE TEIL
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
@@ -42,15 +41,15 @@ export default function ContactForm() {
       name: formData.get('name'),
       email: formData.get('email'),
       message: formData.get('message'),
-      interests: selectedInterests
+      interests: selectedInterests,
+      company: formData.get('company'), // honeypot
+      formStartTime: Number(formData.get('formStartTime'))
     }
 
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
 
@@ -72,7 +71,7 @@ export default function ContactForm() {
   return (
     <section id="kontakt" className="py-20 sm:py-28 bg-gradient-to-b from-white to-green-50/30">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* HEADER */}
         <motion.div
           ref={ref}
@@ -113,6 +112,21 @@ export default function ContactForm() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
+
+              {/* 🛡️ Honeypot */}
+              <input
+                type="text"
+                name="company"
+                className="hidden"
+                autoComplete="off"
+              />
+
+              {/* ⏱️ Zeit */}
+              <input
+                type="hidden"
+                name="formStartTime"
+                value={Date.now()}
+              />
 
               {/* NAME */}
               <div>
