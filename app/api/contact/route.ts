@@ -15,13 +15,13 @@ export async function POST(req: Request) {
 
     // 🛑 SPAM SCHUTZ
 
-    // 1. Honeypot (Bots füllen versteckte Felder)
+    // 1. Honeypot
     if (company) {
       console.log('🚫 Spam erkannt (Honeypot)')
       return Response.json({ success: true })
     }
 
-    // 2. Zeitcheck (zu schnell ausgefüllt = Bot)
+    // 2. Zeitcheck
     const now = Date.now()
     if (formStartTime && now - formStartTime < 2000) {
       console.log('🚫 Spam erkannt (zu schnell)')
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
     // 📩 E-Mail senden
     const result = await resend.emails.send({
-      from: 'SAG Studernheim <onboarding@resend.dev>',
+      from: 'SAG Studernheim <onboarding@resend.dev>', // später ändern!
       to: 'studernheim.ag@gmail.com',
       subject: `📩 Neue Nachricht von ${name}`,
 
@@ -68,12 +68,21 @@ export async function POST(req: Request) {
       `
     })
 
+    // ❗ wichtig: Fehler von Resend prüfen
+    if (result.error) {
+      console.error('❌ Resend API Fehler:', result.error)
+      return Response.json(
+        { error: result.error.message || 'Mail konnte nicht gesendet werden' },
+        { status: 500 }
+      )
+    }
+
     console.log('✅ Resend success:', result)
 
     return Response.json({ success: true })
 
   } catch (error) {
-    console.error('❌ Resend error:', error)
+    console.error('❌ Server error:', error)
 
     return Response.json(
       { error: 'Fehler beim Senden der Nachricht' },
