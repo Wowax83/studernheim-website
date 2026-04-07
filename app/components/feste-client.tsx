@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Calendar, MapPin, Info, X } from 'lucide-react'
+import { Calendar, MapPin, Info, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 
@@ -10,15 +10,14 @@ export default function FesteClient({ feste }: any) {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 })
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-
   const [pausedCards, setPausedCards] = useState<{ [key: string]: boolean }>({})
   const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: string]: number }>({})
 
-  // 🔥 Lightbox State
+  // 🔥 Lightbox
   const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  // 🔄 Auto rotation
+  // 🔄 Auto Rotation
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => {
@@ -41,26 +40,28 @@ export default function FesteClient({ feste }: any) {
     return () => clearInterval(interval)
   }, [feste, pausedCards])
 
-  // 🔥 Swipe Handler
-  const handleSwipe = (festId: string, direction: number, length: number) => {
-    setCurrentImageIndex((prev) => {
-      const current = prev[festId] || 0
-      const next = (current + direction + length) % length
-      return { ...prev, [festId]: next }
-    })
+  // 🔁 Navigation
+  const nextImage = () => {
+    if (!lightboxImages) return
+    setLightboxIndex((prev) => (prev + 1) % lightboxImages.length)
+  }
+
+  const prevImage = () => {
+    if (!lightboxImages) return
+    setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length)
   }
 
   return (
-    <section id="feste" className="py-20 sm:py-28 bg-gradient-to-b from-green-50/30 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20">
+      <div className="max-w-7xl mx-auto px-4">
 
         {/* Header */}
-        <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}} className="text-center mb-16">
-          <h2 className="text-5xl font-bold mb-4">Unsere <span className="text-green-600">Feste</span></h2>
+        <motion.div ref={ref} initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} className="text-center mb-12">
+          <h2 className="text-5xl font-bold">Unsere <span className="text-green-600">Feste</span></h2>
         </motion.div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {feste?.map((fest: any, index: number) => {
             const images = Array.isArray(fest.images) ? fest.images.filter(Boolean) : []
             const currentIndex = images.length > 0 ? (currentImageIndex[fest._id] || 0) % images.length : 0
@@ -68,23 +69,33 @@ export default function FesteClient({ feste }: any) {
             return (
               <motion.div
                 key={fest._id}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: index * 0.1 }}
                 onMouseEnter={() => setPausedCards((p) => ({ ...p, [fest._id]: true }))}
                 onMouseLeave={() => setPausedCards((p) => ({ ...p, [fest._id]: false }))}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg"
+                className="bg-white rounded-xl overflow-hidden shadow"
               >
 
-                {/* 🔥 Swipe + Slider */}
+                {/* Slider mit Swipe */}
                 <motion.div
                   className="relative aspect-[4/3]"
                   drag="x"
                   dragConstraints={{ left: 0, right: 0 }}
                   onDragEnd={(e, info) => {
                     if (images.length < 2) return
-                    if (info.offset.x < -50) handleSwipe(fest._id, 1, images.length)
-                    if (info.offset.x > 50) handleSwipe(fest._id, -1, images.length)
+                    if (info.offset.x < -50) {
+                      setCurrentImageIndex((prev) => ({
+                        ...prev,
+                        [fest._id]: (currentIndex + 1) % images.length
+                      }))
+                    }
+                    if (info.offset.x > 50) {
+                      setCurrentImageIndex((prev) => ({
+                        ...prev,
+                        [fest._id]: (currentIndex - 1 + images.length) % images.length
+                      }))
+                    }
                   }}
                 >
                   {images.map((img: string, i: number) => (
@@ -115,11 +126,9 @@ export default function FesteClient({ feste }: any) {
                 </motion.div>
 
                 {/* Content */}
-                <div className="p-5">
-                  <h3 className="text-xl font-bold">{fest.name}</h3>
-                  <p className="text-sm text-gray-600">{fest.description}</p>
+                <div className="p-4">
+                  <h3 className="font-bold text-lg">{fest.name}</h3>
                 </div>
-
               </motion.div>
             )
           })}
@@ -127,24 +136,51 @@ export default function FesteClient({ feste }: any) {
 
         {/* 🔥 LIGHTBOX */}
         {lightboxImages && (
-          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+          <motion.div
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
 
-            <button
-              onClick={() => setLightboxImages(null)}
-              className="absolute top-5 right-5 text-white"
-            >
+            {/* Close */}
+            <button onClick={() => setLightboxImages(null)} className="absolute top-5 right-5 text-white z-50">
               <X size={32} />
             </button>
 
-            <Image
-              src={lightboxImages[lightboxIndex]}
-              alt=""
-              width={1200}
-              height={800}
-              className="object-contain max-h-[90vh]"
-            />
+            {/* Left */}
+            <button onClick={prevImage} className="absolute left-5 text-white z-50">
+              <ChevronLeft size={32} />
+            </button>
 
-          </div>
+            {/* Right */}
+            <button onClick={nextImage} className="absolute right-5 text-white z-50">
+              <ChevronRight size={32} />
+            </button>
+
+            {/* 🔥 Swipe + Zoom */}
+            <motion.div
+              key={lightboxIndex}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              onDragEnd={(e, info) => {
+                if (info.offset.x < -80) nextImage()
+                if (info.offset.x > 80) prevImage()
+              }}
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4 }}
+              className="max-w-5xl w-full px-4"
+            >
+              <Image
+                src={lightboxImages[lightboxIndex]}
+                alt=""
+                width={1400}
+                height={900}
+                className="object-contain max-h-[90vh] w-full"
+              />
+            </motion.div>
+
+          </motion.div>
         )}
       </div>
     </section>
