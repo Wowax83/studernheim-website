@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
     await resend.emails.send({
       from: 'SAG Studernheim <onboarding@resend.dev>',
-      to: 'DEINE@EMAIL.DE', // <-- hier deine Mail rein
+      to: 'studernheim.ag@gmail.com', // <-- hier deine Mail rein
       subject: `Neue Nachricht von ${name}`,
       html: `
         <h2>Neue Anfrage über Website</h2>
