@@ -4,23 +4,55 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: Request) {
   try {
-    const { name, email, message } = await req.json()
+    const body = await req.json()
 
-    await resend.emails.send({
-      from: 'SAG Studernheim <onboarding@resend.dev>',
-      to: 'studernheim.ag@gmail.com', // <-- hier deine Mail rein
-      subject: `Neue Nachricht von ${name}`,
+    const name = body.name || 'Unbekannt'
+    const email = body.email || 'Keine E-Mail'
+    const message = body.message || 'Keine Nachricht'
+
+    const result = await resend.emails.send({
+      from: 'SAG Studernheim <onboarding@resend.dev>', // später eigene Domain!
+      to: 'studernheim.ag@gmail.com',
+      subject: `📩 Neue Nachricht von ${name}`,
+
       html: `
-        <h2>Neue Anfrage über Website</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>E-Mail:</strong> ${email}</p>
-        <p><strong>Nachricht:</strong><br/>${message}</p>
+        <div style="font-family: Arial, sans-serif; line-height:1.6; color:#333">
+          
+          <h2 style="color:#16a34a;">Neue Anfrage über Website</h2>
+
+          <p><strong>Name:</strong><br/>${name}</p>
+          <p><strong>E-Mail:</strong><br/>${email}</p>
+
+          <p><strong>Nachricht:</strong></p>
+          <div style="
+            background:#f3f4f6;
+            padding:12px;
+            border-radius:8px;
+            margin-top:8px;
+          ">
+            ${message}
+          </div>
+
+          <hr style="margin:20px 0"/>
+
+          <p style="font-size:12px;color:#888">
+            Diese Nachricht wurde über das Kontaktformular der SAG Studernheim Website gesendet.
+          </p>
+
+        </div>
       `
     })
 
+    console.log('✅ Resend success:', result)
+
     return Response.json({ success: true })
+
   } catch (error) {
-    console.error(error)
-    return Response.json({ error: 'Fehler beim Senden' }, { status: 500 })
+    console.error('❌ Resend error:', error)
+
+    return Response.json(
+      { error: 'Fehler beim Senden der Nachricht' },
+      { status: 500 }
+    )
   }
 }
