@@ -13,16 +13,19 @@ export default function FesteClient({ feste }: any) {
   })
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-  const [isPaused, setIsPaused] = useState(false)
 
+  // 🔥 Pause pro Karte
+  const [pausedCards, setPausedCards] = useState<{
+    [key: string]: boolean
+  }>({})
+
+  // 🔥 Bild Index pro Karte
   const [currentImageIndex, setCurrentImageIndex] = useState<{
     [key: string]: number
   }>({})
 
-  // 🔄 Auto-Rotation (mit Pause)
+  // 🔄 Auto Rotation (pro Karte gesteuert)
   useEffect(() => {
-    if (isPaused) return
-
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => {
         const updated: any = { ...prev }
@@ -31,6 +34,9 @@ export default function FesteClient({ feste }: any) {
           const images = Array.isArray(fest.images)
             ? fest.images.filter(Boolean)
             : []
+
+          // ❗ nur pausieren wenn diese Karte gehovert ist
+          if (pausedCards[fest._id]) return
 
           if (images.length > 1) {
             const current = prev[fest._id] || 0
@@ -43,7 +49,7 @@ export default function FesteClient({ feste }: any) {
     }, 3500)
 
     return () => clearInterval(interval)
-  }, [feste, isPaused])
+  }, [feste, pausedCards])
 
   return (
     <section
@@ -89,16 +95,16 @@ export default function FesteClient({ feste }: any) {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 onMouseEnter={() => {
                   setHoveredCard(fest._id)
-                  setIsPaused(true)
+                  setPausedCards((prev) => ({ ...prev, [fest._id]: true }))
                 }}
                 onMouseLeave={() => {
                   setHoveredCard(null)
-                  setIsPaused(false)
+                  setPausedCards((prev) => ({ ...prev, [fest._id]: false }))
                 }}
                 className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
               >
 
-                {/* 🔥 Smooth Image Slider */}
+                {/* 🔥 Smooth Slider */}
                 <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
                   {images.length > 0 ? (
                     images.map((img: string, i: number) => (
@@ -124,9 +130,9 @@ export default function FesteClient({ feste }: any) {
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-                  {/* Date Badge */}
+                  {/* 🔥 Datum IMMER sichtbar */}
                   {fest.date && (
-                    <div className="absolute top-4 right-4 px-3 py-1 text-white text-sm bg-black/50 rounded-full flex items-center gap-1">
+                    <div className="absolute top-4 right-4 z-20 px-3 py-1 text-white text-sm bg-black/70 backdrop-blur-sm rounded-full flex items-center gap-1 shadow-lg">
                       <Calendar size={14} />
                       {new Date(fest.date).toLocaleDateString('de-DE', {
                         day: '2-digit',
@@ -161,7 +167,7 @@ export default function FesteClient({ feste }: any) {
                     </p>
                   )}
 
-                  {/* Hover Details */}
+                  {/* Hover Infos */}
                   {hoveredCard === fest._id && fest.quickFacts && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
