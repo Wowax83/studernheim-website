@@ -116,142 +116,83 @@ export default function Ortsverwaltung() {
           </motion.div>
         </motion.div>
 
-        {/* GRID */}
+        {/* GRID (jetzt 1 Spalte mobil / 2 Spalten Desktop sinnvoll genutzt) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
-          {/* LEFT */}
-          <div className="space-y-6">
-            
-            {/* CONTACT */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              animate={inView ? 'show' : 'hidden'}
-              transition={{ delay: 0.1 }}
-              className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-            >
-              <h3 className="font-heading text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <MapPin className="text-green-600" size={26} />
-                Kontakt
-              </h3>
+          {/* CONTACT */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate={inView ? 'show' : 'hidden'}
+            transition={{ delay: 0.1 }}
+            className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+          >
+            <h3 className="font-heading text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+              <MapPin className="text-green-600" size={26} />
+              Kontakt
+            </h3>
 
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <MapPin size={20} className="text-green-600 mt-1" />
-                  <div>
-                    <p className="font-medium text-gray-900">Adresse</p>
-                    <p className="text-gray-600">{ortsverwaltungData.address}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Phone size={20} className="text-green-600 mt-1" />
-                  <div>
-                    <p className="font-medium text-gray-900">Telefon</p>
-                    <a href={`tel:${ortsverwaltungData.phone}`} className="text-green-600 hover:text-green-800">
-                      {ortsverwaltungData.phone}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Mail size={20} className="text-green-600 mt-1" />
-                  <div>
-                    <p className="font-medium text-gray-900">E-Mail</p>
-                    <a href={`mailto:${ortsverwaltungData.email}`} className="text-green-600 hover:text-green-800">
-                      {ortsverwaltungData.email}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <User size={20} className="text-green-600 mt-1" />
-                  <div>
-                    <p className="font-medium text-gray-900">Ortsvorsteher</p>
-                    <p className="text-gray-600">Thomas Batke (FWG)</p>
-                  </div>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <MapPin size={20} className="text-green-600 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-900">Adresse</p>
+                  <p className="text-gray-600">{ortsverwaltungData.address}</p>
                 </div>
               </div>
-            </motion.div>
 
-            {/* OPENING HOURS */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              animate={inView ? 'show' : 'hidden'}
-              transition={{ delay: 0.2 }}
-              className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md"
-            >
-              <h3 className="font-heading text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <Clock className="text-green-600" size={26} />
-                Öffnungszeiten
-              </h3>
-
-              <div className="space-y-3">
-                {ortsverwaltungData.openingHours.map((s, i) => (
-                  <div key={i} className="flex justify-between py-2 border-b border-gray-100 last:border-0">
-                    <span className="font-medium text-gray-900">{s.day}</span>
-                    <span className="text-gray-600">{s.hours}</span>
-                  </div>
-                ))}
+              <div className="flex items-start gap-3">
+                <Phone size={20} className="text-green-600 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-900">Telefon</p>
+                  <a href={`tel:${ortsverwaltungData.phone}`} className="text-green-600 hover:text-green-800">
+                    {ortsverwaltungData.phone}
+                  </a>
+                </div>
               </div>
-            </motion.div>
-          </div>
 
-          {/* RIGHT */}
-          <div className="space-y-6">
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              animate={inView ? 'show' : 'hidden'}
-              transition={{ delay: 0.4 }}
-              className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md"
-            >
-              <h3 className="font-heading text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <User className="text-green-600" size={26} />
-                Ansprechpartner
-              </h3>
-
-              <div className="space-y-4">
-                {ortsverwaltungData.contacts.map((c, i) => {
-                  const isOrtsvorsteher = c.name === 'Thomas Batke'
-
-                  return (
-                    <div
-                      key={i}
-                      className={`flex items-start gap-4 p-4 rounded-xl transition-all
-                        ${isOrtsvorsteher 
-                          ? 'bg-gradient-to-br from-green-600 to-emerald-600 text-white shadow-lg' 
-                          : 'bg-green-50/60'
-                        }`}
-                    >
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold
-                        ${isOrtsvorsteher ? 'bg-white/20 text-white' : 'bg-green-600 text-white'}`}>
-                        {c.name.charAt(0)}
-                      </div>
-
-                      <div className="flex-1">
-                        <p className={`font-medium ${isOrtsvorsteher ? 'text-white' : 'text-gray-900'}`}>
-                          {c.name}
-                        </p>
-
-                        <p className={`text-sm ${isOrtsvorsteher ? 'text-white/90' : 'text-gray-600'}`}>
-                          {isOrtsvorsteher ? 'Ortsvorsteher (FWG)' : c.role}
-                        </p>
-
-                        <a
-                          href={`tel:${c.phone}`}
-                          className={`text-sm ${isOrtsvorsteher ? 'text-white underline' : 'text-green-600'}`}
-                        >
-                          {c.phone}
-                        </a>
-                      </div>
-                    </div>
-                  )
-                })}
+              <div className="flex items-start gap-3">
+                <Mail size={20} className="text-green-600 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-900">E-Mail</p>
+                  <a href={`mailto:${ortsverwaltungData.email}`} className="text-green-600 hover:text-green-800">
+                    {ortsverwaltungData.email}
+                  </a>
+                </div>
               </div>
-            </motion.div>
-          </div>
+
+              <div className="flex items-start gap-3">
+                <User size={20} className="text-green-600 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-900">Ortsvorsteher</p>
+                  <p className="text-gray-600">Thomas Batke (FWG)</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* OPENING HOURS */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate={inView ? 'show' : 'hidden'}
+            transition={{ delay: 0.2 }}
+            className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md"
+          >
+            <h3 className="font-heading text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+              <Clock className="text-green-600" size={26} />
+              Öffnungszeiten
+            </h3>
+
+            <div className="space-y-3">
+              {ortsverwaltungData.openingHours.map((s, i) => (
+                <div key={i} className="flex justify-between py-2 border-b border-gray-100 last:border-0">
+                  <span className="font-medium text-gray-900">{s.day}</span>
+                  <span className="text-gray-600">{s.hours}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
 
         </div>
       </div>
