@@ -30,20 +30,43 @@ export default function ContactForm() {
     )
   }
 
+  // ✅ HIER IST DER WICHTIGE TEIL
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
 
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    const form = e.target as HTMLFormElement
+    const formData = new FormData(form)
+
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      message: formData.get('message'),
+      interests: selectedInterests
+    }
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+
+      if (res.ok) {
+        setIsSuccess(true)
+        form.reset()
+        setSelectedInterests([])
+      } else {
+        alert('Fehler beim Senden')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Serverfehler')
+    }
 
     setIsSubmitting(false)
-    setIsSuccess(true)
-
-    setTimeout(() => {
-      setIsSuccess(false)
-      ;(e.target as HTMLFormElement).reset()
-      setSelectedInterests([])
-    }, 3000)
   }
 
   return (
@@ -171,7 +194,17 @@ export default function ContactForm() {
                 disabled={isSubmitting}
                 className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-bold hover:shadow-xl transition-all flex items-center justify-center gap-2"
               >
-                {isSubmitting ? 'Wird gesendet...' : 'Nachricht senden'}
+                {isSubmitting ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Wird gesendet...
+                  </>
+                ) : (
+                  <>
+                    <Send size={18} />
+                    Nachricht senden
+                  </>
+                )}
               </button>
 
             </form>
