@@ -13,22 +13,28 @@ export default function FesteClient({ feste }: any) {
   })
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const [isPaused, setIsPaused] = useState(false)
 
-  // 🔥 Bild-Slider State
   const [currentImageIndex, setCurrentImageIndex] = useState<{
     [key: string]: number
   }>({})
 
-  // 🔄 Auto-Rotation
+  // 🔄 Auto-Rotation (mit Pause)
   useEffect(() => {
+    if (isPaused) return
+
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => {
         const updated: any = { ...prev }
 
         feste?.forEach((fest: any) => {
-          if (fest.images?.length > 1) {
+          const images = Array.isArray(fest.images)
+            ? fest.images.filter(Boolean)
+            : []
+
+          if (images.length > 1) {
             const current = prev[fest._id] || 0
-            updated[fest._id] = (current + 1) % fest.images.length
+            updated[fest._id] = (current + 1) % images.length
           }
         })
 
@@ -37,7 +43,7 @@ export default function FesteClient({ feste }: any) {
     }, 3500)
 
     return () => clearInterval(interval)
-  }, [feste])
+  }, [feste, isPaused])
 
   return (
     <section
@@ -45,6 +51,7 @@ export default function FesteClient({ feste }: any) {
       className="py-20 sm:py-28 bg-gradient-to-b from-green-50/30 to-white"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
         {/* Header */}
         <motion.div
           ref={ref}
@@ -65,11 +72,14 @@ export default function FesteClient({ feste }: any) {
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {feste?.map((fest: any, index: number) => {
-            const currentIndex = currentImageIndex[fest._id] || 0
-            const currentImage =
-              fest.images && fest.images.length > 0
-                ? fest.images[currentIndex]
-                : null
+            const images = Array.isArray(fest.images)
+              ? fest.images.filter(Boolean)
+              : []
+
+            const currentIndex =
+              images.length > 0
+                ? (currentImageIndex[fest._id] || 0) % images.length
+                : 0
 
             return (
               <motion.div
@@ -77,19 +87,34 @@ export default function FesteClient({ feste }: any) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                onMouseEnter={() => setHoveredCard(fest._id)}
-                onMouseLeave={() => setHoveredCard(null)}
+                onMouseEnter={() => {
+                  setHoveredCard(fest._id)
+                  setIsPaused(true)
+                }}
+                onMouseLeave={() => {
+                  setHoveredCard(null)
+                  setIsPaused(false)
+                }}
                 className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
               >
-                {/* Image / Slider */}
+
+                {/* 🔥 Smooth Image Slider */}
                 <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-                  {currentImage ? (
-                    <Image
-                      src={currentImage}
-                      alt={fest.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-all duration-700"
-                    />
+                  {images.length > 0 ? (
+                    images.map((img: string, i: number) => (
+                      <Image
+                        key={i}
+                        src={img}
+                        alt={fest.name || 'Fest'}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className={`object-cover absolute inset-0 transition-opacity duration-1000 ${
+                          i === currentIndex
+                            ? 'opacity-100 z-10'
+                            : 'opacity-0 z-0'
+                        }`}
+                      />
+                    ))
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
                       Kein Bild vorhanden
@@ -113,7 +138,6 @@ export default function FesteClient({ feste }: any) {
 
                 {/* Content */}
                 <div className="p-6">
-                  {/* Region */}
                   {fest.region && (
                     <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                       <MapPin size={14} />
@@ -121,26 +145,23 @@ export default function FesteClient({ feste }: any) {
                     </div>
                   )}
 
-                  {/* Title */}
                   <h3 className="font-heading text-2xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
                     {fest.name}
                   </h3>
 
-                  {/* Vibe */}
                   {fest.vibe && (
                     <p className="text-green-600 font-medium text-sm mb-3">
                       {fest.vibe}
                     </p>
                   )}
 
-                  {/* Description */}
                   {fest.description && (
                     <p className="text-gray-600 leading-relaxed mb-4">
                       {fest.description}
                     </p>
                   )}
 
-                  {/* Quick Facts (Hover) */}
+                  {/* Hover Details */}
                   {hoveredCard === fest._id && fest.quickFacts && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
@@ -167,7 +188,6 @@ export default function FesteClient({ feste }: any) {
                     </motion.div>
                   )}
 
-                  {/* Organizer */}
                   {fest.organizer && (
                     <div className="text-xs text-gray-500 mt-4">
                       Veranstalter: {fest.organizer}
