@@ -28,25 +28,31 @@ export default function CookieBanner() {
   if (!mounted || !visible) return null
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black text-white p-4 z-50 flex flex-col sm:flex-row justify-between items-center gap-4">
-      <p className="text-sm">
-        Wir verwenden Cookies, um die Website zu verbessern.
-      </p>
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-2xl">
+      <div className="bg-white/90 backdrop-blur-lg shadow-2xl border border-gray-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
 
-      <div className="flex gap-2">
-        <button
-          onClick={decline}
-          className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600"
-        >
-          Ablehnen
-        </button>
+        {/* Text */}
+        <p className="text-sm text-gray-700 text-center sm:text-left leading-relaxed">
+          🍪 Wir verwenden Cookies, um deine Erfahrung zu verbessern.
+        </p>
 
-        <button
-          onClick={accept}
-          className="bg-green-600 px-4 py-2 rounded hover:bg-green-700"
-        >
-          OK
-        </button>
+        {/* Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={decline}
+            className="px-4 py-2 rounded-lg text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition"
+          >
+            Ablehnen
+          </button>
+
+          <button
+            onClick={accept}
+            className="px-4 py-2 rounded-lg text-sm bg-green-600 hover:bg-green-700 text-white shadow-md transition"
+          >
+            Akzeptieren
+          </button>
+        </div>
+
       </div>
     </div>
   )
