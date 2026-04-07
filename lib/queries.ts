@@ -1,7 +1,7 @@
 import { client } from './sanity'
 
 /**
- * 🔥 FESTE (mit mehreren Bildern + Fallback)
+ * 🔥 FESTE (alle)
  */
 export async function getFeste() {
   return await client.fetch(
@@ -14,9 +14,10 @@ export async function getFeste() {
       vibe,
       organizer,
 
+      // 🔥 Bilder safe
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
-      // 🔥 FIX
+      // 🔥 Highlights FIX (alt + neu kompatibel)
       "quickFacts": coalesce(
         quickFacts,
         highlights[].text,
@@ -29,8 +30,9 @@ export async function getFeste() {
     }
   )
 }
+
 /**
- * 🔥 OPTIONAL: nur zukünftige Feste (z. B. für Homepage)
+ * 🔥 NUR zukünftige Feste (Homepage etc.)
  */
 export async function getUpcomingFeste(limit = 4) {
   return await client.fetch(
@@ -43,8 +45,16 @@ export async function getUpcomingFeste(limit = 4) {
       "region": region,
       vibe,
       organizer,
-      "images": coalesce(images[].asset->url, [image.asset->url]),
-      quickFacts
+
+      // 🔥 Bilder safe
+      "images": coalesce(images[].asset->url, [image.asset->url], []),
+
+      // 🔥 Highlights FIX
+      "quickFacts": coalesce(
+        quickFacts,
+        highlights[].text,
+        []
+      )
     }`,
     {},
     {
@@ -90,7 +100,15 @@ export async function getAllEvents(limit = 4) {
           "location": region,
           organizer,
           "type": "fest",
-          "images": coalesce(images[].asset->url, [image.asset->url])
+
+          "images": coalesce(images[].asset->url, [image.asset->url], []),
+
+          // 🔥 auch hier wichtig!
+          "quickFacts": coalesce(
+            quickFacts,
+            highlights[].text,
+            []
+          )
         },
 
         // 🔥 TERMINE
