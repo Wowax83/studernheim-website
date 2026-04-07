@@ -5,7 +5,6 @@ import { useInView } from 'react-intersection-observer'
 import {
   Calendar,
   MapPin,
-  Info,
   X,
   ChevronLeft,
   ChevronRight
@@ -17,12 +16,8 @@ export default function FesteClient({ feste }: any) {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 })
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-  const [pausedCards, setPausedCards] = useState<{ [key: string]: boolean }>(
-    {}
-  )
-  const [currentImageIndex, setCurrentImageIndex] = useState<{
-    [key: string]: number
-  }>({})
+  const [pausedCards, setPausedCards] = useState<{ [key: string]: boolean }>({})
+  const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: string]: number }>({})
 
   const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState(0)
@@ -154,7 +149,7 @@ export default function FesteClient({ feste }: any) {
                   )}
                 </motion.div>
 
-                {/* 🔥 Content mit Hover Animation */}
+                {/* Content */}
                 <motion.div
                   animate={{
                     y: hoveredCard === fest._id ? -5 : 0
@@ -177,12 +172,31 @@ export default function FesteClient({ feste }: any) {
                     </p>
                   )}
 
-                  {/* 🔥 2 Zeilen Clamp */}
                   {fest.description && (
                     <p className="text-gray-600 text-sm mb-3 leading-relaxed">
-                    {fest.description}
+                      {fest.description}
                     </p>
                   )}
+
+                  {/* 🔥 BADGES (Hover) */}
+                  {hoveredCard === fest._id &&
+                    Array.isArray(fest.quickFacts) &&
+                    fest.quickFacts.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-3 flex flex-wrap gap-2"
+                      >
+                        {fest.quickFacts.map((fact: string, i: number) => (
+                          <span
+                            key={i}
+                            className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"
+                          >
+                            {fact}
+                          </span>
+                        ))}
+                      </motion.div>
+                    )}
                 </motion.div>
               </motion.div>
             )
