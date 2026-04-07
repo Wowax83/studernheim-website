@@ -2,40 +2,30 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Calendar, MapPin, Info } from 'lucide-react'
+import { Calendar, MapPin, Info, X } from 'lucide-react'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 
 export default function FesteClient({ feste }: any) {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.05
-  })
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 })
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
 
-  // 🔥 Pause pro Karte
-  const [pausedCards, setPausedCards] = useState<{
-    [key: string]: boolean
-  }>({})
+  const [pausedCards, setPausedCards] = useState<{ [key: string]: boolean }>({})
+  const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: string]: number }>({})
 
-  // 🔥 Bild Index pro Karte
-  const [currentImageIndex, setCurrentImageIndex] = useState<{
-    [key: string]: number
-  }>({})
+  // 🔥 Lightbox State
+  const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  // 🔄 Auto Rotation (pro Karte gesteuert)
+  // 🔄 Auto rotation
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => {
         const updated: any = { ...prev }
 
         feste?.forEach((fest: any) => {
-          const images = Array.isArray(fest.images)
-            ? fest.images.filter(Boolean)
-            : []
-
-          // ❗ nur pausieren wenn diese Karte gehovert ist
+          const images = Array.isArray(fest.images) ? fest.images.filter(Boolean) : []
           if (pausedCards[fest._id]) return
 
           if (images.length > 1) {
@@ -51,162 +41,111 @@ export default function FesteClient({ feste }: any) {
     return () => clearInterval(interval)
   }, [feste, pausedCards])
 
+  // 🔥 Swipe Handler
+  const handleSwipe = (festId: string, direction: number, length: number) => {
+    setCurrentImageIndex((prev) => {
+      const current = prev[festId] || 0
+      const next = (current + direction + length) % length
+      return { ...prev, [festId]: next }
+    })
+  }
+
   return (
-    <section
-      id="feste"
-      className="py-20 sm:py-28 bg-gradient-to-b from-green-50/30 to-white"
-    >
+    <section id="feste" className="py-20 sm:py-28 bg-gradient-to-b from-green-50/30 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="font-heading text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            Unsere <span className="text-green-600">Feste</span>
-          </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Das ganze Jahr über feiern wir gemeinsam – traditionell,
-            gesellig und mit viel Herzblut.
-          </p>
+        <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}} className="text-center mb-16">
+          <h2 className="text-5xl font-bold mb-4">Unsere <span className="text-green-600">Feste</span></h2>
         </motion.div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {feste?.map((fest: any, index: number) => {
-            const images = Array.isArray(fest.images)
-              ? fest.images.filter(Boolean)
-              : []
-
-            const currentIndex =
-              images.length > 0
-                ? (currentImageIndex[fest._id] || 0) % images.length
-                : 0
+            const images = Array.isArray(fest.images) ? fest.images.filter(Boolean) : []
+            const currentIndex = images.length > 0 ? (currentImageIndex[fest._id] || 0) % images.length : 0
 
             return (
               <motion.div
                 key={fest._id}
                 initial={{ opacity: 0, y: 30 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                onMouseEnter={() => {
-                  setHoveredCard(fest._id)
-                  setPausedCards((prev) => ({ ...prev, [fest._id]: true }))
-                }}
-                onMouseLeave={() => {
-                  setHoveredCard(null)
-                  setPausedCards((prev) => ({ ...prev, [fest._id]: false }))
-                }}
-                className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+                transition={{ delay: index * 0.1 }}
+                onMouseEnter={() => setPausedCards((p) => ({ ...p, [fest._id]: true }))}
+                onMouseLeave={() => setPausedCards((p) => ({ ...p, [fest._id]: false }))}
+                className="bg-white rounded-2xl overflow-hidden shadow-lg"
               >
 
-                {/* 🔥 Smooth Slider */}
-                <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-                  {images.length > 0 ? (
-                    images.map((img: string, i: number) => (
-                      <Image
-                        key={i}
-                        src={img}
-                        alt={fest.name || 'Fest'}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className={`object-cover absolute inset-0 transition-opacity duration-1000 ${
-                          i === currentIndex
-                            ? 'opacity-100 z-10'
-                            : 'opacity-0 z-0'
-                        }`}
-                      />
-                    ))
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
-                      Kein Bild vorhanden
-                    </div>
-                  )}
+                {/* 🔥 Swipe + Slider */}
+                <motion.div
+                  className="relative aspect-[4/3]"
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  onDragEnd={(e, info) => {
+                    if (images.length < 2) return
+                    if (info.offset.x < -50) handleSwipe(fest._id, 1, images.length)
+                    if (info.offset.x > 50) handleSwipe(fest._id, -1, images.length)
+                  }}
+                >
+                  {images.map((img: string, i: number) => (
+                    <Image
+                      key={i}
+                      src={img}
+                      alt=""
+                      fill
+                      onClick={() => {
+                        setLightboxImages(images)
+                        setLightboxIndex(i)
+                      }}
+                      className={`absolute inset-0 object-cover transition-opacity duration-700 ${
+                        i === currentIndex ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
+                  ))}
 
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-                  {/* 🔥 Datum IMMER sichtbar */}
+                  {/* Datum */}
                   {fest.date && (
-                    <div className="absolute top-4 right-4 z-20 px-3 py-1 text-white text-sm bg-black/70 backdrop-blur-sm rounded-full flex items-center gap-1 shadow-lg">
-                      <Calendar size={14} />
+                    <div className="absolute top-3 right-3 z-20 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
                       {new Date(fest.date).toLocaleDateString('de-DE', {
                         day: '2-digit',
                         month: 'short'
                       })}
                     </div>
                   )}
-                </div>
+                </motion.div>
 
                 {/* Content */}
-                <div className="p-6">
-                  {fest.region && (
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                      <MapPin size={14} />
-                      {fest.region}
-                    </div>
-                  )}
-
-                  <h3 className="font-heading text-2xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
-                    {fest.name}
-                  </h3>
-
-                  {fest.vibe && (
-                    <p className="text-green-600 font-medium text-sm mb-3">
-                      {fest.vibe}
-                    </p>
-                  )}
-
-                  {fest.description && (
-                    <p className="text-gray-600 leading-relaxed mb-4">
-                      {fest.description}
-                    </p>
-                  )}
-
-                  {/* Hover Infos */}
-                  {hoveredCard === fest._id && fest.quickFacts && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      className="border-t border-gray-200 pt-4 mt-4 space-y-2"
-                    >
-                      <div className="flex items-start gap-2 text-sm">
-                        <Info size={16} className="text-green-600 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-gray-900 mb-1">
-                            Highlights:
-                          </p>
-                          <ul className="space-y-1 text-gray-600">
-                            {fest.quickFacts.map(
-                              (fact: string, i: number) => (
-                                <li key={i} className="text-xs">
-                                  • {fact}
-                                </li>
-                              )
-                            )}
-                          </ul>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {fest.organizer && (
-                    <div className="text-xs text-gray-500 mt-4">
-                      Veranstalter: {fest.organizer}
-                    </div>
-                  )}
+                <div className="p-5">
+                  <h3 className="text-xl font-bold">{fest.name}</h3>
+                  <p className="text-sm text-gray-600">{fest.description}</p>
                 </div>
 
-                {/* Shine Effekt */}
-                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
               </motion.div>
             )
           })}
         </div>
+
+        {/* 🔥 LIGHTBOX */}
+        {lightboxImages && (
+          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+
+            <button
+              onClick={() => setLightboxImages(null)}
+              className="absolute top-5 right-5 text-white"
+            >
+              <X size={32} />
+            </button>
+
+            <Image
+              src={lightboxImages[lightboxIndex]}
+              alt=""
+              width={1200}
+              height={800}
+              className="object-contain max-h-[90vh]"
+            />
+
+          </div>
+        )}
       </div>
     </section>
   )
