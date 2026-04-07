@@ -14,10 +14,14 @@ export async function getFeste() {
       vibe,
       organizer,
 
-      // 🔥 NEU: mehrere Bilder + Fallback für alte Daten
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
-      quickFacts
+      // 🔥 FIX
+      "quickFacts": coalesce(
+        quickFacts,
+        highlights[].text,
+        []
+      )
     }`,
     {},
     {
@@ -25,7 +29,6 @@ export async function getFeste() {
     }
   )
 }
-
 /**
  * 🔥 OPTIONAL: nur zukünftige Feste (z. B. für Homepage)
  */
