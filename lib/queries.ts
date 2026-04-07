@@ -20,7 +20,7 @@ export async function getFeste() {
       // 🔥 Highlights FIX (alt + neu kompatibel)
       "quickFacts": coalesce(
         quickFacts,
-        highlights[].text,
+        highlights,
         []
       )
     }`,
@@ -52,7 +52,7 @@ export async function getUpcomingFeste(limit = 4) {
       // 🔥 Highlights FIX
       "quickFacts": coalesce(
         quickFacts,
-        highlights[].text,
+        highlights,
         []
       )
     }`,
