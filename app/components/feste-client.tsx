@@ -179,8 +179,8 @@ export default function FesteClient({ feste }: any) {
 
                   {/* 🔥 2 Zeilen Clamp */}
                   {fest.description && (
-                    <p className="text-gray-600 text-sm line-clamp-2">
-                      {fest.description}
+                    <p className="text-gray-600 text-sm mb-3 leading-relaxed">
+                    {fest.description}
                     </p>
                   )}
                 </motion.div>
