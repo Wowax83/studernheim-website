@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
     // 📩 E-Mail senden
     const result = await resend.emails.send({
-      from: 'SAG Studernheim <onboarding@resend.dev>', // später ändern!
+      from: 'SAG Studernheim <kontakt@studrum.de>', // später ändern!
       to: 'studernheim.ag@gmail.com',
       subject: `📩 Neue Nachricht von ${name}`,
 
