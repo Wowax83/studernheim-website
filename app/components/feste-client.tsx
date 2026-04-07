@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import {
-  Calendar,
   MapPin,
   X,
   ChevronLeft,
@@ -22,14 +21,18 @@ export default function FesteClient({ feste }: any) {
   const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  // 🔄 Auto Rotation
+  // 🔄 Auto Rotation (safe)
   useEffect(() => {
+    if (!Array.isArray(feste)) return
+
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => {
         const updated: any = { ...prev }
 
-        feste?.forEach((fest: any) => {
-          const images = Array.isArray(fest.images)
+        feste.forEach((fest: any) => {
+          if (!fest?._id) return
+
+          const images = Array.isArray(fest?.images)
             ? fest.images.filter(Boolean)
             : []
 
@@ -49,12 +52,12 @@ export default function FesteClient({ feste }: any) {
   }, [feste, pausedCards])
 
   const nextImage = () => {
-    if (!lightboxImages) return
+    if (!lightboxImages || lightboxImages.length === 0) return
     setLightboxIndex((prev) => (prev + 1) % lightboxImages.length)
   }
 
   const prevImage = () => {
-    if (!lightboxImages) return
+    if (!lightboxImages || lightboxImages.length === 0) return
     setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length)
   }
 
@@ -76,138 +79,161 @@ export default function FesteClient({ feste }: any) {
 
         {/* Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {feste?.map((fest: any, index: number) => {
-            const images = Array.isArray(fest.images)
-              ? fest.images.filter(Boolean)
-              : []
+          {Array.isArray(feste) &&
+            feste.map((fest: any, index: number) => {
+              if (!fest) return null
 
-            const currentIndex =
-              images.length > 0
-                ? (currentImageIndex[fest._id] || 0) % images.length
-                : 0
+              const images = Array.isArray(fest.images)
+                ? fest.images.filter((img: any) => typeof img === 'string')
+                : []
 
-            return (
-              <motion.div
-                key={fest._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: index * 0.1 }}
-                onMouseEnter={() => {
-                  setHoveredCard(fest._id)
-                  setPausedCards((p) => ({ ...p, [fest._id]: true }))
-                }}
-                onMouseLeave={() => {
-                  setHoveredCard(null)
-                  setPausedCards((p) => ({ ...p, [fest._id]: false }))
-                }}
-                className="group bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition"
-              >
+              const currentIndex =
+                images.length > 0
+                  ? (currentImageIndex[fest._id] || 0) % images.length
+                  : 0
 
-                {/* Slider */}
+              return (
                 <motion.div
-                  className="relative aspect-[4/3]"
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  onDragEnd={(e, info) => {
-                    if (images.length < 2) return
-                    if (info.offset.x < -50)
-                      setCurrentImageIndex((p) => ({
-                        ...p,
-                        [fest._id]: (currentIndex + 1) % images.length
-                      }))
-                    if (info.offset.x > 50)
-                      setCurrentImageIndex((p) => ({
-                        ...p,
-                        [fest._id]: (currentIndex - 1 + images.length) % images.length
-                      }))
+                  key={fest._id || index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={inView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ delay: index * 0.1 }}
+                  onMouseEnter={() => {
+                    if (!fest._id) return
+                    setHoveredCard(fest._id)
+                    setPausedCards((p) => ({ ...p, [fest._id]: true }))
                   }}
-                >
-                  {images.map((img: string, i: number) => (
-                    <Image
-                      key={i}
-                      src={img}
-                      alt=""
-                      fill
-                      onClick={() => {
-                        setLightboxImages(images)
-                        setLightboxIndex(i)
-                      }}
-                      className={`absolute inset-0 object-cover transition-opacity duration-700 ${
-                        i === currentIndex ? 'opacity-100' : 'opacity-0'
-                      }`}
-                    />
-                  ))}
-
-                  {/* Datum */}
-                  {fest.date && (
-                    <div className="absolute top-3 right-3 z-20 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
-                      {new Date(fest.date).toLocaleDateString('de-DE', {
-                        day: '2-digit',
-                        month: 'short'
-                      })}
-                    </div>
-                  )}
-                </motion.div>
-
-                {/* Content */}
-                <motion.div
-                  animate={{
-                    y: hoveredCard === fest._id ? -5 : 0
+                  onMouseLeave={() => {
+                    setHoveredCard(null)
+                    if (!fest._id) return
+                    setPausedCards((p) => ({ ...p, [fest._id]: false }))
                   }}
-                  transition={{ duration: 0.25 }}
-                  className="p-5"
+                  className="group bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition"
                 >
-                  {fest.region && (
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                      <MapPin size={14} />
-                      {fest.region}
-                    </div>
-                  )}
 
-                  <h3 className="font-bold text-lg mb-2">{fest.name}</h3>
+                  {/* Slider */}
+                  <motion.div
+                    className="relative aspect-[4/3] bg-gray-100"
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    onDragEnd={(e, info) => {
+                      if (images.length < 2 || !fest._id) return
 
-                  {fest.vibe && (
-                    <p className="text-green-600 text-sm mb-2">
-                      {fest.vibe}
-                    </p>
-                  )}
+                      if (info.offset.x < -50) {
+                        setCurrentImageIndex((p) => ({
+                          ...p,
+                          [fest._id]: (currentIndex + 1) % images.length
+                        }))
+                      }
 
-                  {fest.description && (
-                    <p className="text-gray-600 text-sm mb-3 leading-relaxed">
-                      {fest.description}
-                    </p>
-                  )}
-
-                  {/* 🔥 BADGES (Hover) */}
-                  {hoveredCard === fest._id &&
-                    Array.isArray(fest.quickFacts) &&
-                    fest.quickFacts.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-3 flex flex-wrap gap-2"
-                      >
-                        {fest.quickFacts.map((fact: string, i: number) => (
-                          <span
-                            key={i}
-                            className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"
-                          >
-                            {fact}
-                          </span>
-                        ))}
-                      </motion.div>
+                      if (info.offset.x > 50) {
+                        setCurrentImageIndex((p) => ({
+                          ...p,
+                          [fest._id]: (currentIndex - 1 + images.length) % images.length
+                        }))
+                      }
+                    }}
+                  >
+                    {images.length > 0 ? (
+                      images.map((img: string, i: number) => (
+                        <Image
+                          key={i}
+                          src={img}
+                          alt={fest?.name || 'Fest'}
+                          fill
+                          onClick={() => {
+                            setLightboxImages(images)
+                            setLightboxIndex(i)
+                          }}
+                          className={`absolute inset-0 object-cover transition-opacity duration-700 ${
+                            i === currentIndex ? 'opacity-100' : 'opacity-0'
+                          }`}
+                        />
+                      ))
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                        Kein Bild vorhanden
+                      </div>
                     )}
+
+                    {/* Datum */}
+                    {fest?.date && (
+                      <div className="absolute top-3 right-3 z-20 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+                        {new Date(fest.date).toLocaleDateString('de-DE', {
+                          day: '2-digit',
+                          month: 'short'
+                        })}
+                      </div>
+                    )}
+                  </motion.div>
+
+                  {/* Content */}
+                  <motion.div
+                    animate={{
+                      y: hoveredCard === fest._id ? -5 : 0
+                    }}
+                    transition={{ duration: 0.25 }}
+                    className="p-5"
+                  >
+                    {fest?.region && (
+                      <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                        <MapPin size={14} />
+                        {fest.region}
+                      </div>
+                    )}
+
+                    <h3 className="font-bold text-lg mb-2">
+                      {fest?.name || 'Unbenanntes Fest'}
+                    </h3>
+
+                    {fest?.vibe && (
+                      <p className="text-green-600 text-sm mb-2">
+                        {fest.vibe}
+                      </p>
+                    )}
+
+                    {fest?.description && (
+                      <p className="text-gray-600 text-sm mb-3 leading-relaxed">
+                        {fest.description}
+                      </p>
+                    )}
+
+                    {/* BADGES */}
+                    {hoveredCard === fest._id &&
+                      Array.isArray(fest?.quickFacts) &&
+                      fest.quickFacts.length > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-3 flex flex-wrap gap-2"
+                        >
+                          {fest.quickFacts.map((fact: any, i: number) => {
+                            if (!fact) return null
+                            return (
+                              <span
+                                key={i}
+                                className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"
+                              >
+                                {typeof fact === 'string' ? fact : ''}
+                              </span>
+                            )
+                          })}
+                        </motion.div>
+                      )}
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            )
-          })}
+              )
+            })}
         </div>
 
         {/* LIGHTBOX */}
-        {lightboxImages && (
+        {Array.isArray(lightboxImages) && lightboxImages.length > 0 && (
           <motion.div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
 
-            <button onClick={() => setLightboxImages(null)} className="absolute top-5 right-5 text-white">
+            <button
+              onClick={() => setLightboxImages(null)}
+              className="absolute top-5 right-5 text-white"
+            >
               <X size={32} />
             </button>
 
@@ -234,7 +260,7 @@ export default function FesteClient({ feste }: any) {
             >
               <Image
                 src={lightboxImages[lightboxIndex]}
-                alt=""
+                alt="Bild"
                 width={1400}
                 height={900}
                 className="object-contain max-h-[90vh] w-full"
