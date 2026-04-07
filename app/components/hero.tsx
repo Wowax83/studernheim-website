@@ -16,18 +16,18 @@ export default function Hero() {
 
   const { scrollY } = useScroll()
 
-  // 🔥 Scroll Effects (dezent & smooth)
+  // 🔥 Scroll Effects
   const y = useTransform(scrollY, [0, 500], [0, 100])
   const x = useTransform(scrollY, [0, 500], [0, 40])
   const scale = useTransform(scrollY, [0, 500], [1, 1.04])
 
-  // 🔥 Blur (dezent)
+  // 🔥 Blur
   const blur = useTransform(scrollY, [0, 300], [0, 2])
   const blurPx = useTransform(blur, (v) => `blur(${v}px)`)
 
   const opacity = useTransform(scrollY, [0, 300], [1, 0])
 
-  // 🔥 Mouse Movement (weich)
+  // 🔥 Mouse Movement
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
@@ -45,12 +45,21 @@ export default function Hero() {
   const xTotal = useTransform([x, mouseX], (v: number[]) => v[0] + v[1])
   const yTotal = useTransform([y, mouseY], (v: number[]) => v[0] + v[1])
 
-  // 🔥 Smooth easing (kein Ruckeln)
   const smoothX = useSpring(xTotal, { stiffness: 40, damping: 20 })
   const smoothY = useSpring(yTotal, { stiffness: 40, damping: 20 })
 
+  // 🔥 FIX: Scroll mit Offset (Navbar!)
   const scrollToNext = () => {
-    document.getElementById('sag')?.scrollIntoView({ behavior: 'smooth' })
+    const element = document.getElementById('sag')
+    if (!element) return
+
+    const yOffset = -80
+    const y =
+      element.getBoundingClientRect().top +
+      window.pageYOffset +
+      yOffset
+
+    window.scrollTo({ top: y, behavior: 'smooth' })
   }
 
   return (
@@ -75,9 +84,9 @@ export default function Hero() {
           y: smoothY,
           scale,
           filter: blurPx,
-          willChange: 'transform'
+          willChange: 'transform, filter'
         }}
-        className="absolute -inset-10" // 🔥 verhindert weiße Ränder
+        className="absolute -inset-10"
       >
         <Image
           src="/hero.webp"
@@ -86,62 +95,31 @@ export default function Hero() {
           priority
           quality={75}
           sizes="100vw"
+          placeholder="blur"
+          blurDataURL="/hero.webp"
           className="object-cover"
         />
 
-        {/* 🌅 Grund Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/70" />
-
-        {/* 🌞 Bewegte Lichtquelle */}
-        <motion.div
-          className="absolute inset-0 pointer-events-none"
-          animate={{
-            x: [0, 40, -30, 0],
-            y: [0, -20, 30, 0]
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: 'easeInOut'
-          }}
-          style={{
-            background:
-              'radial-gradient(circle at 30% 30%, rgba(255,220,120,0.2), transparent 60%)'
-          }}
-        />
-
-        {/* 🌞 zweite Lichtquelle */}
-        <motion.div
-          className="absolute inset-0 pointer-events-none"
-          animate={{
-            x: [0, -20, 20, 0],
-            y: [0, 30, -20, 0]
-          }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: 'easeInOut'
-          }}
-          style={{
-            background:
-              'radial-gradient(circle at 70% 70%, rgba(255,200,100,0.12), transparent 70%)'
-          }}
-        />
+        {/* 🌑 Overlay (wichtig für Lesbarkeit!) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/70" />
       </motion.div>
 
-      {/* Aurora optional */}
+      {/* Aurora (optional behalten) */}
       <div className="absolute inset-0 aurora pointer-events-none" />
 
       {/* Content */}
       <motion.div
-        style={{ opacity }}
+        style={{
+          opacity,
+          y: useTransform(scrollY, [0, 300], [0, -50])
+        }}
         className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center"
       >
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="font-heading text-5xl sm:text-6xl md:text-8xl font-bold text-white mb-6 drop-shadow-2xl"
+          className="font-heading text-5xl sm:text-6xl md:text-8xl font-bold text-white mb-6 drop-shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
         >
           Studernheim
         </motion.h1>
@@ -155,10 +133,10 @@ export default function Hero() {
           Ein Dorf voller Leben, Tradition und Gemeinschaft
         </motion.p>
 
-        {/* Scroll */}
+        {/* Scroll Button */}
         <motion.button
           onClick={scrollToNext}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/80 hover:text-white transition"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/80 hover:text-white hover:scale-110 transition-all"
         >
           <motion.div
             animate={{ y: [0, 10, 0] }}
