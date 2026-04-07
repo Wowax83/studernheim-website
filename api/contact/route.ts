@@ -9,9 +9,28 @@ export async function POST(req: Request) {
     const name = body.name || 'Unbekannt'
     const email = body.email || 'Keine E-Mail'
     const message = body.message || 'Keine Nachricht'
+    const interests = body.interests || []
+    const company = body.company // 🛡️ Honeypot
+    const formStartTime = body.formStartTime // ⏱️ Zeitcheck
 
+    // 🛑 SPAM SCHUTZ
+
+    // 1. Honeypot (Bots füllen versteckte Felder)
+    if (company) {
+      console.log('🚫 Spam erkannt (Honeypot)')
+      return Response.json({ success: true })
+    }
+
+    // 2. Zeitcheck (zu schnell ausgefüllt = Bot)
+    const now = Date.now()
+    if (formStartTime && now - formStartTime < 2000) {
+      console.log('🚫 Spam erkannt (zu schnell)')
+      return Response.json({ success: true })
+    }
+
+    // 📩 E-Mail senden
     const result = await resend.emails.send({
-      from: 'SAG Studernheim <onboarding@resend.dev>', // später eigene Domain!
+      from: 'SAG Studernheim <onboarding@resend.dev>',
       to: 'studernheim.ag@gmail.com',
       subject: `📩 Neue Nachricht von ${name}`,
 
@@ -22,6 +41,12 @@ export async function POST(req: Request) {
 
           <p><strong>Name:</strong><br/>${name}</p>
           <p><strong>E-Mail:</strong><br/>${email}</p>
+
+          ${
+            interests.length > 0
+              ? `<p><strong>Interessen:</strong><br/>${interests.join(', ')}</p>`
+              : ''
+          }
 
           <p><strong>Nachricht:</strong></p>
           <div style="
