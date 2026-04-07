@@ -2,7 +2,14 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Calendar, MapPin, Info, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  Calendar,
+  MapPin,
+  Info,
+  X,
+  ChevronLeft,
+  ChevronRight
+} from 'lucide-react'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 
@@ -10,10 +17,13 @@ export default function FesteClient({ feste }: any) {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 })
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-  const [pausedCards, setPausedCards] = useState<{ [key: string]: boolean }>({})
-  const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: string]: number }>({})
+  const [pausedCards, setPausedCards] = useState<{ [key: string]: boolean }>(
+    {}
+  )
+  const [currentImageIndex, setCurrentImageIndex] = useState<{
+    [key: string]: number
+  }>({})
 
-  // 🔥 Lightbox
   const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
@@ -24,7 +34,10 @@ export default function FesteClient({ feste }: any) {
         const updated: any = { ...prev }
 
         feste?.forEach((fest: any) => {
-          const images = Array.isArray(fest.images) ? fest.images.filter(Boolean) : []
+          const images = Array.isArray(fest.images)
+            ? fest.images.filter(Boolean)
+            : []
+
           if (pausedCards[fest._id]) return
 
           if (images.length > 1) {
@@ -40,7 +53,6 @@ export default function FesteClient({ feste }: any) {
     return () => clearInterval(interval)
   }, [feste, pausedCards])
 
-  // 🔁 Navigation
   const nextImage = () => {
     if (!lightboxImages) return
     setLightboxIndex((prev) => (prev + 1) % lightboxImages.length)
@@ -56,15 +68,28 @@ export default function FesteClient({ feste }: any) {
       <div className="max-w-7xl mx-auto px-4">
 
         {/* Header */}
-        <motion.div ref={ref} initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} className="text-center mb-12">
-          <h2 className="text-5xl font-bold">Unsere <span className="text-green-600">Feste</span></h2>
+        <motion.div
+          ref={ref}
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}}
+          className="text-center mb-12"
+        >
+          <h2 className="text-5xl font-bold">
+            Unsere <span className="text-green-600">Feste</span>
+          </h2>
         </motion.div>
 
         {/* Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {feste?.map((fest: any, index: number) => {
-            const images = Array.isArray(fest.images) ? fest.images.filter(Boolean) : []
-            const currentIndex = images.length > 0 ? (currentImageIndex[fest._id] || 0) % images.length : 0
+            const images = Array.isArray(fest.images)
+              ? fest.images.filter(Boolean)
+              : []
+
+            const currentIndex =
+              images.length > 0
+                ? (currentImageIndex[fest._id] || 0) % images.length
+                : 0
 
             return (
               <motion.div
@@ -72,30 +97,34 @@ export default function FesteClient({ feste }: any) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: index * 0.1 }}
-                onMouseEnter={() => setPausedCards((p) => ({ ...p, [fest._id]: true }))}
-                onMouseLeave={() => setPausedCards((p) => ({ ...p, [fest._id]: false }))}
-                className="bg-white rounded-xl overflow-hidden shadow"
+                onMouseEnter={() => {
+                  setHoveredCard(fest._id)
+                  setPausedCards((p) => ({ ...p, [fest._id]: true }))
+                }}
+                onMouseLeave={() => {
+                  setHoveredCard(null)
+                  setPausedCards((p) => ({ ...p, [fest._id]: false }))
+                }}
+                className="group bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition"
               >
 
-                {/* Slider mit Swipe */}
+                {/* Slider */}
                 <motion.div
                   className="relative aspect-[4/3]"
                   drag="x"
                   dragConstraints={{ left: 0, right: 0 }}
                   onDragEnd={(e, info) => {
                     if (images.length < 2) return
-                    if (info.offset.x < -50) {
-                      setCurrentImageIndex((prev) => ({
-                        ...prev,
+                    if (info.offset.x < -50)
+                      setCurrentImageIndex((p) => ({
+                        ...p,
                         [fest._id]: (currentIndex + 1) % images.length
                       }))
-                    }
-                    if (info.offset.x > 50) {
-                      setCurrentImageIndex((prev) => ({
-                        ...prev,
+                    if (info.offset.x > 50)
+                      setCurrentImageIndex((p) => ({
+                        ...p,
                         [fest._id]: (currentIndex - 1 + images.length) % images.length
                       }))
-                    }
                   }}
                 >
                   {images.map((img: string, i: number) => (
@@ -125,39 +154,57 @@ export default function FesteClient({ feste }: any) {
                   )}
                 </motion.div>
 
-                {/* Content */}
-                <div className="p-4">
-                  <h3 className="font-bold text-lg">{fest.name}</h3>
-                </div>
+                {/* 🔥 Content mit Hover Animation */}
+                <motion.div
+                  animate={{
+                    y: hoveredCard === fest._id ? -5 : 0
+                  }}
+                  transition={{ duration: 0.25 }}
+                  className="p-5"
+                >
+                  {fest.region && (
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                      <MapPin size={14} />
+                      {fest.region}
+                    </div>
+                  )}
+
+                  <h3 className="font-bold text-lg mb-2">{fest.name}</h3>
+
+                  {fest.vibe && (
+                    <p className="text-green-600 text-sm mb-2">
+                      {fest.vibe}
+                    </p>
+                  )}
+
+                  {/* 🔥 2 Zeilen Clamp */}
+                  {fest.description && (
+                    <p className="text-gray-600 text-sm line-clamp-2">
+                      {fest.description}
+                    </p>
+                  )}
+                </motion.div>
               </motion.div>
             )
           })}
         </div>
 
-        {/* 🔥 LIGHTBOX */}
+        {/* LIGHTBOX */}
         {lightboxImages && (
-          <motion.div
-            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
+          <motion.div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
 
-            {/* Close */}
-            <button onClick={() => setLightboxImages(null)} className="absolute top-5 right-5 text-white z-50">
+            <button onClick={() => setLightboxImages(null)} className="absolute top-5 right-5 text-white">
               <X size={32} />
             </button>
 
-            {/* Left */}
-            <button onClick={prevImage} className="absolute left-5 text-white z-50">
+            <button onClick={prevImage} className="absolute left-5 text-white">
               <ChevronLeft size={32} />
             </button>
 
-            {/* Right */}
-            <button onClick={nextImage} className="absolute right-5 text-white z-50">
+            <button onClick={nextImage} className="absolute right-5 text-white">
               <ChevronRight size={32} />
             </button>
 
-            {/* 🔥 Swipe + Zoom */}
             <motion.div
               key={lightboxIndex}
               drag="x"
