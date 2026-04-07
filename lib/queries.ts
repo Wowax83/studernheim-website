@@ -15,7 +15,7 @@ export async function getFeste() {
       organizer,
 
       // 🔥 NEU: mehrere Bilder + Fallback für alte Daten
-      "images": coalesce(images[].asset->url, [image.asset->url]),
+      "images": coalesce(images[].asset->url, [image.asset->url], []),
 
       quickFacts
     }`,
