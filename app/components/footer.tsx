@@ -44,16 +44,12 @@ export default function Footer() {
           <div>
             <h4 className="font-heading font-bold text-lg mb-4">Kontakt</h4>
             <ul className="space-y-2 text-gray-400">
-              <li>Hauptstraße 1</li>
-              <li>67376 Studernheim</li>
+              <li>Alexander Hüter</li>
+              <li>Oggersheimer Str. 14</li>
+              <li>67227 Frankenthal (Pfalz)</li>
               <li>
-                <a href="tel:063441234" className="hover:text-green-400 transition-colors">
-                  06344 / 1234
-                </a>
-              </li>
-              <li>
-                <a href="mailto:info@studernheim.de" className="hover:text-green-400 transition-colors">
-                  info@studernheim.de
+                <a href="mailto:studernheim.ag@gmail.com" className="hover:text-green-400 transition-colors">
+                  studernheim.ag@gmail.com
                 </a>
               </li>
             </ul>
