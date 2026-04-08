@@ -4,6 +4,12 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Settings } from 'lucide-react'
 
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void
+  }
+}
+
 type ConsentType = {
   necessary: boolean
   analytics: boolean
