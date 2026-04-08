@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import CookieBanner from '@/components/cookie-banner'
 import Navbar from '@/app/components/navbar'
-import WhatsAppFloating from '@/components/whatsapp-floating'
+import WhatsAppFloating from '@/app/components/whatsapp-floating'
 
 export const dynamic = 'force-dynamic'
 
