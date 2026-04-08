@@ -165,14 +165,6 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* Floating Mobile CTA */}
-      <Link
-        href="/#kontakt"
-        onClick={() => scrollToSection('/#kontakt')}
-        className="md:hidden fixed bottom-6 right-6 z-40 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full font-medium shadow-2xl hover:scale-110 transition-transform"
-      >
-        Kontakt
-      </Link>
     </>
   )
 }
