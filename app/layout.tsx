@@ -1,7 +1,10 @@
+'use client'
+
 import type { Metadata } from 'next'
 import './globals.css'
 import CookieBanner from '@/components/cookie-banner'
 import Navbar from '@/app/components/navbar'
+import WhatsAppFloating from '@/components/whatsapp-floating'
 
 export const dynamic = 'force-dynamic'
 
@@ -83,7 +86,7 @@ export default function RootLayout({
     <html lang="de" className="scroll-smooth">
       <body className="font-body antialiased bg-white text-gray-900">
 
-        {/* 🔥 STRUCTURED DATA (SEO BOOST) */}
+        {/* 🔥 STRUCTURED DATA */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -101,7 +104,7 @@ export default function RootLayout({
           }}
         />
 
-        {/* 🔥 ORGANIZATION SCHEMA (NEU → sehr stark) */}
+        {/* 🔥 ORGANIZATION SCHEMA */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -122,6 +125,9 @@ export default function RootLayout({
         <main className="pt-20">
           {children}
         </main>
+
+        {/* 🔥 WHATSAPP FLOATING BUTTON */}
+        <WhatsAppFloating />
 
         {/* Cookie Banner */}
         <CookieBanner />
