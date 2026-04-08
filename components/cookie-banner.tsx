@@ -27,14 +27,34 @@ export default function CookieBanner() {
     const saved = localStorage.getItem('cookieConsent')
 
     if (saved) {
-      const parsed = JSON.parse(saved)
-      setConsent(parsed)
+      try {
+        const parsed = JSON.parse(saved)
 
-      // 👉 Consent Mode vorbereiten
-      if (parsed.analytics) {
-        window.gtag?.('consent', 'update', {
-          analytics_storage: 'granted'
-        })
+        // 👉 FALLBACK für alte Version ("accepted" / "declined")
+        if (typeof parsed === 'string') {
+          const fallback =
+            parsed === 'accepted'
+              ? { necessary: true, analytics: true }
+              : { necessary: true, analytics: false }
+
+          setConsent(fallback)
+          localStorage.setItem('cookieConsent', JSON.stringify(fallback))
+        } else {
+          setConsent(parsed)
+        }
+
+        // 👉 Consent Mode
+        if (parsed?.analytics && typeof window !== 'undefined' && window.gtag) {
+          window.gtag('consent', 'update', {
+            analytics_storage: 'granted'
+          })
+        }
+      } catch (e) {
+        console.error('Cookie parse error', e)
+
+        // ❗ corrupted storage fix
+        localStorage.removeItem('cookieConsent')
+        setVisible(true)
       }
     } else {
       setVisible(true)
@@ -47,14 +67,9 @@ export default function CookieBanner() {
     setVisible(false)
     setShowSettings(false)
 
-    // 👉 Google Consent Mode vorbereiten
-    if (data.analytics) {
-      window.gtag?.('consent', 'update', {
-        analytics_storage: 'granted'
-      })
-    } else {
-      window.gtag?.('consent', 'update', {
-        analytics_storage: 'denied'
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('consent', 'update', {
+        analytics_storage: data.analytics ? 'granted' : 'denied'
       })
     }
   }
@@ -124,7 +139,7 @@ export default function CookieBanner() {
                     <span>Statistik (Google Analytics)</span>
                     <input
                       type="checkbox"
-                      checked={consent?.analytics ?? false}
+                      checked={!!consent?.analytics}
                       onChange={(e) =>
                         setConsent({
                           necessary: true,
@@ -166,6 +181,7 @@ export default function CookieBanner() {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           className="fixed bottom-6 left-6 z-50 bg-white px-4 py-3 rounded-full shadow-xl border"
         >
           <Settings size={18} />
