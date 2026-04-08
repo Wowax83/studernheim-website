@@ -5,6 +5,7 @@ export default function Impressum() {
 
       <div className="space-y-6 text-gray-700 leading-relaxed">
 
+        {/* 1 */}
         <section>
           <h2 className="text-xl font-semibold">Angaben gemäß § 5 TMG</h2>
           <p>
@@ -15,6 +16,7 @@ export default function Impressum() {
           </p>
         </section>
 
+        {/* 2 */}
         <section>
           <h2 className="text-xl font-semibold">Registereintrag</h2>
           <p>
@@ -24,13 +26,15 @@ export default function Impressum() {
           </p>
         </section>
 
+        {/* 3 */}
         <section>
-          <h2 className="text-xl font-semibold">Vertreten durch</h2>
+          <h2 className="text-xl font-semibold">Vertreten durch den Vorstand</h2>
           <p>
-            Der Vorstand
+            Der Vorstand des Vereins gemäß § 26 BGB
           </p>
         </section>
 
+        {/* 4 */}
         <section>
           <h2 className="text-xl font-semibold">Kontakt</h2>
           <p>
@@ -38,6 +42,19 @@ export default function Impressum() {
           </p>
         </section>
 
+        {/* 5 */}
+        <section>
+          <h2 className="text-xl font-semibold">
+            Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV
+          </h2>
+          <p>
+            Studernheimer Arbeitsgemeinschaft (SAG) e.V.<br />
+            Oggersheimer Str. 14<br />
+            67227 Frankenthal
+          </p>
+        </section>
+
+        {/* 6 */}
         <section>
           <h2 className="text-xl font-semibold">Haftung für Inhalte</h2>
           <p>
@@ -45,22 +62,39 @@ export default function Impressum() {
             Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte
             können wir jedoch keine Gewähr übernehmen.
           </p>
+          <p>
+            Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte
+            auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.
+          </p>
         </section>
 
+        {/* 7 */}
         <section>
           <h2 className="text-xl font-semibold">Haftung für Links</h2>
           <p>
-            Unsere Website enthält Links zu externen Websites Dritter.
-            Auf deren Inhalte haben wir keinen Einfluss.
+            Unsere Website enthält Links zu externen Websites Dritter,
+            auf deren Inhalte wir keinen Einfluss haben.
+          </p>
+          <p>
+            Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen.
             Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter verantwortlich.
           </p>
         </section>
 
+        {/* 8 */}
         <section>
           <h2 className="text-xl font-semibold">Urheberrecht</h2>
           <p>
-            Die Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht.
-            Vervielfältigung, Bearbeitung und Verwertung bedürfen der Zustimmung des jeweiligen Autors.
+            Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten
+            unterliegen dem deutschen Urheberrecht.
+          </p>
+          <p>
+            Beiträge Dritter sind als solche gekennzeichnet.
+          </p>
+          <p>
+            Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung
+            außerhalb der Grenzen des Urheberrechts bedürfen der schriftlichen Zustimmung
+            des jeweiligen Autors bzw. Erstellers.
           </p>
         </section>
 
