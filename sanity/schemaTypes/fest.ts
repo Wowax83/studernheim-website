@@ -17,11 +17,10 @@ export default {
 
     { name: 'region', type: 'string', title: 'Ort' },
 
-    // 🔥 Zusatzinfos
     { name: 'vibe', type: 'string', title: 'Stimmung / Vibe' },
     { name: 'organizer', type: 'string', title: 'Veranstalter' },
 
-    // 🔥 NEU: mehrere Bilder (Slider)
+    // 🔥 Bilder (Slider)
     {
       name: 'images',
       title: 'Bilder',
@@ -35,7 +34,7 @@ export default {
       description: 'Erstes Bild = Startbild im Slider'
     },
 
-    // 🔥 OPTIONAL: altes Feld drin lassen (Fallback)
+    // 🔥 Fallback (alt)
     {
       name: 'image',
       type: 'image',
@@ -43,16 +42,47 @@ export default {
       hidden: true
     },
 
-    // 🔥 Highlights (für Hover bei dir)
+    // 🔥 BADGES (kurze Infos)
     {
       name: 'quickFacts',
-      title: 'Highlights',
+      title: 'Kurzinfos (Badges)',
       type: 'array',
       of: [
         {
           type: 'string'
         }
       ]
+    },
+
+    // 🔥 NEU: LINKS (WICHTIG)
+    {
+      name: 'highlights',
+      title: 'Links / Highlights',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          preview: {
+            select: {
+              title: 'text',
+              subtitle: 'url'
+            }
+          },
+          fields: [
+            {
+              name: 'text',
+              title: 'Text',
+              type: 'string'
+            },
+            {
+              name: 'url',
+              title: 'Link',
+              type: 'url'
+            }
+          ]
+        }
+      ],
+      description: 'z.B. Homepage oder Helferliste'
     }
   ]
 }
