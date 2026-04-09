@@ -9,7 +9,6 @@ function formatDate(date: string) {
   return new Date(date).toLocaleDateString('de-DE')
 }
 
-// 🔥 Monat + Jahr Label
 function getMonthLabel(date: string) {
   const d = new Date(date)
   return d.toLocaleDateString('de-DE', {
@@ -22,12 +21,10 @@ export default function TermineClient({ events }: { events: any[] }) {
   const { ref, inView } = useInView({ triggerOnce: true })
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
 
-  // 🔥 sortieren
   const sortedEvents = [...events]
     .filter(e => e.date)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
-  // 🔥 gruppieren nach Monat
   const grouped = sortedEvents.reduce((acc: any, event: any) => {
     const key = getMonthLabel(event.date)
     if (!acc[key]) acc[key] = []
@@ -52,12 +49,10 @@ export default function TermineClient({ events }: { events: any[] }) {
           </h2>
         </motion.div>
 
-        {/* 🔥 Monatsgruppen */}
         <div className="space-y-12">
           {Object.entries(grouped).map(([month, monthEvents]: any, groupIndex) => (
             <div key={month}>
 
-              {/* 🔥 Monat Titel */}
               <motion.h3
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -67,10 +62,14 @@ export default function TermineClient({ events }: { events: any[] }) {
                 {month}
               </motion.h3>
 
-              {/* Events */}
               <div className="space-y-4">
                 {monthEvents.map((event: any, index: number) => {
                   const dateObj = new Date(event.date)
+
+                  // 🔥 Helferliste finden
+                  const helferLink = event.highlights?.find((item: any) =>
+                    item?.url?.toLowerCase().includes('helferliste.online')
+                  )
 
                   return (
                     <motion.div
@@ -85,7 +84,7 @@ export default function TermineClient({ events }: { events: any[] }) {
                       <div className="flex flex-col md:flex-row gap-6">
 
                         {/* Datum */}
-                        <div className="flex-shrink-0 w-24 h-24 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex flex-col items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+                        <div className="flex-shrink-0 w-24 h-24 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex flex-col items-center justify-center text-white shadow-lg">
                           <div className="text-3xl font-bold">
                             {dateObj.getDate()}
                           </div>
@@ -98,7 +97,7 @@ export default function TermineClient({ events }: { events: any[] }) {
                         <div className="flex-1">
                           
                           <div className="flex items-center gap-3 mb-3">
-                            <h3 className="font-heading text-2xl font-bold text-gray-900 group-hover:text-green-600">
+                            <h3 className="font-heading text-2xl font-bold text-gray-900">
                               {event.title}
                             </h3>
 
@@ -113,7 +112,8 @@ export default function TermineClient({ events }: { events: any[] }) {
                             </p>
                           )}
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                          {/* 🔥 DETAILS + BUTTON */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm items-center">
 
                             <div className="flex items-center gap-2 text-gray-600">
                               <Calendar size={16} className="text-green-600" />
@@ -140,11 +140,23 @@ export default function TermineClient({ events }: { events: any[] }) {
                                 <span>{event.organizer}</span>
                               </div>
                             )}
+
+                            {/* 🔥 JETZT HELFEN BUTTON */}
+                            {helferLink && (
+                              <a
+                                href={helferLink.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-700 hover:scale-105 transition shadow-md"
+                              >
+                                <span className="text-lg">📝</span>
+                                Jetzt helfen
+                              </a>
+                            )}
                           </div>
 
-                          {/* 🔥 Highlights */}
+                          {/* 🔥 ANDERE LINKS (Hover) */}
                           {hoveredEvent === event._id &&
-                            event.type === 'fest' &&
                             event.highlights && (
                               <motion.div
                                 initial={{ opacity: 0, height: 0 }}
@@ -153,28 +165,15 @@ export default function TermineClient({ events }: { events: any[] }) {
                               >
                                 {event.highlights.map((item: any, i: number) => {
 
-                                  if (typeof item === 'string') {
-                                    return (
-                                      <span key={i} className="text-xs bg-gray-200 px-3 py-1 rounded-full">
-                                        {item}
-                                      </span>
-                                    )
-                                  }
+                                  if (typeof item === 'string') return null
 
                                   const url = item.url?.toLowerCase() || ''
 
-                                  let icon = '🔗'
-                                  let style = 'bg-gray-200 text-gray-700'
-                                  let label = item.text
+                                  // ❌ Helferliste hier NICHT nochmal anzeigen
+                                  if (url.includes('helferliste.online')) return null
 
-                                  if (url.includes('helferliste.online')) {
-                                    icon = '📝'
-                                    style = 'bg-emerald-600 text-white'
-                                    label = 'Helferliste'
-                                  } else if (url.startsWith('http')) {
-                                    icon = '🌐'
-                                    style = 'bg-blue-100 text-blue-700'
-                                  }
+                                  let icon = '🌐'
+                                  let style = 'bg-blue-100 text-blue-700'
 
                                   return (
                                     <a
@@ -183,7 +182,7 @@ export default function TermineClient({ events }: { events: any[] }) {
                                       target="_blank"
                                       className={`text-xs px-4 py-2 rounded-lg ${style}`}
                                     >
-                                      {icon} {label}
+                                      {icon} {item.text}
                                     </a>
                                   )
                                 })}
