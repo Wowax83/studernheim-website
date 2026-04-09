@@ -11,8 +11,12 @@ function formatDate(date: string) {
 
 export default function TermineClient({ events }: { events: any[] }) {
   const { ref, inView } = useInView({ triggerOnce: true })
-
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
+
+  // 🔥 NEU: sortieren + nur gültige Events
+  const sortedEvents = [...events]
+    .filter(e => e.date)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
   return (
     <section id="termine" className="py-20 sm:py-28 bg-gradient-to-b from-emerald-50/30 to-white">
@@ -36,7 +40,7 @@ export default function TermineClient({ events }: { events: any[] }) {
 
         {/* Liste */}
         <div className="space-y-4">
-          {events.map((event, index) => {
+          {sortedEvents.map((event, index) => {
             const dateObj = new Date(event.date)
 
             return (
@@ -67,7 +71,7 @@ export default function TermineClient({ events }: { events: any[] }) {
                     {/* Titel */}
                     <div className="flex items-center gap-3 mb-3">
                       <h3 className="font-heading text-2xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">
-                        {event.name || event.title}
+                        {event.title}
                       </h3>
 
                       <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
@@ -112,7 +116,7 @@ export default function TermineClient({ events }: { events: any[] }) {
                       )}
                     </div>
 
-                    {/* 🔥 Highlights */}
+                    {/* 🔥 Highlights FIXED */}
                     {hoveredEvent === event._id &&
                       event.type === 'fest' &&
                       event.highlights && (
@@ -122,6 +126,19 @@ export default function TermineClient({ events }: { events: any[] }) {
                           className="border-t border-gray-200 pt-4 mt-4 flex flex-wrap gap-2"
                         >
                           {event.highlights.map((item: any, i: number) => {
+
+                            // 🔥 FALLBACK für alte Daten (nur Text)
+                            if (typeof item === 'string') {
+                              return (
+                                <span
+                                  key={i}
+                                  className="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full"
+                                >
+                                  {item}
+                                </span>
+                              )
+                            }
+
                             const url = item.url?.toLowerCase() || ''
 
                             let icon = '🔗'
@@ -159,25 +176,6 @@ export default function TermineClient({ events }: { events: any[] }) {
           })}
         </div>
 
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-12 text-center"
-        >
-          <p className="text-gray-600 mb-4">
-            Sie möchten keine Termine verpassen?
-          </p>
-          <button
-            onClick={() =>
-              document.getElementById('kontakt')?.scrollIntoView({ behavior: 'smooth' })
-            }
-            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
-          >
-            Newsletter abonnieren
-          </button>
-        </motion.div>
       </div>
     </section>
   )
