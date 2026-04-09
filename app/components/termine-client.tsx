@@ -51,7 +51,7 @@ export default function TermineClient({ events }: { events: any[] }) {
               >
                 <div className="flex flex-col md:flex-row gap-6">
 
-                  {/* Datum Box */}
+                  {/* Datum */}
                   <div className="flex-shrink-0 w-24 h-24 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex flex-col items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
                     <div className="text-3xl font-bold">
                       {dateObj.getDate()}
@@ -64,7 +64,7 @@ export default function TermineClient({ events }: { events: any[] }) {
                   {/* Content */}
                   <div className="flex-1">
                     
-                    {/* Titel + Typ */}
+                    {/* Titel */}
                     <div className="flex items-center gap-3 mb-3">
                       <h3 className="font-heading text-2xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">
                         {event.name || event.title}
@@ -112,7 +112,7 @@ export default function TermineClient({ events }: { events: any[] }) {
                       )}
                     </div>
 
-                    {/* 🔥 Highlights (nur bei Hover + nur bei Festen) */}
+                    {/* 🔥 Highlights */}
                     {hoveredEvent === event._id &&
                       event.type === 'fest' &&
                       event.highlights && (
@@ -121,26 +121,34 @@ export default function TermineClient({ events }: { events: any[] }) {
                           animate={{ opacity: 1, height: 'auto' }}
                           className="border-t border-gray-200 pt-4 mt-4 flex flex-wrap gap-2"
                         >
-                          {event.highlights.map((item: any, i: number) =>
-                            item.url ? (
+                          {event.highlights.map((item: any, i: number) => {
+                            const url = item.url?.toLowerCase() || ''
+
+                            let icon = '🔗'
+                            let style = 'bg-gray-200 text-gray-700'
+                            let label = item.text
+
+                            if (url.includes('helferliste.online')) {
+                              icon = '📝'
+                              style = 'bg-emerald-600 text-white'
+                              label = 'Helferliste'
+                            } else if (url.startsWith('http')) {
+                              icon = '🌐'
+                              style = 'bg-blue-100 text-blue-700'
+                            }
+
+                            return (
                               <a
                                 key={i}
                                 href={item.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition"
+                                className={`text-xs px-4 py-2 rounded-lg font-medium hover:scale-105 transition ${style}`}
                               >
-                                {item.text}
+                                {icon} {label}
                               </a>
-                            ) : (
-                              <span
-                                key={i}
-                                className="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full"
-                              >
-                                {item.text}
-                              </span>
                             )
-                          )}
+                          })}
                         </motion.div>
                       )}
 
@@ -151,7 +159,7 @@ export default function TermineClient({ events }: { events: any[] }) {
           })}
         </div>
 
-        {/* Footer CTA */}
+        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
