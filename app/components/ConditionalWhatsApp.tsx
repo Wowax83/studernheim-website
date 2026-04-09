@@ -7,7 +7,6 @@ export default function ConditionalWhatsApp() {
   const pathname = usePathname()
 
   // ❌ im Studio nicht anzeigen
-  if (pathname.startsWith('/studio')) return null
-
+  if (pathname.includes('studio') || pathname.includes('structure')) return null
   return <WhatsAppFloating />
 }
