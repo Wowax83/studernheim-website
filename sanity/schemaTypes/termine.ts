@@ -13,7 +13,6 @@ export default {
       title: 'Datum',
       type: 'date',
     },
-
     {
       name: 'time',
       title: 'Uhrzeit',
@@ -28,6 +27,48 @@ export default {
       name: 'location',
       title: 'Ort',
       type: 'string',
+    },
+
+    // ✅ NEU: Typ (Fest oder normaler Termin)
+    {
+      name: 'type',
+      title: 'Typ',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Termin', value: 'termin' },
+          { title: 'Fest', value: 'fest' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'termin',
+    },
+
+    // ✅ NEU: Highlights (wie Vereine)
+    {
+      name: 'highlights',
+      title: 'Highlights / Links',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'text',
+              title: 'Text',
+              type: 'string',
+            },
+            {
+              name: 'url',
+              title: 'Link',
+              type: 'url',
+            },
+          ],
+        },
+      ],
+
+      // 🔥 Optional: nur anzeigen wenn Fest
+      hidden: ({ document }) => document?.type !== 'fest',
     },
   ],
 }
