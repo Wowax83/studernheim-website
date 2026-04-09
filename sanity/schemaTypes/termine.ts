@@ -29,7 +29,7 @@ export default {
       type: 'string',
     },
 
-    // ✅ NEU: Typ (Fest oder normaler Termin)
+    // ✅ Typ (Fest oder Termin)
     {
       name: 'type',
       title: 'Typ',
@@ -44,30 +44,36 @@ export default {
       initialValue: 'termin',
     },
 
-    // ✅ NEU: Highlights (wie Vereine)
+    // 🔥 IDENTISCH wie bei Vereinen
     {
       name: 'highlights',
-      title: 'Highlights / Links',
+      title: 'Highlights',
       type: 'array',
       of: [
         {
           type: 'object',
+          preview: {
+            select: {
+              title: 'text',
+              subtitle: 'url'
+            }
+          },
           fields: [
             {
               name: 'text',
               title: 'Text',
-              type: 'string',
+              type: 'string'
             },
             {
               name: 'url',
               title: 'Link',
-              type: 'url',
-            },
-          ],
-        },
+              type: 'url'
+            }
+          ]
+        }
       ],
 
-      // 🔥 Optional: nur anzeigen wenn Fest
+      // 👉 nur bei Fest anzeigen
       hidden: ({ document }) => document?.type !== 'fest',
     },
   ],
