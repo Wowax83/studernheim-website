@@ -1,9 +1,8 @@
-
 import type { Metadata } from 'next'
 import './globals.css'
 import CookieBanner from '@/components/cookie-banner'
 import Navbar from '@/app/components/navbar'
-import WhatsAppFloating from '@/app/components/whatsapp-floating'
+import ConditionalWhatsApp from '@/app/components/ConditionalWhatsApp'
 
 export const dynamic = 'force-dynamic'
 
@@ -125,8 +124,8 @@ export default function RootLayout({
           {children}
         </main>
 
-        {/* 🔥 WHATSAPP FLOATING BUTTON */}
-        <WhatsAppFloating />
+        {/* ✅ WhatsApp nur außerhalb Studio */}
+        <ConditionalWhatsApp />
 
         {/* Cookie Banner */}
         <CookieBanner />
