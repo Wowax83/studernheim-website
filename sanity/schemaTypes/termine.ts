@@ -74,7 +74,7 @@ export default {
       ],
 
       // 👉 nur bei Fest anzeigen
-      hidden: ({ document }) => document?.type !== 'fest',
+      hidden: ({ document }: { document?: any }) => document?.type !== 'fest',
     },
   ],
 }
