@@ -21,7 +21,6 @@ export default function FesteClient({ feste }: any) {
   const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  // 🔄 Auto Rotation (safe)
   useEffect(() => {
     if (!Array.isArray(feste)) return
 
@@ -52,12 +51,12 @@ export default function FesteClient({ feste }: any) {
   }, [feste, pausedCards])
 
   const nextImage = () => {
-    if (!lightboxImages || lightboxImages.length === 0) return
+    if (!lightboxImages) return
     setLightboxIndex((prev) => (prev + 1) % lightboxImages.length)
   }
 
   const prevImage = () => {
-    if (!lightboxImages || lightboxImages.length === 0) return
+    if (!lightboxImages) return
     setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length)
   }
 
@@ -156,9 +155,8 @@ export default function FesteClient({ feste }: any) {
                       </div>
                     )}
 
-                    {/* Datum */}
                     {fest?.date && (
-                      <div className="absolute top-3 right-3 z-20 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+                      <div className="absolute top-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
                         {new Date(fest.date).toLocaleDateString('de-DE', {
                           day: '2-digit',
                           month: 'short'
@@ -168,13 +166,8 @@ export default function FesteClient({ feste }: any) {
                   </motion.div>
 
                   {/* Content */}
-                  <motion.div
-                    animate={{
-                      y: hoveredCard === fest._id ? -5 : 0
-                    }}
-                    transition={{ duration: 0.25 }}
-                    className="p-5"
-                  >
+                  <div className="p-5">
+
                     {fest?.region && (
                       <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                         <MapPin size={14} />
@@ -186,54 +179,83 @@ export default function FesteClient({ feste }: any) {
                       {fest?.name || 'Unbenanntes Fest'}
                     </h3>
 
-                    {fest?.vibe && (
-                      <p className="text-green-600 text-sm mb-2">
-                        {fest.vibe}
-                      </p>
-                    )}
-
                     {fest?.description && (
-                      <p className="text-gray-600 text-sm mb-3 leading-relaxed">
+                      <p className="text-gray-600 text-sm mb-3">
                         {fest.description}
                       </p>
                     )}
 
-                    {/* BADGES */}
+                    {/* Quick Facts */}
                     {hoveredCard === fest._id &&
-                      Array.isArray(fest?.quickFacts) &&
-                      fest.quickFacts.length > 0 && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-3 flex flex-wrap gap-2"
-                        >
-                          {fest.quickFacts.map((fact: any, i: number) => {
-                            if (!fact) return null
+                      Array.isArray(fest?.quickFacts) && (
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {fest.quickFacts.map((fact: any, i: number) => (
+                            <span
+                              key={i}
+                              className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"
+                            >
+                              {fact}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                    {/* 🔥 Highlights (NEU) */}
+                    {hoveredCard === fest._id &&
+                      Array.isArray(fest?.highlights) &&
+                      fest.highlights.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {fest.highlights.map((item: any, i: number) => {
+
+                            if (typeof item === 'string') {
+                              return (
+                                <span key={i} className="text-xs bg-gray-200 px-3 py-1 rounded-full">
+                                  {item}
+                                </span>
+                              )
+                            }
+
+                            const url = item.url?.toLowerCase() || ''
+
+                            let icon = '🔗'
+                            let style = 'bg-gray-200 text-gray-700'
+                            let label = item.text
+
+                            if (url.includes('helferliste.online')) {
+                              icon = '📝'
+                              style = 'bg-emerald-600 text-white'
+                              label = 'Helferliste'
+                            } else if (url.startsWith('http')) {
+                              icon = '🌐'
+                              style = 'bg-blue-100 text-blue-700'
+                            }
+
                             return (
-                              <span
+                              <a
                                 key={i}
-                                className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"
+                                href={item.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`text-xs px-4 py-2 rounded-lg font-medium hover:scale-105 transition ${style}`}
                               >
-                                {typeof fact === 'string' ? fact : ''}
-                              </span>
+                                {icon} {label}
+                              </a>
                             )
                           })}
-                        </motion.div>
+                        </div>
                       )}
-                  </motion.div>
+
+                  </div>
                 </motion.div>
               )
             })}
         </div>
 
-        {/* LIGHTBOX */}
-        {Array.isArray(lightboxImages) && lightboxImages.length > 0 && (
-          <motion.div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+        {/* Lightbox */}
+        {lightboxImages && (
+          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
 
-            <button
-              onClick={() => setLightboxImages(null)}
-              className="absolute top-5 right-5 text-white"
-            >
+            <button onClick={() => setLightboxImages(null)} className="absolute top-5 right-5 text-white">
               <X size={32} />
             </button>
 
@@ -245,29 +267,14 @@ export default function FesteClient({ feste }: any) {
               <ChevronRight size={32} />
             </button>
 
-            <motion.div
-              key={lightboxIndex}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              onDragEnd={(e, info) => {
-                if (info.offset.x < -80) nextImage()
-                if (info.offset.x > 80) prevImage()
-              }}
-              initial={{ scale: 0.85, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              className="max-w-5xl w-full px-4"
-            >
-              <Image
-                src={lightboxImages[lightboxIndex]}
-                alt="Bild"
-                width={1400}
-                height={900}
-                className="object-contain max-h-[90vh] w-full"
-              />
-            </motion.div>
-
-          </motion.div>
+            <Image
+              src={lightboxImages[lightboxIndex]}
+              alt="Bild"
+              width={1400}
+              height={900}
+              className="max-h-[90vh] object-contain"
+            />
+          </div>
         )}
       </div>
     </section>
