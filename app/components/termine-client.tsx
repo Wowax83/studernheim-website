@@ -9,19 +9,36 @@ function formatDate(date: string) {
   return new Date(date).toLocaleDateString('de-DE')
 }
 
+// 🔥 Monat + Jahr Label
+function getMonthLabel(date: string) {
+  const d = new Date(date)
+  return d.toLocaleDateString('de-DE', {
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
 export default function TermineClient({ events }: { events: any[] }) {
   const { ref, inView } = useInView({ triggerOnce: true })
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
 
-  // 🔥 NEU: sortieren + nur gültige Events
+  // 🔥 sortieren
   const sortedEvents = [...events]
     .filter(e => e.date)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
+  // 🔥 gruppieren nach Monat
+  const grouped = sortedEvents.reduce((acc: any, event: any) => {
+    const key = getMonthLabel(event.date)
+    if (!acc[key]) acc[key] = []
+    acc[key].push(event)
+    return acc
+  }, {})
+
   return (
     <section id="termine" className="py-20 sm:py-28 bg-gradient-to-b from-emerald-50/30 to-white">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <motion.div
           ref={ref}
@@ -33,147 +50,154 @@ export default function TermineClient({ events }: { events: any[] }) {
           <h2 className="font-heading text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             Aktuelle <span className="gradient-text">Termine</span>
           </h2>
-          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
-            Verpassen Sie keine Veranstaltung - hier finden Sie alle kommenden Termine auf einen Blick.
-          </p>
         </motion.div>
 
-        {/* Liste */}
-        <div className="space-y-4">
-          {sortedEvents.map((event, index) => {
-            const dateObj = new Date(event.date)
+        {/* 🔥 Monatsgruppen */}
+        <div className="space-y-12">
+          {Object.entries(grouped).map(([month, monthEvents]: any, groupIndex) => (
+            <div key={month}>
 
-            return (
-              <motion.div
-                key={event._id}
-                initial={{ opacity: 0, x: -30 }}
-                animate={inView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                onMouseEnter={() => setHoveredEvent(event._id)}
-                onMouseLeave={() => setHoveredEvent(null)}
-                className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
+              {/* 🔥 Monat Titel */}
+              <motion.h3
+                initial={{ opacity: 0, y: 20 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: groupIndex * 0.1 }}
+                className="text-2xl font-bold text-gray-800 mb-6 border-l-4 border-green-600 pl-4"
               >
-                <div className="flex flex-col md:flex-row gap-6">
+                {month}
+              </motion.h3>
 
-                  {/* Datum */}
-                  <div className="flex-shrink-0 w-24 h-24 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex flex-col items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
-                    <div className="text-3xl font-bold">
-                      {dateObj.getDate()}
-                    </div>
-                    <div className="text-xs uppercase">
-                      {dateObj.toLocaleDateString('de-DE', { month: 'short' })}
-                    </div>
-                  </div>
+              {/* Events */}
+              <div className="space-y-4">
+                {monthEvents.map((event: any, index: number) => {
+                  const dateObj = new Date(event.date)
 
-                  {/* Content */}
-                  <div className="flex-1">
-                    
-                    {/* Titel */}
-                    <div className="flex items-center gap-3 mb-3">
-                      <h3 className="font-heading text-2xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">
-                        {event.title}
-                      </h3>
+                  return (
+                    <motion.div
+                      key={event._id}
+                      initial={{ opacity: 0, x: -30 }}
+                      animate={inView ? { opacity: 1, x: 0 } : {}}
+                      transition={{ delay: index * 0.05 }}
+                      onMouseEnter={() => setHoveredEvent(event._id)}
+                      onMouseLeave={() => setHoveredEvent(null)}
+                      className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
+                    >
+                      <div className="flex flex-col md:flex-row gap-6">
 
-                      <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
-                        {event.type === 'fest' ? '🎉 Fest' : '📅 Termin'}
-                      </span>
-                    </div>
-
-                    {/* Beschreibung */}
-                    {event.description && (
-                      <p className="text-gray-600 leading-relaxed mb-4">
-                        {event.description}
-                      </p>
-                    )}
-
-                    {/* Details */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Calendar size={16} className="text-green-600" />
-                        <span>{formatDate(event.date)}</span>
-                      </div>
-
-                      {event.time && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Clock size={16} className="text-green-600" />
-                          <span>{event.time}</span>
+                        {/* Datum */}
+                        <div className="flex-shrink-0 w-24 h-24 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex flex-col items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+                          <div className="text-3xl font-bold">
+                            {dateObj.getDate()}
+                          </div>
+                          <div className="text-xs uppercase">
+                            {dateObj.toLocaleDateString('de-DE', { month: 'short' })}
+                          </div>
                         </div>
-                      )}
 
-                      {event.location && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <MapPin size={16} className="text-green-600" />
-                          <span>{event.location}</span>
-                        </div>
-                      )}
+                        {/* Content */}
+                        <div className="flex-1">
+                          
+                          <div className="flex items-center gap-3 mb-3">
+                            <h3 className="font-heading text-2xl font-bold text-gray-900 group-hover:text-green-600">
+                              {event.title}
+                            </h3>
 
-                      {event.organizer && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <User size={16} className="text-green-600" />
-                          <span>{event.organizer}</span>
-                        </div>
-                      )}
-                    </div>
+                            <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
+                              {event.type === 'fest' ? '🎉 Fest' : '📅 Termin'}
+                            </span>
+                          </div>
 
-                    {/* 🔥 Highlights FIXED */}
-                    {hoveredEvent === event._id &&
-                      event.type === 'fest' &&
-                      event.highlights && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          className="border-t border-gray-200 pt-4 mt-4 flex flex-wrap gap-2"
-                        >
-                          {event.highlights.map((item: any, i: number) => {
+                          {event.description && (
+                            <p className="text-gray-600 mb-4">
+                              {event.description}
+                            </p>
+                          )}
 
-                            // 🔥 FALLBACK für alte Daten (nur Text)
-                            if (typeof item === 'string') {
-                              return (
-                                <span
-                                  key={i}
-                                  className="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full"
-                                >
-                                  {item}
-                                </span>
-                              )
-                            }
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
 
-                            const url = item.url?.toLowerCase() || ''
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <Calendar size={16} className="text-green-600" />
+                              <span>{formatDate(event.date)}</span>
+                            </div>
 
-                            let icon = '🔗'
-                            let style = 'bg-gray-200 text-gray-700'
-                            let label = item.text
+                            {event.time && (
+                              <div className="flex items-center gap-2 text-gray-600">
+                                <Clock size={16} className="text-green-600" />
+                                <span>{event.time}</span>
+                              </div>
+                            )}
 
-                            if (url.includes('helferliste.online')) {
-                              icon = '📝'
-                              style = 'bg-emerald-600 text-white'
-                              label = 'Helferliste'
-                            } else if (url.startsWith('http')) {
-                              icon = '🌐'
-                              style = 'bg-blue-100 text-blue-700'
-                            }
+                            {event.location && (
+                              <div className="flex items-center gap-2 text-gray-600">
+                                <MapPin size={16} className="text-green-600" />
+                                <span>{event.location}</span>
+                              </div>
+                            )}
 
-                            return (
-                              <a
-                                key={i}
-                                href={item.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={`text-xs px-4 py-2 rounded-lg font-medium hover:scale-105 transition ${style}`}
+                            {event.organizer && (
+                              <div className="flex items-center gap-2 text-gray-600">
+                                <User size={16} className="text-green-600" />
+                                <span>{event.organizer}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 🔥 Highlights */}
+                          {hoveredEvent === event._id &&
+                            event.type === 'fest' &&
+                            event.highlights && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                className="border-t border-gray-200 pt-4 mt-4 flex flex-wrap gap-2"
                               >
-                                {icon} {label}
-                              </a>
-                            )
-                          })}
-                        </motion.div>
-                      )}
+                                {event.highlights.map((item: any, i: number) => {
 
-                  </div>
-                </div>
-              </motion.div>
-            )
-          })}
+                                  if (typeof item === 'string') {
+                                    return (
+                                      <span key={i} className="text-xs bg-gray-200 px-3 py-1 rounded-full">
+                                        {item}
+                                      </span>
+                                    )
+                                  }
+
+                                  const url = item.url?.toLowerCase() || ''
+
+                                  let icon = '🔗'
+                                  let style = 'bg-gray-200 text-gray-700'
+                                  let label = item.text
+
+                                  if (url.includes('helferliste.online')) {
+                                    icon = '📝'
+                                    style = 'bg-emerald-600 text-white'
+                                    label = 'Helferliste'
+                                  } else if (url.startsWith('http')) {
+                                    icon = '🌐'
+                                    style = 'bg-blue-100 text-blue-700'
+                                  }
+
+                                  return (
+                                    <a
+                                      key={i}
+                                      href={item.url}
+                                      target="_blank"
+                                      className={`text-xs px-4 py-2 rounded-lg ${style}`}
+                                    >
+                                      {icon} {label}
+                                    </a>
+                                  )
+                                })}
+                              </motion.div>
+                            )}
+
+                        </div>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </div>
 
       </div>
