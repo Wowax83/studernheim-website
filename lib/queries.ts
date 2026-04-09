@@ -14,15 +14,12 @@ export async function getFeste() {
       vibe,
       organizer,
 
-      // 🔥 Bilder safe
+      // 🔥 Bilder
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
-      // 🔥 Highlights FIX (alt + neu kompatibel)
-      "quickFacts": coalesce(
-        quickFacts,
-        highlights,
-        []
-      )
+      // 🔥 WICHTIG: beide getrennt behalten
+      highlights,
+      quickFacts
     }`,
     {},
     {
@@ -32,7 +29,7 @@ export async function getFeste() {
 }
 
 /**
- * 🔥 NUR zukünftige Feste (Homepage etc.)
+ * 🔥 NUR zukünftige Feste
  */
 export async function getUpcomingFeste(limit = 4) {
   return await client.fetch(
@@ -46,15 +43,10 @@ export async function getUpcomingFeste(limit = 4) {
       vibe,
       organizer,
 
-      // 🔥 Bilder safe
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
-      // 🔥 Highlights FIX
-      "quickFacts": coalesce(
-        quickFacts,
-        highlights,
-        []
-      )
+      highlights,
+      quickFacts
     }`,
     {},
     {
@@ -91,10 +83,11 @@ export async function getAllEvents(limit = 4) {
   return await client.fetch(
     `{
       "events": [
+
         // 🔥 FESTE
         ...*[_type == "fest" && date >= string::split(now(), "T")[0]]{
           _id,
-          name,
+          "title": name,
           description,
           date,
           "location": region,
@@ -103,12 +96,8 @@ export async function getAllEvents(limit = 4) {
 
           "images": coalesce(images[].asset->url, [image.asset->url], []),
 
-          // 🔥 auch hier wichtig!
-          "quickFacts": coalesce(
-            quickFacts,
-            highlights[].text,
-            []
-          )
+          highlights,
+          quickFacts
         },
 
         // 🔥 TERMINE
@@ -120,7 +109,9 @@ export async function getAllEvents(limit = 4) {
           location,
           organizer,
           time,
-          "type": "termin"
+          "type": coalesce(type, "termin"),
+
+          highlights
         }
       ]
     }.events | order(date asc)[0...${limit}]`,
