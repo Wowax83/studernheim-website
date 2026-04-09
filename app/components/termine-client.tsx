@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Calendar, Clock, MapPin, User } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
+import { useState } from 'react'
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString('de-DE')
@@ -10,6 +11,8 @@ function formatDate(date: string) {
 
 export default function TermineClient({ events }: { events: any[] }) {
   const { ref, inView } = useInView({ triggerOnce: true })
+
+  const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
 
   return (
     <section id="termine" className="py-20 sm:py-28 bg-gradient-to-b from-emerald-50/30 to-white">
@@ -42,6 +45,8 @@ export default function TermineClient({ events }: { events: any[] }) {
                 initial={{ opacity: 0, x: -30 }}
                 animate={inView ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
+                onMouseEnter={() => setHoveredEvent(event._id)}
+                onMouseLeave={() => setHoveredEvent(null)}
                 className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
               >
                 <div className="flex flex-col md:flex-row gap-6">
@@ -106,6 +111,39 @@ export default function TermineClient({ events }: { events: any[] }) {
                         </div>
                       )}
                     </div>
+
+                    {/* 🔥 Highlights (nur bei Hover + nur bei Festen) */}
+                    {hoveredEvent === event._id &&
+                      event.type === 'fest' &&
+                      event.highlights && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          className="border-t border-gray-200 pt-4 mt-4 flex flex-wrap gap-2"
+                        >
+                          {event.highlights.map((item: any, i: number) =>
+                            item.url ? (
+                              <a
+                                key={i}
+                                href={item.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition"
+                              >
+                                {item.text}
+                              </a>
+                            ) : (
+                              <span
+                                key={i}
+                                className="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full"
+                              >
+                                {item.text}
+                              </span>
+                            )
+                          )}
+                        </motion.div>
+                      )}
+
                   </div>
                 </div>
               </motion.div>
