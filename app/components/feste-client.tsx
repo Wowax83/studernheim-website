@@ -61,7 +61,7 @@ export default function FesteClient({ feste }: any) {
   }
 
   return (
-    <section className="py-20">
+    <section id="feste" className="py-20">
       <div className="max-w-7xl mx-auto px-4">
 
         {/* Header */}
