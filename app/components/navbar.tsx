@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const navigation = [
   { name: 'SAG', href: '/#sag' },
@@ -71,7 +72,7 @@ export default function Navbar() {
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
           isScrolled
-            ? 'glass backdrop-blur-xl shadow-xl'
+            ? 'backdrop-blur-xl bg-white/80 shadow-lg border-b border-gray-100'
             : 'bg-transparent'
         )}
       >
@@ -83,36 +84,50 @@ export default function Navbar() {
             )}
           >
 
-            {/* Logo */}
+            {/* 🔥 LOGO MIT WAPPEN */}
             <Link
               href="/"
-              className="font-heading text-2xl font-bold gradient-text hover:scale-110 transition-all duration-300"
+              className="flex items-center gap-3 hover:scale-105 transition-all"
             >
-              Studernheim
+              <Image
+                src="/favicon.svg"
+                alt="Wappen Studernheim"
+                width={36}
+                height={36}
+                className="object-contain"
+              />
+              <span className="font-heading text-xl sm:text-2xl font-bold text-green-600 tracking-tight">
+                Studernheim
+              </span>
             </Link>
 
             {/* Desktop */}
             <div className="hidden md:flex items-center space-x-2">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => scrollToSection(item.href)}
-                  className={cn(
-                    'nav-item nav-glow',
-                    activeSection === item.href.split('#')[1]
-                      ? 'text-green-600 bg-white/60 shadow-sm'
-                      : 'text-gray-700 hover:text-green-600'
-                  )}
-                >
-                  {item.name}
-                </Link>
-              ))}
+              {navigation.map((item) => {
+                const isActive = activeSection === item.href.split('#')[1]
 
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => scrollToSection(item.href)}
+                    className={cn(
+                      'px-4 py-2 rounded-full font-medium transition-all duration-200',
+                      isActive
+                        ? 'bg-green-100 text-green-700 shadow-sm'
+                        : 'text-gray-800 hover:text-green-600 hover:bg-gray-100'
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                )
+              })}
+
+              {/* Kontakt Button */}
               <Link
                 href="/#kontakt"
                 onClick={() => scrollToSection('/#kontakt')}
-                className="ml-3 px-5 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full font-medium shadow-lg hover:scale-105 hover:shadow-xl transition-all"
+                className="ml-3 px-5 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full font-semibold shadow-md hover:scale-105 hover:shadow-lg transition-all"
               >
                 Kontakt
               </Link>
@@ -131,14 +146,14 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden glass backdrop-blur-xl border-t border-white/20">
+          <div className="md:hidden backdrop-blur-xl bg-white/90 border-t border-gray-200">
             <div className="px-4 py-4 space-y-2">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
                   onClick={() => scrollToSection(item.href)}
-                  className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-white/50 transition"
+                  className="block px-4 py-3 rounded-lg text-gray-800 font-medium hover:bg-gray-100 transition"
                 >
                   {item.name}
                 </Link>
@@ -147,7 +162,7 @@ export default function Navbar() {
               <Link
                 href="/#kontakt"
                 onClick={() => scrollToSection('/#kontakt')}
-                className="block px-4 py-3 bg-green-600 text-white rounded-lg text-center font-medium"
+                className="block px-4 py-3 bg-green-600 text-white rounded-lg text-center font-semibold"
               >
                 Kontakt
               </Link>
@@ -164,7 +179,6 @@ export default function Navbar() {
           </div>
         )}
       </nav>
-
     </>
   )
 }
