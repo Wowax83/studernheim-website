@@ -2,8 +2,9 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { MapPin, Phone, Mail, Clock, User } from 'lucide-react'
+import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import { ortsverwaltungData } from '@/lib/data'
 
 /* ---------------- HELPERS ---------------- */
@@ -57,7 +58,7 @@ function getNextSprechstunde() {
 
   return candidates
     .filter(c => c.fullDate >= now)
-    .sort((a, b) => a.fullDate - b.fullDate)[0]
+    .sort((a, b) => a.fullDate.getTime() - b.fullDate.getTime())[0]
 }
 
 function isNowOpen() {
@@ -84,7 +85,16 @@ export default function Ortsverwaltung() {
   })
 
   const next = getNextSprechstunde()
-  const openNow = isNowOpen()
+
+  const [openNow, setOpenNow] = useState(isNowOpen())
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setOpenNow(isNowOpen())
+    }, 60000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   const fadeUp = {
     hidden: { opacity: 0, y: 40 },
@@ -150,7 +160,9 @@ export default function Ortsverwaltung() {
                 {/* STATUS */}
                 <div className="mt-4">
                   <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    openNow ? 'bg-green-400 text-green-900' : 'bg-red-400 text-red-900'
+                    openNow
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
                   }`}>
                     {openNow ? 'Jetzt geöffnet' : 'Geschlossen'}
                   </span>
@@ -164,32 +176,66 @@ export default function Ortsverwaltung() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
           {/* CONTACT */}
-          <motion.div className="bg-white/90 rounded-2xl p-8 shadow-md">
-            <h3 className="text-2xl font-bold mb-6">Kontakt</h3>
+          <motion.div className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+              <MapPin className="text-green-600" size={26} />
+              Kontakt
+            </h3>
 
-            <div className="space-y-4">
-              <p>{ortsverwaltungData.address}</p>
-              <p>{ortsverwaltungData.phone}</p>
-              <p>{ortsverwaltungData.email}</p>
+            <div className="space-y-5 text-gray-700">
+
+              <div className="flex items-start gap-3">
+                <MapPin size={20} className="text-green-600 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-900">Adresse</p>
+                  <p>Frankenthaler Straße 4</p>
+                  <p>67227 Frankenthal - Studernheim</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Phone size={20} className="text-green-600 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-900">Telefon</p>
+                  <a href="tel:0623342334" className="text-green-600 hover:text-green-800">
+                    06233 42334
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Mail size={20} className="text-green-600 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-900">E-Mail</p>
+                  <a href="mailto:ortsvorsteher.studernheim@gmail.com" className="text-green-600 hover:text-green-800">
+                    ortsvorsteher.studernheim@gmail.com
+                  </a>
+                </div>
+              </div>
+
             </div>
           </motion.div>
 
           {/* OPENING */}
-          <motion.div className="bg-white/90 rounded-2xl p-8 shadow-md">
-            <h3 className="text-2xl font-bold mb-6">Öffnungszeiten</h3>
+          <motion.div className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md">
+            <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+              <Clock className="text-green-600" size={26} />
+              Öffnungszeiten
+            </h3>
 
             {ortsverwaltungData.openingHours.map((s, i) => (
-              <div key={i} className="flex justify-between py-2">
-                <span>{s.day}</span>
-                <span>{s.hours}</span>
+              <div key={i} className="flex justify-between py-2 border-b border-gray-100 last:border-0">
+                <span className="font-medium text-gray-900">{s.day}</span>
+                <span className="text-gray-600">{s.hours}</span>
               </div>
             ))}
 
-            {/* NEXT */}
             {next && (
-              <div className="mt-6 p-4 bg-green-50 rounded-xl">
-                <p className="text-sm text-green-700">Nächste Sprechstunde</p>
-                <p className="font-semibold">
+              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+                <p className="text-sm text-green-700 font-medium mb-1">
+                  Nächste Sprechstunde
+                </p>
+                <p className="text-gray-900 font-semibold">
                   {next.fullDate.toLocaleDateString('de-DE', {
                     weekday: 'long',
                     day: 'numeric',
@@ -199,6 +245,7 @@ export default function Ortsverwaltung() {
                 <p className="text-green-700">{next.label}</p>
               </div>
             )}
+
           </motion.div>
 
         </div>
