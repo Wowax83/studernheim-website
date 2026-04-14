@@ -253,23 +253,8 @@ export const ortsverwaltungData = {
   phone: '06344 / 1234',
   email: 'info@studernheim.de',
   openingHours: [
-    { day: 'Montag', hours: '8:00 - 12:00 Uhr' },
-    { day: 'Dienstag', hours: '14:00 - 18:00 Uhr' },
-    { day: 'Mittwoch', hours: '8:00 - 12:00 Uhr' },
-    { day: 'Donnerstag', hours: '14:00 - 16:00 Uhr' },
-    { day: 'Freitag', hours: 'Geschlossen' }
-  ],
-  services: [
-    'Meldewesen & Ausweise',
-    'Bauanträge & Genehmigungen',
-    'Friedhofsverwaltung',
-    'Vereinsförderung',
-    'Ordnungsangelegenheiten',
-    'Bürgersprechstunde'
-  ],
-  contacts: [
-    { role: 'Ortsbürgermeister', name: 'Hans Becker', phone: '06344 / 1234-10' },
-    { role: 'Verwaltung', name: 'Andrea Klein', phone: '06344 / 1234-11' },
-    { role: 'Bauhof', name: 'Jürgen Hoffmann', phone: '06344 / 1234-20' }
+   { day: '1. Donnerstag im Monat', hours: '17:00 - 18:00 Uhr' },
+   { day: '3. Donnerstag im Monat', hours: '20:00 - 21:00 Uhr' },
+   { day: 'Sprechstunde', hours: 'nach vorheriger telefonischer Vereinbarung möglich' }
   ]
 }
