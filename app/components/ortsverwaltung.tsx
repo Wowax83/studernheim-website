@@ -37,7 +37,6 @@ function getNextSprechstunde() {
     slots.forEach(slot => {
       const fullDate = new Date(slot.date)
       fullDate.setHours(slot.start, 0, 0)
-
       candidates.push({ ...slot, fullDate })
     })
   }
@@ -92,14 +91,18 @@ export default function Ortsverwaltung() {
           </p>
         </motion.div>
 
-        {/* CARD */}
+        {/* HEADER CARD */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
           animate={inView ? 'show' : 'hidden'}
           className="mb-16"
         >
-          <motion.div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-green-700 to-emerald-600 text-white">
+          <motion.div
+            whileHover={{ y: -4 }}
+            transition={{ duration: 0.2 }}
+            className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-green-700 to-emerald-600 text-white"
+          >
             <div className="relative p-6 sm:p-10 flex flex-col md:flex-row items-center gap-8">
 
               <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-white/20">
@@ -125,7 +128,6 @@ export default function Ortsverwaltung() {
                   Freie Wählergruppe (FWG)
                 </p>
 
-                {/* TEXT */}
                 <p className="text-white/90 leading-relaxed">
                   Thomas Batke ist seit der Kommunalwahl 2024 Ortsvorsteher von Studernheim. 
                   In seiner Funktion vertritt er die Interessen der Bürgerinnen und Bürger, 
@@ -142,10 +144,14 @@ export default function Ortsverwaltung() {
         </motion.div>
 
         {/* GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
 
           {/* CONTACT */}
-          <motion.div className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300">
+          <motion.div
+            whileHover={{ y: -4 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300"
+          >
             <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <MapPin className="text-green-600" size={26} />
               Kontakt
@@ -185,15 +191,17 @@ export default function Ortsverwaltung() {
             </div>
           </motion.div>
 
-          {/* OPENING + AUFGABEN */}
-          <motion.div className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md">
-
+          {/* OPENING */}
+          <motion.div
+            whileHover={{ y: -4 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300"
+          >
             <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
               <Clock className="text-green-600" size={26} />
               Sprechzeiten & Aufgaben
             </h3>
 
-            {/* Öffnungszeiten */}
             {ortsverwaltungData.openingHours.map((s, i) => (
               <div key={i} className="flex justify-between py-2 border-b border-gray-100 last:border-0">
                 <span className="font-medium text-gray-900">{s.day}</span>
@@ -201,7 +209,6 @@ export default function Ortsverwaltung() {
               </div>
             ))}
 
-            {/* NEXT */}
             {next && (
               <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
                 <p className="text-sm text-green-700 font-medium mb-1">
@@ -217,6 +224,7 @@ export default function Ortsverwaltung() {
                 <p className="text-green-700">{next.label}</p>
               </div>
             )}
+
           </motion.div>
 
         </div>
