@@ -217,21 +217,6 @@ export default function Ortsverwaltung() {
                 <p className="text-green-700">{next.label}</p>
               </div>
             )}
-
-            {/* AUFGABEN */}
-            <div className="mt-8 text-gray-700 leading-relaxed">
-              <p className="font-semibold text-gray-900 mb-2">
-                Aufgaben der Ortsverwaltung
-              </p>
-              <p>
-                Die Ortsverwaltung ist zentrale Anlaufstelle für Bürgerinnen und Bürger in 
-                Studernheim. Sie unterstützt bei Anliegen des täglichen Lebens, koordiniert 
-                lokale Projekte und steht im engen Austausch mit der Stadtverwaltung 
-                Frankenthal. Dazu gehören unter anderem organisatorische Aufgaben, die 
-                Förderung des Vereinslebens sowie die Mitwirkung an der Entwicklung des Orts.
-              </p>
-            </div>
-
           </motion.div>
 
         </div>
