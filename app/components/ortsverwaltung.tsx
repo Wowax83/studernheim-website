@@ -2,15 +2,89 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { MapPin, Phone, Mail, Clock, CheckCircle, User } from 'lucide-react'
+import { MapPin, Phone, Mail, Clock, User } from 'lucide-react'
 import Image from 'next/image'
 import { ortsverwaltungData } from '@/lib/data'
+
+/* ---------------- HELPERS ---------------- */
+
+function getNthWeekdayOfMonth(year: number, month: number, weekday: number, nth: number) {
+  const firstDay = new Date(year, month, 1)
+  const firstWeekday = firstDay.getDay()
+  const offset = (weekday - firstWeekday + 7) % 7
+  const day = 1 + offset + (nth - 1) * 7
+  return new Date(year, month, day)
+}
+
+function getSprechstundenForMonth(year: number, month: number) {
+  const firstThu = getNthWeekdayOfMonth(year, month, 4, 1)
+  const thirdThu = getNthWeekdayOfMonth(year, month, 4, 3)
+
+  return [
+    {
+      date: firstThu,
+      start: 17,
+      end: 18,
+      label: '17:00 - 18:00 Uhr'
+    },
+    {
+      date: thirdThu,
+      start: 20,
+      end: 21,
+      label: '20:00 - 21:00 Uhr'
+    }
+  ]
+}
+
+function getNextSprechstunde() {
+  const now = new Date()
+  const candidates: any[] = []
+
+  for (let i = 0; i < 3; i++) {
+    const base = new Date(now.getFullYear(), now.getMonth() + i, 1)
+    const slots = getSprechstundenForMonth(base.getFullYear(), base.getMonth())
+
+    slots.forEach(slot => {
+      const fullDate = new Date(slot.date)
+      fullDate.setHours(slot.start, 0, 0)
+
+      candidates.push({
+        ...slot,
+        fullDate
+      })
+    })
+  }
+
+  return candidates
+    .filter(c => c.fullDate >= now)
+    .sort((a, b) => a.fullDate - b.fullDate)[0]
+}
+
+function isNowOpen() {
+  const now = new Date()
+  const slots = getSprechstundenForMonth(now.getFullYear(), now.getMonth())
+
+  return slots.some(slot => {
+    const start = new Date(slot.date)
+    start.setHours(slot.start, 0, 0)
+
+    const end = new Date(slot.date)
+    end.setHours(slot.end, 0, 0)
+
+    return now >= start && now <= end
+  })
+}
+
+/* ---------------- COMPONENT ---------------- */
 
 export default function Ortsverwaltung() {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.15
   })
+
+  const next = getNextSprechstunde()
+  const openNow = isNowOpen()
 
   const fadeUp = {
     hidden: { opacity: 0, y: 40 },
@@ -50,25 +124,17 @@ export default function Ortsverwaltung() {
           </p>
         </motion.div>
 
-        {/* 🏛️ ORTSVORSTEHER CARD */}
+        {/* CARD */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
           animate={inView ? 'show' : 'hidden'}
-          transition={{ delay: 0.05 }}
           className="mb-16"
         >
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-green-700 to-emerald-600 text-white"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-transparent" />
-
+          <motion.div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-green-700 to-emerald-600 text-white">
             <div className="relative p-6 sm:p-10 flex flex-col md:flex-row items-center gap-8">
 
-              {/* FOTO */}
-              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-white/20 shadow-lg">
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-white/20">
                 <Image
                   src="/images/thomas-batke.png"
                   alt="Thomas Batke"
@@ -77,38 +143,17 @@ export default function Ortsverwaltung() {
                 />
               </div>
 
-              {/* TEXT */}
               <div className="text-center md:text-left">
-                <p className="uppercase tracking-wide text-white/80 text-sm mb-2">
-                  Ortsvorsteher Studernheim
-                </p>
+                <h3 className="text-3xl font-bold">Thomas Batke</h3>
+                <p className="text-white/80">Ortsvorsteher</p>
 
-                <h3 className="text-3xl sm:text-4xl font-bold mb-2">
-                  Thomas Batke
-                </h3>
-
-                <p className="text-white/90 mb-4">
-                  Freie Wählergruppe (FWG)
-                </p>
-
-                <p className="text-white/80 max-w-xl leading-relaxed">
-                  Seit der Kommunalwahl im Juni 2024 im Amt.
-                </p>
-
-                <div className="mt-5 flex flex-wrap gap-3 justify-center md:justify-start">
-                  <a
-                    href={`tel:${ortsverwaltungData.phone}`}
-                    className="bg-white text-green-700 px-5 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition"
-                  >
-                    Anrufen
-                  </a>
-
-                  <a
-                    href={`mailto:${ortsverwaltungData.email}`}
-                    className="border border-white/40 px-5 py-2 rounded-full text-sm font-medium hover:bg-white/10 transition"
-                  >
-                    E-Mail senden
-                  </a>
+                {/* STATUS */}
+                <div className="mt-4">
+                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${
+                    openNow ? 'bg-green-400 text-green-900' : 'bg-red-400 text-red-900'
+                  }`}>
+                    {openNow ? 'Jetzt geöffnet' : 'Geschlossen'}
+                  </span>
                 </div>
               </div>
 
@@ -116,82 +161,44 @@ export default function Ortsverwaltung() {
           </motion.div>
         </motion.div>
 
-        {/* GRID (jetzt 1 Spalte mobil / 2 Spalten Desktop sinnvoll genutzt) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
           {/* CONTACT */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate={inView ? 'show' : 'hidden'}
-            transition={{ delay: 0.1 }}
-            className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-          >
-            <h3 className="font-heading text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <MapPin className="text-green-600" size={26} />
-              Kontakt
-            </h3>
+          <motion.div className="bg-white/90 rounded-2xl p-8 shadow-md">
+            <h3 className="text-2xl font-bold mb-6">Kontakt</h3>
 
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <MapPin size={20} className="text-green-600 mt-1" />
-                <div>
-                  <p className="font-medium text-gray-900">Adresse</p>
-                  <p className="text-gray-600">{ortsverwaltungData.address}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <Phone size={20} className="text-green-600 mt-1" />
-                <div>
-                  <p className="font-medium text-gray-900">Telefon</p>
-                  <a href={`tel:${ortsverwaltungData.phone}`} className="text-green-600 hover:text-green-800">
-                    {ortsverwaltungData.phone}
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <Mail size={20} className="text-green-600 mt-1" />
-                <div>
-                  <p className="font-medium text-gray-900">E-Mail</p>
-                  <a href={`mailto:${ortsverwaltungData.email}`} className="text-green-600 hover:text-green-800">
-                    {ortsverwaltungData.email}
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <User size={20} className="text-green-600 mt-1" />
-                <div>
-                  <p className="font-medium text-gray-900">Ortsvorsteher</p>
-                  <p className="text-gray-600">Thomas Batke (FWG)</p>
-                </div>
-              </div>
+              <p>{ortsverwaltungData.address}</p>
+              <p>{ortsverwaltungData.phone}</p>
+              <p>{ortsverwaltungData.email}</p>
             </div>
           </motion.div>
 
-          {/* OPENING HOURS */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate={inView ? 'show' : 'hidden'}
-            transition={{ delay: 0.2 }}
-            className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md"
-          >
-            <h3 className="font-heading text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <Clock className="text-green-600" size={26} />
-              Öffnungszeiten
-            </h3>
+          {/* OPENING */}
+          <motion.div className="bg-white/90 rounded-2xl p-8 shadow-md">
+            <h3 className="text-2xl font-bold mb-6">Öffnungszeiten</h3>
 
-            <div className="space-y-3">
-              {ortsverwaltungData.openingHours.map((s, i) => (
-                <div key={i} className="flex justify-between py-2 border-b border-gray-100 last:border-0">
-                  <span className="font-medium text-gray-900">{s.day}</span>
-                  <span className="text-gray-600">{s.hours}</span>
-                </div>
-              ))}
-            </div>
+            {ortsverwaltungData.openingHours.map((s, i) => (
+              <div key={i} className="flex justify-between py-2">
+                <span>{s.day}</span>
+                <span>{s.hours}</span>
+              </div>
+            ))}
+
+            {/* NEXT */}
+            {next && (
+              <div className="mt-6 p-4 bg-green-50 rounded-xl">
+                <p className="text-sm text-green-700">Nächste Sprechstunde</p>
+                <p className="font-semibold">
+                  {next.fullDate.toLocaleDateString('de-DE', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long'
+                  })}
+                </p>
+                <p className="text-green-700">{next.label}</p>
+              </div>
+            )}
           </motion.div>
 
         </div>
