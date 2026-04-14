@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
 import { ortsverwaltungData } from '@/lib/data'
 
 /* ---------------- HELPERS ---------------- */
@@ -22,18 +21,8 @@ function getSprechstundenForMonth(year: number, month: number) {
   const thirdThu = getNthWeekdayOfMonth(year, month, 4, 3)
 
   return [
-    {
-      date: firstThu,
-      start: 17,
-      end: 18,
-      label: '17:00 - 18:00 Uhr'
-    },
-    {
-      date: thirdThu,
-      start: 20,
-      end: 21,
-      label: '20:00 - 21:00 Uhr'
-    }
+    { date: firstThu, start: 17, end: 18, label: '17:00 - 18:00 Uhr' },
+    { date: thirdThu, start: 20, end: 21, label: '20:00 - 21:00 Uhr' }
   ]
 }
 
@@ -49,31 +38,13 @@ function getNextSprechstunde() {
       const fullDate = new Date(slot.date)
       fullDate.setHours(slot.start, 0, 0)
 
-      candidates.push({
-        ...slot,
-        fullDate
-      })
+      candidates.push({ ...slot, fullDate })
     })
   }
 
   return candidates
     .filter(c => c.fullDate >= now)
     .sort((a, b) => a.fullDate.getTime() - b.fullDate.getTime())[0]
-}
-
-function isNowOpen() {
-  const now = new Date()
-  const slots = getSprechstundenForMonth(now.getFullYear(), now.getMonth())
-
-  return slots.some(slot => {
-    const start = new Date(slot.date)
-    start.setHours(slot.start, 0, 0)
-
-    const end = new Date(slot.date)
-    end.setHours(slot.end, 0, 0)
-
-    return now >= start && now <= end
-  })
 }
 
 /* ---------------- COMPONENT ---------------- */
@@ -86,25 +57,12 @@ export default function Ortsverwaltung() {
 
   const next = getNextSprechstunde()
 
-  const [openNow, setOpenNow] = useState(isNowOpen())
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setOpenNow(isNowOpen())
-    }, 60000)
-
-    return () => clearInterval(interval)
-  }, [])
-
   const fadeUp = {
     hidden: { opacity: 0, y: 40 },
     show: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.7,
-        ease: 'easeOut'
-      }
+      transition: { duration: 0.7, ease: 'easeOut' }
     }
   }
 
@@ -116,7 +74,7 @@ export default function Ortsverwaltung() {
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/30 to-green-100/20 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* HEADER */}
         <motion.div
           ref={ref}
@@ -153,28 +111,39 @@ export default function Ortsverwaltung() {
                 />
               </div>
 
-              <div className="text-center md:text-left">
-                <h3 className="text-3xl font-bold">Thomas Batke</h3>
-                <p className="text-white/80">Ortsvorsteher</p>
+              <div className="text-center md:text-left max-w-2xl">
 
-                {/* STATUS */}
-                <div className="mt-4">
-                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    openNow
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {openNow ? 'Jetzt geöffnet' : 'Geschlossen'}
-                  </span>
-                </div>
+                <p className="uppercase tracking-wide text-white/70 text-sm mb-2">
+                  Ortsvorsteher Studernheim
+                </p>
+
+                <h3 className="text-3xl sm:text-4xl font-bold mb-2">
+                  Thomas Batke
+                </h3>
+
+                <p className="text-white/80 mb-4">
+                  Freie Wählergruppe (FWG)
+                </p>
+
+                {/* TEXT */}
+                <p className="text-white/90 leading-relaxed">
+                  Thomas Batke ist seit der Kommunalwahl 2024 Ortsvorsteher von Studernheim. 
+                  In seiner Funktion vertritt er die Interessen der Bürgerinnen und Bürger, 
+                  koordiniert die Zusammenarbeit mit der Stadt Frankenthal und engagiert sich 
+                  für die Weiterentwicklung des Orts. Ein besonderer Fokus liegt auf dem Erhalt 
+                  der Dorfgemeinschaft, der Unterstützung von Vereinen sowie der Förderung 
+                  lokaler Projekte.
+                </p>
+
               </div>
 
             </div>
           </motion.div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
+        {/* GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
           {/* CONTACT */}
           <motion.div className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300">
             <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
@@ -216,13 +185,15 @@ export default function Ortsverwaltung() {
             </div>
           </motion.div>
 
-          {/* OPENING */}
+          {/* OPENING + AUFGABEN */}
           <motion.div className="bg-white/90 backdrop-blur rounded-2xl p-8 shadow-md">
+
             <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
               <Clock className="text-green-600" size={26} />
-              Öffnungszeiten
+              Sprechzeiten & Aufgaben
             </h3>
 
+            {/* Öffnungszeiten */}
             {ortsverwaltungData.openingHours.map((s, i) => (
               <div key={i} className="flex justify-between py-2 border-b border-gray-100 last:border-0">
                 <span className="font-medium text-gray-900">{s.day}</span>
@@ -230,6 +201,7 @@ export default function Ortsverwaltung() {
               </div>
             ))}
 
+            {/* NEXT */}
             {next && (
               <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
                 <p className="text-sm text-green-700 font-medium mb-1">
@@ -245,6 +217,20 @@ export default function Ortsverwaltung() {
                 <p className="text-green-700">{next.label}</p>
               </div>
             )}
+
+            {/* AUFGABEN */}
+            <div className="mt-8 text-gray-700 leading-relaxed">
+              <p className="font-semibold text-gray-900 mb-2">
+                Aufgaben der Ortsverwaltung
+              </p>
+              <p>
+                Die Ortsverwaltung ist zentrale Anlaufstelle für Bürgerinnen und Bürger in 
+                Studernheim. Sie unterstützt bei Anliegen des täglichen Lebens, koordiniert 
+                lokale Projekte und steht im engen Austausch mit der Stadtverwaltung 
+                Frankenthal. Dazu gehören unter anderem organisatorische Aufgaben, die 
+                Förderung des Vereinslebens sowie die Mitwirkung an der Entwicklung des Orts.
+              </p>
+            </div>
 
           </motion.div>
 
