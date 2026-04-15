@@ -113,7 +113,7 @@ export default function Hero() {
           opacity,
           y: useTransform(scrollY, [0, 300], [0, -50])
         }}
-        className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center"
+        className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center -translate-y-16 sm:-translate-y-20 md:-translate-y-24"
       >
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
