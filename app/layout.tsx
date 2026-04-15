@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     siteName: 'Studernheim',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.webp',
         width: 1200,
         height: 630,
         alt: 'Studernheim Dorfleben',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: 'Studernheim – Feste & Dorfleben',
     description:
       'Alle Veranstaltungen und Feste in Studernheim auf einen Blick.',
-    images: ['/og-image.png'],
+    images: ['/og-image.webp'],
   },
 
   robots: {
