@@ -129,12 +129,11 @@ export default function Ortsverwaltung() {
                 </p>
 
                 <p className="text-white/90 leading-relaxed">
-                  Thomas Batke ist seit der Kommunalwahl 2024 Ortsvorsteher von Studernheim. 
-                  In seiner Funktion vertritt er die Interessen der Bürgerinnen und Bürger, 
-                  koordiniert die Zusammenarbeit mit der Stadt Frankenthal und engagiert sich 
-                  für die Weiterentwicklung des Orts. Ein besonderer Fokus liegt auf dem Erhalt 
-                  der Dorfgemeinschaft, der Unterstützung von Vereinen sowie der Förderung 
-                  lokaler Projekte.
+                  Thomas Batke ist seit der Kommunalwahl 2024 Ortsvorsteher von Studernheim.
+                  Er vertritt die Interessen der Bürgerinnen und Bürger, koordiniert die Zusammenarbeit
+                  mit der Stadt Frankenthal und engagiert sich für die Weiterentwicklung des Orts.
+                  Ein besonderer Fokus liegt auf dem Erhalt der Dorfgemeinschaft, der Unterstützung von
+                  Vereinen sowie der Förderung lokaler Projekte.
                 </p>
 
               </div>
@@ -179,6 +178,16 @@ export default function Ortsverwaltung() {
               </div>
 
               <div className="flex items-start gap-3">
+                <Phone size={20} className="text-green-600 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-900">Mobil (für eilige Themen)</p>
+                  <a href={`tel:${ortsverwaltungData.mobile}`} className="text-green-600 hover:text-green-800">
+                    {ortsverwaltungData.mobile}
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
                 <Mail size={20} className="text-green-600 mt-1" />
                 <div>
                   <p className="font-medium text-gray-900">E-Mail</p>
@@ -191,7 +200,7 @@ export default function Ortsverwaltung() {
             </div>
           </motion.div>
 
-          {/* OPENING */}
+          {/* RECHTE CARD */}
           <motion.div
             whileHover={{ y: -4 }}
             transition={{ duration: 0.2 }}
@@ -199,16 +208,41 @@ export default function Ortsverwaltung() {
           >
             <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
               <Clock className="text-green-600" size={26} />
-              Sprechzeiten & Aufgaben
+              Sprechzeiten & Verwaltung
             </h3>
 
-            {ortsverwaltungData.openingHours.map((s, i) => (
-              <div key={i} className="flex justify-between py-2 border-b border-gray-100 last:border-0">
-                <span className="font-medium text-gray-900">{s.day}</span>
-                <span className="text-gray-600">{s.hours}</span>
-              </div>
-            ))}
+            {/* Sprechstunden */}
+            <div className="mb-6">
+              {ortsverwaltungData.openingHours.map((s, i) => (
+                <div key={i} className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="font-medium text-gray-900">{s.day}</span>
+                  <span className="text-gray-600">{s.hours}</span>
+                </div>
+              ))}
+            </div>
 
+            {/* Verwaltung */}
+            <div className="mb-6">
+              <p className="text-sm font-semibold text-gray-500 mb-2">
+                Ortsverwaltung (Verwaltungsmitarbeiter)
+              </p>
+
+              {ortsverwaltungData.officeHours.map((s, i) => (
+                <div key={i} className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="font-medium text-gray-900">{s.day}</span>
+                  <span className="text-gray-600">{s.hours}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Hinweise */}
+            <div className="space-y-2 text-sm text-gray-600">
+              {ortsverwaltungData.notes.map((note, i) => (
+                <p key={i}>• {note}</p>
+              ))}
+            </div>
+
+            {/* NEXT */}
             {next && (
               <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
                 <p className="text-sm text-green-700 font-medium mb-1">
