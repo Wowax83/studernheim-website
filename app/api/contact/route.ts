@@ -2,6 +2,19 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+/* ---------------- HELPERS ---------------- */
+
+function escapeHtml(str: string) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
+/* ---------------- ROUTE ---------------- */
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -10,37 +23,49 @@ export async function POST(req: Request) {
     const email = body.email || 'Keine E-Mail'
     const message = body.message || 'Keine Nachricht'
     const interests = body.interests || []
-    const company = body.company // 🛡️ Honeypot
-    const formStartTime = body.formStartTime // ⏱️ Zeitcheck
+    const company = body.company // Honeypot
+    const formStartTime = body.formStartTime
 
-    // 🛑 SPAM SCHUTZ
+    /* ---------------- SPAM SCHUTZ ---------------- */
 
-    // 1. Honeypot
+    // Honeypot
     if (company) {
-      console.log('🚫 Spam erkannt (Honeypot)')
+      console.log('🚫 Spam (Honeypot)')
       return Response.json({ success: true })
     }
 
-    // 2. Zeitcheck
-    const now = Date.now()
-    if (formStartTime && now - formStartTime < 2000) {
-      console.log('🚫 Spam erkannt (zu schnell)')
+    // Zeitcheck
+    if (formStartTime && Date.now() - formStartTime < 2000) {
+      console.log('🚫 Spam (zu schnell)')
       return Response.json({ success: true })
     }
 
-    // 📩 E-Mail senden
-    const result = await resend.emails.send({
-      from: 'SAG Studernheim <kontakt@studrum.de>', // später ändern!
+    // Email basic check
+    if (!email.includes('@')) {
+      return Response.json({ error: 'Ungültige E-Mail-Adresse' }, { status: 400 })
+    }
+
+    /* ---------------- ESCAPE ---------------- */
+
+    const safeName = escapeHtml(name)
+    const safeEmail = escapeHtml(email)
+    const safeMessage = escapeHtml(message)
+
+    /* ---------------- ADMIN MAIL ---------------- */
+
+    const adminResult = await resend.emails.send({
+      from: 'Studernheim <noreply@studrum.de>', // Domain muss verifiziert sein!
       to: 'studernheim.ag@gmail.com',
-      subject: `📩 Neue Nachricht von ${name}`,
+      reply_to: email,
+      subject: `📩 Neue Nachricht von ${safeName}`,
 
       html: `
         <div style="font-family: Arial, sans-serif; line-height:1.6; color:#333">
           
           <h2 style="color:#16a34a;">Neue Anfrage über Website</h2>
 
-          <p><strong>Name:</strong><br/>${name}</p>
-          <p><strong>E-Mail:</strong><br/>${email}</p>
+          <p><strong>Name:</strong><br/>${safeName}</p>
+          <p><strong>E-Mail:</strong><br/>${safeEmail}</p>
 
           ${
             interests.length > 0
@@ -49,35 +74,78 @@ export async function POST(req: Request) {
           }
 
           <p><strong>Nachricht:</strong></p>
+
           <div style="
             background:#f3f4f6;
             padding:12px;
             border-radius:8px;
             margin-top:8px;
           ">
-            ${message}
+            ${safeMessage}
           </div>
 
           <hr style="margin:20px 0"/>
 
           <p style="font-size:12px;color:#888">
-            Diese Nachricht wurde über das Kontaktformular der SAG Studernheim Website gesendet.
+            Diese Nachricht wurde über das Kontaktformular der Studernheim Website gesendet.
           </p>
 
         </div>
       `
     })
 
-    // ❗ wichtig: Fehler von Resend prüfen
-    if (result.error) {
-      console.error('❌ Resend API Fehler:', result.error)
+    if (adminResult.error) {
+      console.error('❌ Admin Mail Fehler:', adminResult.error)
       return Response.json(
-        { error: result.error.message || 'Mail konnte nicht gesendet werden' },
+        { error: adminResult.error.message },
         { status: 500 }
       )
     }
 
-    console.log('✅ Resend success:', result)
+    /* ---------------- USER BESTÄTIGUNG ---------------- */
+
+    await resend.emails.send({
+      from: 'Studernheim <noreply@studrum.de>',
+      to: email,
+      subject: '✅ Ihre Anfrage wurde empfangen',
+
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height:1.6; color:#333">
+
+          <h2 style="color:#16a34a;">Vielen Dank für Ihre Nachricht</h2>
+
+          <p>Hallo ${safeName},</p>
+
+          <p>
+            wir haben Ihre Anfrage erhalten und werden uns schnellstmöglich bei Ihnen melden.
+          </p>
+
+          <div style="
+            background:#f3f4f6;
+            padding:12px;
+            border-radius:8px;
+            margin-top:12px;
+          ">
+            <strong>Ihre Nachricht:</strong><br/>
+            ${safeMessage}
+          </div>
+
+          <p style="margin-top:20px;">
+            Mit freundlichen Grüßen<br/>
+            Ortsverwaltung Studernheim
+          </p>
+
+          <hr style="margin:20px 0"/>
+
+          <p style="font-size:12px;color:#888">
+            Dies ist eine automatische Bestätigung Ihrer Anfrage.
+          </p>
+
+        </div>
+      `
+    })
+
+    console.log('✅ Mail erfolgreich gesendet')
 
     return Response.json({ success: true })
 
