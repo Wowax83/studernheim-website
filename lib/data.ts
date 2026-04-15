@@ -107,7 +107,7 @@ export const ortsverwaltungData: Ortsverwaltung = {
 
   phone: '06233 42334',
 
-  mobile: '0151 XXXXXXXX', // ← echte Nummer eintragen
+  mobile: '0151 5355 9090', // ← echte Nummer eintragen
 
   email: 'ortsvorsteher.studernheim@gmail.com',
 
