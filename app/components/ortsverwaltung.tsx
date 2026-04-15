@@ -241,24 +241,6 @@ export default function Ortsverwaltung() {
                 <p key={i}>• {note}</p>
               ))}
             </div>
-
-            {/* NEXT */}
-            {next && (
-              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
-                <p className="text-sm text-green-700 font-medium mb-1">
-                  Nächste Sprechstunde
-                </p>
-                <p className="text-gray-900 font-semibold">
-                  {next.fullDate.toLocaleDateString('de-DE', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long'
-                  })}
-                </p>
-                <p className="text-green-700">{next.label}</p>
-              </div>
-            )}
-
           </motion.div>
 
         </div>
