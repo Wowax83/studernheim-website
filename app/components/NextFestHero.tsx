@@ -4,14 +4,6 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
-function getNextFest(feste: any[]) {
-  const now = new Date()
-
-  return feste
-    ?.filter(f => f?.date && new Date(f.date) >= now)
-    ?.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0]
-}
-
 function getTimeLeft(targetDate: string) {
   const total = new Date(targetDate).getTime() - new Date().getTime()
 
@@ -25,14 +17,17 @@ function getTimeLeft(targetDate: string) {
 }
 
 export default function NextFestHero({ feste }: any) {
-  const nextFest = getNextFest(feste)
+  if (!Array.isArray(feste) || feste.length === 0) return null
+
+  // 👉 erstes Fest = nächstes (kommt schon gefiltert aus page)
+  const nextFest = feste[0]
 
   const [time, setTime] = useState(
-    nextFest ? getTimeLeft(nextFest.date) : null
+    nextFest?.date ? getTimeLeft(nextFest.date) : null
   )
 
   useEffect(() => {
-    if (!nextFest) return
+    if (!nextFest?.date) return
 
     const interval = setInterval(() => {
       setTime(getTimeLeft(nextFest.date))
@@ -41,12 +36,27 @@ export default function NextFestHero({ feste }: any) {
     return () => clearInterval(interval)
   }, [nextFest])
 
-  if (!nextFest) return null
-
+  // 👉 Bild
   const image =
     Array.isArray(nextFest.images) && nextFest.images.length > 0
       ? nextFest.images[0]
       : null
+
+  // 👉 Button aus Highlights (erster Link)
+  let button = null
+
+  if (Array.isArray(nextFest.highlights)) {
+    const firstLink = nextFest.highlights.find(
+      (item: any) => typeof item === 'object' && item?.url
+    )
+
+    if (firstLink) {
+      button = {
+        text: firstLink.text || 'Mehr erfahren',
+        url: firstLink.url
+      }
+    }
+  }
 
   return (
     <section className="relative max-w-4xl ml-auto mr-6 md:mr-16 -mt-28 z-20">
@@ -79,16 +89,19 @@ export default function NextFestHero({ feste }: any) {
             {nextFest.name}
           </h2>
 
-          <p className="text-white/80 mb-6 text-sm md:text-base">
-            {new Date(nextFest.date).toLocaleDateString('de-DE', {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long'
-            })}
-          </p>
+          {/* Datum */}
+          {nextFest.date && (
+            <p className="text-white/80 mb-6 text-sm md:text-base">
+              {new Date(nextFest.date).toLocaleDateString('de-DE', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long'
+              })}
+            </p>
+          )}
 
-          {/* Countdown */}
-          {time && time.total > 0 && (
+          {/* Countdown oder Fallback */}
+          {time && time.total > 0 ? (
             <div className="grid grid-cols-4 gap-3 max-w-md">
               {[
                 { label: 'Tage', value: time.days },
@@ -109,17 +122,23 @@ export default function NextFestHero({ feste }: any) {
                 </div>
               ))}
             </div>
+          ) : (
+            <div className="text-sm text-white/70">
+              Dieses Fest hat bereits stattgefunden
+            </div>
           )}
 
           {/* 🔥 Button */}
-          <button
-            onClick={() => {
-              document.getElementById('feste')?.scrollIntoView({ behavior: 'smooth' })
-            }}
-            className="mt-6 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium transition hover:scale-105"
-          >
-            Zu den Highlights →
-          </button>
+          {button && (
+            <a
+              href={button.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium transition hover:scale-105"
+            >
+              {button.text} →
+            </a>
+          )}
         </div>
       </motion.div>
     </section>
