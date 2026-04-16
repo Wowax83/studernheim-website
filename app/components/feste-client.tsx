@@ -64,6 +64,7 @@ export default function FesteClient({ feste }: any) {
     <section id="feste" className="py-20">
       <div className="max-w-7xl mx-auto px-4">
 
+        {/* Header */}
         <motion.div
           ref={ref}
           initial={{ opacity: 0 }}
@@ -75,6 +76,7 @@ export default function FesteClient({ feste }: any) {
           </h2>
         </motion.div>
 
+        {/* Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.isArray(feste) &&
             feste.map((fest: any, index: number) => {
@@ -95,14 +97,120 @@ export default function FesteClient({ feste }: any) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={inView ? { opacity: 1, y: 0 } : {}}
                   transition={{ delay: index * 0.1 }}
+                  onMouseEnter={() => {
+                    if (!fest._id) return
+                    setHoveredCard(fest._id)
+                    setPausedCards((p) => ({ ...p, [fest._id]: true }))
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredCard(null)
+                    if (!fest._id) return
+                    setPausedCards((p) => ({ ...p, [fest._id]: false }))
+                  }}
                   className="group bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition"
                 >
-                  {/* Dein restlicher Code bleibt gleich */}
+
+                  {/* Slider */}
+                  <div className="relative aspect-[4/3] bg-gray-100">
+                    {images.length > 0 ? (
+                      <Image
+                        src={images[currentIndex]}
+                        alt={fest?.name || 'Fest'}
+                        fill
+                        onClick={() => {
+                          setLightboxImages(images)
+                          setLightboxIndex(currentIndex)
+                        }}
+                        className="object-cover cursor-pointer"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                        Kein Bild vorhanden
+                      </div>
+                    )}
+
+                    {fest?.date && (
+                      <div className="absolute top-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+                        {new Date(fest.date).toLocaleDateString('de-DE')}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-5">
+                    {fest?.region && (
+                      <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                        <MapPin size={14} />
+                        {fest.region}
+                      </div>
+                    )}
+
+                    <h3 className="font-bold text-lg mb-2">
+                      {fest?.name}
+                    </h3>
+
+                    {fest?.description && (
+                      <p className="text-gray-600 text-sm mb-3">
+                        {fest.description}
+                      </p>
+                    )}
+
+                    {/* Highlights */}
+                    {hoveredCard === fest._id &&
+                      Array.isArray(fest?.highlights) && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {fest.highlights.map((item: any, i: number) => {
+                            if (typeof item === 'string') {
+                              return (
+                                <span key={i} className="text-xs bg-gray-200 px-3 py-1 rounded-full">
+                                  {item}
+                                </span>
+                              )
+                            }
+
+                            return (
+                              <a
+                                key={i}
+                                href={item.url}
+                                target="_blank"
+                                className="text-xs px-3 py-1 rounded bg-blue-100 text-blue-700"
+                              >
+                                🔗 {item.text || 'Link'}
+                              </a>
+                            )
+                          })}
+                        </div>
+                      )}
+                  </div>
                 </motion.div>
               )
             })}
         </div>
 
+        {/* Lightbox */}
+        {lightboxImages && (
+          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+            <button onClick={() => setLightboxImages(null)} className="absolute top-5 right-5 text-white">
+              <X size={32} />
+            </button>
+
+            <button onClick={prevImage} className="absolute left-5 text-white">
+              <ChevronLeft size={32} />
+            </button>
+
+            <button onClick={nextImage} className="absolute right-5 text-white">
+              <ChevronRight size={32} />
+            </button>
+
+            <Image
+              src={lightboxImages[lightboxIndex]}
+              alt="Bild"
+              width={1200}
+              height={800}
+              className="max-h-[90vh] object-contain"
+            />
+          </div>
+        )}
       </div>
     </section>
   )
