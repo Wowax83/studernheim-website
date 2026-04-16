@@ -2,138 +2,176 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Users } from 'lucide-react'
+import {
+  Globe,
+  MessageCircle,
+  Instagram,
+  Facebook,
+  ClipboardList
+} from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 
-export default function VereineClient({ vereine }: any) {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.05
-  })
+/**
+ * 🔥 Smart Link Buttons (identisch zu Feste)
+ */
+function getLinkMeta(url: string, text?: string) {
+  const u = url.toLowerCase()
 
+  if (u.includes('helferliste')) {
+    return {
+      label: text || 'Helferliste',
+      icon: ClipboardList,
+      className: 'bg-emerald-600 hover:bg-emerald-700 text-white'
+    }
+  }
+
+  if (u.includes('wa.me') || u.includes('whatsapp')) {
+    return {
+      label: text || 'WhatsApp',
+      icon: MessageCircle,
+      className: 'bg-green-500 hover:bg-green-600 text-white'
+    }
+  }
+
+  if (u.includes('instagram')) {
+    return {
+      label: text || 'Instagram',
+      icon: Instagram,
+      className: 'bg-pink-500 hover:bg-pink-600 text-white'
+    }
+  }
+
+  if (u.includes('facebook')) {
+    return {
+      label: text || 'Facebook',
+      icon: Facebook,
+      className: 'bg-blue-600 hover:bg-blue-700 text-white'
+    }
+  }
+
+  return {
+    label: text || 'Website',
+    icon: Globe,
+    className: 'bg-gray-800 hover:bg-gray-900 text-white'
+  }
+}
+
+export default function VereineClient({ vereine }: any) {
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 })
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
 
   return (
-    <section id="vereine" className="py-20 sm:py-28 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="vereine" className="py-16 md:py-20">
+      <div className="max-w-7xl mx-auto px-3 md:px-4">
 
         {/* Header */}
         <motion.div
           ref={ref}
-          initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}}
+          className="text-center mb-10 md:mb-12"
         >
-          <h2 className="font-heading text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl md:text-5xl font-bold">
             Unsere <span className="text-green-600">Vereine</span>
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Unsere Vereine sind das Herz der Gemeinschaft – engagiert, vielfältig und lebendig.
-          </p>
         </motion.div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {vereine?.map((verein: any, index: number) => (
-            <motion.div
-              key={verein._id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              onMouseEnter={() => setHoveredCard(verein._id)}
-              onMouseLeave={() => setHoveredCard(null)}
-              className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
-            >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {Array.isArray(vereine) &&
+            vereine.map((verein: any, index: number) => {
+              if (!verein) return null
 
-              {/* Image */}
-              {verein.image && (
-                <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-                  <Image
-                    src={verein.image}
-                    alt={verein.title}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                </div>
-              )}
+              return (
+                <motion.div
+                  key={verein._id || index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={inView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ delay: index * 0.1 }}
+                  onMouseEnter={() => setHoveredCard(verein._id)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  className="group bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition"
+                >
 
-              {/* Content */}
-              <div className="p-6">
-
-                {/* Title */}
-                <h3 className="font-heading text-2xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
-                  {verein.title || 'Kein Name'}
-                </h3>
-
-                {/* Category */}
-                {verein.category && (
-                  <p className="text-green-600 font-medium text-sm mb-3">
-                    {verein.category}
-                  </p>
-                )}
-
-                {/* Description */}
-                {verein.description && (
-                  <p className="text-gray-600 leading-relaxed mb-4">
-                    {verein.description}
-                  </p>
-                )}
-
-                {/* 🔥 Highlights (nur bei Hover) */}
-                {hoveredCard === verein._id && verein.highlights && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="border-t border-gray-200 pt-4 mt-4 flex flex-wrap gap-2"
-                  >
-                    {verein.highlights.map((item: any, i: number) =>
-                      item.url ? (
-                        <a
-                          key={i}
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition"
-                        >
-                          {item.text}
-                        </a>
-                      ) : (
-                        <span
-                          key={i}
-                          className="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full"
-                        >
-                          {item.text}
-                        </span>
-                      )
-                    )}
-                  </motion.div>
-                )}
-
-                {/* Contact */}
-                {verein.contact && (
-                  <div className="flex items-center gap-2 text-xs text-gray-500 mt-4">
-                    <Users size={14} />
-                    <div className="flex flex-col">
-                      {verein.contact.name && <span>{verein.contact.name}</span>}
-                      {verein.contact.email && (
-                        <a
-                          href={`mailto:${verein.contact.email}`}
-                          className="text-green-600 hover:underline"
-                        >
-                          {verein.contact.email}
-                        </a>
-                      )}
-                      {verein.contact.phone && <span>{verein.contact.phone}</span>}
+                  {/* Bild */}
+                  {verein?.image && (
+                    <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
+                      <Image
+                        src={verein.image}
+                        alt={verein.title}
+                        fill
+                        className="object-cover object-top scale-105"
+                      />
                     </div>
-                  </div>
-                )}
+                  )}
 
-              </div>
-            </motion.div>
-          ))}
+                  {/* Content */}
+                  <div className="p-4 md:p-5">
+
+                    <h3 className="font-bold text-lg mb-2">
+                      {verein?.title}
+                    </h3>
+
+                    {verein?.description && (
+                      <p className="text-gray-600 text-sm mb-3">
+                        {verein.description}
+                      </p>
+                    )}
+
+                    {/* QuickFacts nur Hover (Desktop) */}
+                    {hoveredCard === verein._id &&
+                      Array.isArray(verein?.quickFacts) && (
+                        <div className="hidden md:flex flex-wrap gap-2 mb-3">
+                          {verein.quickFacts.map((fact: any, i: number) => (
+                            <span
+                              key={i}
+                              className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"
+                            >
+                              {fact}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                    {/* Buttons IMMER sichtbar */}
+                    {Array.isArray(verein?.highlights) && verein.highlights.length > 0 && (
+                      <div className="flex flex-wrap gap-3 mt-3">
+                        {verein.highlights.map((item: any, i: number) => {
+                          if (!item?.url) return null
+
+                          const meta = getLinkMeta(item.url, item.text)
+                          const Icon = meta.icon
+
+                          return (
+                            <a
+                              key={i}
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`
+                                inline-flex items-center gap-2
+                                text-sm font-semibold
+                                px-4 py-2
+                                rounded-xl
+                                shadow-md hover:shadow-lg
+                                transition-all duration-200
+                                hover:scale-105
+                                ${meta.className}
+                              `}
+                            >
+                              <Icon size={16} />
+                              {meta.label}
+                            </a>
+                          )
+                        })}
+                      </div>
+                    )}
+
+                  </div>
+                </motion.div>
+              )
+            })}
         </div>
 
       </div>
