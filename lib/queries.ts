@@ -2,10 +2,12 @@ import { client } from './sanity'
 
 /**
  * 🔥 FESTE (alle)
+ * 👉 Zukünftige zuerst, dann vergangene
  */
 export async function getFeste() {
   return await client.fetch(
-    `*[_type == "fest"] | order(date asc){
+    `*[_type == "fest"]
+      | order(date >= now() desc, date asc){
       _id,
       name,
       description,
@@ -17,7 +19,7 @@ export async function getFeste() {
       // 🔥 Bilder
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
-      // 🔥 WICHTIG: beide getrennt behalten
+      // 🔥 Inhalte
       highlights,
       quickFacts
     }`,
@@ -84,7 +86,7 @@ export async function getAllEvents(limit = 4) {
     `{
       "events": [
 
-        // 🔥 FESTE
+        // 🔥 FESTE (nur kommende)
         ...*[_type == "fest" && date >= string::split(now(), "T")[0]]{
           _id,
           "title": name,
