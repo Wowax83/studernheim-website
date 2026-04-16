@@ -13,17 +13,29 @@ import { getFeste } from '@/lib/queries'
 export default async function Home() {
   const feste = await getFeste()
 
+  // 🔍 DEBUG (wichtig!)
+  console.log('FESTE DATA:', feste)
+
   return (
     <main className="relative">
       <Hero />
 
-      {/* 🔥 Countdown / nächstes Fest */}
-      <NextFestHero feste={feste} />
+      {/* 🔥 Countdown */}
+      {Array.isArray(feste) && feste.length > 0 && (
+        <NextFestHero feste={feste} />
+      )}
 
       <SAG />
 
-      {/* 🔥 Fest-Karten */}
-      <FesteClient feste={feste} />
+      {/* 🔥 Feste */}
+      {Array.isArray(feste) && feste.length > 0 ? (
+        <FesteClient feste={feste} />
+      ) : (
+        <section className="py-20 text-center">
+          <h2 className="text-3xl font-bold mb-4">Unsere Feste</h2>
+          <p className="text-gray-500">Keine Feste vorhanden</p>
+        </section>
+      )}
 
       <Vereine />
       <Termine />
