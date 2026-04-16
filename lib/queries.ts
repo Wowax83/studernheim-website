@@ -20,6 +20,7 @@ export async function getFeste() {
       highlights,
       quickFacts,
 
+      // ✅ wichtig für Sortierung
       "isUpcoming": date >= now()
     }
     | order(isUpcoming desc, date asc)`,
@@ -29,12 +30,13 @@ export async function getFeste() {
     }
   )
 }
+
 /**
  * 🔥 NUR zukünftige Feste
  */
 export async function getUpcomingFeste(limit = 4) {
   return await client.fetch(
-    `*[_type == "fest" && date >= string::split(now(), "T")[0]]
+    `*[_type == "fest" && date >= now()]
       | order(date asc)[0...${limit}]{
       _id,
       name,
@@ -86,7 +88,7 @@ export async function getAllEvents(limit = 4) {
       "events": [
 
         // 🔥 FESTE (nur kommende)
-        ...*[_type == "fest" && date >= string::split(now(), "T")[0]]{
+        ...*[_type == "fest" && date >= now()]{
           _id,
           "title": name,
           description,
@@ -102,7 +104,7 @@ export async function getAllEvents(limit = 4) {
         },
 
         // 🔥 TERMINE
-        ...*[_type == "termine" && date >= string::split(now(), "T")[0]]{
+        ...*[_type == "termine" && date >= now()]{
           _id,
           title,
           description,
