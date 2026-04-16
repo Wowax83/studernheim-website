@@ -21,6 +21,7 @@ export default function FesteClient({ feste }: any) {
   const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
+  // 🔥 Auto Slider
   useEffect(() => {
     if (!Array.isArray(feste)) return
 
@@ -110,19 +111,45 @@ export default function FesteClient({ feste }: any) {
                   className="group bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition"
                 >
 
-                  {/* Slider */}
-                  <div className="relative aspect-[4/3] bg-gray-100">
+                  {/* 🔥 Slider mit Swipe */}
+                  <motion.div
+                    className="relative aspect-[4/3] bg-gray-100 overflow-hidden"
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    onDragEnd={(e, info) => {
+                      if (images.length < 2 || !fest._id) return
+
+                      if (info.offset.x < -50) {
+                        setCurrentImageIndex((p) => ({
+                          ...p,
+                          [fest._id]: (currentIndex + 1) % images.length
+                        }))
+                      }
+
+                      if (info.offset.x > 50) {
+                        setCurrentImageIndex((p) => ({
+                          ...p,
+                          [fest._id]: (currentIndex - 1 + images.length) % images.length
+                        }))
+                      }
+                    }}
+                  >
                     {images.length > 0 ? (
-                      <Image
-                        src={images[currentIndex]}
-                        alt={fest?.name || 'Fest'}
-                        fill
-                        onClick={() => {
-                          setLightboxImages(images)
-                          setLightboxIndex(currentIndex)
-                        }}
-                        className="object-cover cursor-pointer"
-                      />
+                      images.map((img: string, i: number) => (
+                        <Image
+                          key={i}
+                          src={img}
+                          alt={fest?.name || 'Fest'}
+                          fill
+                          onClick={() => {
+                            setLightboxImages(images)
+                            setLightboxIndex(i)
+                          }}
+                          className={`absolute inset-0 object-cover transition-opacity duration-500 ${
+                            i === currentIndex ? 'opacity-100' : 'opacity-0'
+                          }`}
+                        />
+                      ))
                     ) : (
                       <div className="flex items-center justify-center h-full text-gray-400 text-sm">
                         Kein Bild vorhanden
@@ -134,10 +161,11 @@ export default function FesteClient({ feste }: any) {
                         {new Date(fest.date).toLocaleDateString('de-DE')}
                       </div>
                     )}
-                  </div>
+                  </motion.div>
 
                   {/* Content */}
                   <div className="p-5">
+
                     {fest?.region && (
                       <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                         <MapPin size={14} />
@@ -155,32 +183,53 @@ export default function FesteClient({ feste }: any) {
                       </p>
                     )}
 
-                    {/* Highlights */}
+                    {/* QuickFacts */}
+                    {hoveredCard === fest._id &&
+                      Array.isArray(fest?.quickFacts) && (
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {fest.quickFacts.map((fact: any, i: number) => (
+                            <span
+                              key={i}
+                              className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"
+                            >
+                              {fact}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                    {/* Highlights → BUTTONS */}
                     {hoveredCard === fest._id &&
                       Array.isArray(fest?.highlights) && (
-                        <div className="flex flex-wrap gap-2 mt-2">
+                        <div className="flex flex-wrap gap-3 mt-2">
                           {fest.highlights.map((item: any, i: number) => {
-                            if (typeof item === 'string') {
-                              return (
-                                <span key={i} className="text-xs bg-gray-200 px-3 py-1 rounded-full">
-                                  {item}
-                                </span>
-                              )
-                            }
+                            if (!item?.url) return null
 
                             return (
                               <a
                                 key={i}
                                 href={item.url}
                                 target="_blank"
-                                className="text-xs px-3 py-1 rounded bg-blue-100 text-blue-700"
+                                rel="noopener noreferrer"
+                                className="
+                                  inline-flex items-center gap-2
+                                  bg-green-600 hover:bg-green-700
+                                  text-white
+                                  text-sm font-semibold
+                                  px-5 py-2.5
+                                  rounded-xl
+                                  shadow-md hover:shadow-lg
+                                  transition-all duration-200
+                                  hover:scale-105
+                                "
                               >
-                                🔗 {item.text || 'Link'}
+                                {item.text || 'Mehr erfahren'} →
                               </a>
                             )
                           })}
                         </div>
                       )}
+
                   </div>
                 </motion.div>
               )
@@ -190,6 +239,7 @@ export default function FesteClient({ feste }: any) {
         {/* Lightbox */}
         {lightboxImages && (
           <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+
             <button onClick={() => setLightboxImages(null)} className="absolute top-5 right-5 text-white">
               <X size={32} />
             </button>
@@ -205,8 +255,8 @@ export default function FesteClient({ feste }: any) {
             <Image
               src={lightboxImages[lightboxIndex]}
               alt="Bild"
-              width={1200}
-              height={800}
+              width={1400}
+              height={900}
               className="max-h-[90vh] object-contain"
             />
           </div>
