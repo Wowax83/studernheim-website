@@ -71,35 +71,19 @@ export default function NextFestHero({ feste }: any) {
           "
         >
 
-          {/* 🔥 Background + Bild */}
+          {/* 🔥 Background Bild (FIXED) */}
           {image && (
-            <>
-              {/* Blur Background */}
-              <div className="absolute inset-0">
-                <Image
-                  src={image}
-                  alt=""
-                  fill
-                  className="object-cover blur-2xl scale-110 opacity-40"
-                />
-              </div>
-
-              {/* Hauptbild (komplett sichtbar) */}
-              <div className="absolute inset-0 flex items-center justify-center p-6">
-                <div className="relative w-full h-full max-w-3xl">
-                  <Image
-                    src={image}
-                    alt={nextFest.name}
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-              </div>
-            </>
+            <Image
+              src={image}
+              alt={nextFest.name}
+              fill
+              className="object-cover object-top scale-105"
+              priority
+            />
           )}
 
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-black/40" />
+          {/* 🔥 Gradient Overlay (wichtig für Lesbarkeit) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
           {/* Content */}
           <div className="relative p-5 md:p-10 text-white max-w-xl">
