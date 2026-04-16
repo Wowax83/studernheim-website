@@ -6,10 +6,60 @@ import {
   MapPin,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Globe,
+  MessageCircle,
+  Instagram,
+  Facebook,
+  ClipboardList
 } from 'lucide-react'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
+
+/**
+ * 🔥 Smart Link Buttons
+ */
+function getLinkMeta(url: string, text?: string) {
+  const u = url.toLowerCase()
+
+  if (u.includes('helferliste')) {
+    return {
+      label: text || 'Helferliste',
+      icon: ClipboardList,
+      className: 'bg-emerald-600 hover:bg-emerald-700 text-white'
+    }
+  }
+
+  if (u.includes('wa.me') || u.includes('whatsapp')) {
+    return {
+      label: text || 'WhatsApp',
+      icon: MessageCircle,
+      className: 'bg-green-500 hover:bg-green-600 text-white'
+    }
+  }
+
+  if (u.includes('instagram')) {
+    return {
+      label: text || 'Instagram',
+      icon: Instagram,
+      className: 'bg-pink-500 hover:bg-pink-600 text-white'
+    }
+  }
+
+  if (u.includes('facebook')) {
+    return {
+      label: text || 'Facebook',
+      icon: Facebook,
+      className: 'bg-blue-600 hover:bg-blue-700 text-white'
+    }
+  }
+
+  return {
+    label: text || 'Website',
+    icon: Globe,
+    className: 'bg-gray-800 hover:bg-gray-900 text-white'
+  }
+}
 
 export default function FesteClient({ feste }: any) {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 })
@@ -21,7 +71,6 @@ export default function FesteClient({ feste }: any) {
   const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  // 🔥 Auto Slider
   useEffect(() => {
     if (!Array.isArray(feste)) return
 
@@ -111,28 +160,11 @@ export default function FesteClient({ feste }: any) {
                   className="group bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition"
                 >
 
-                  {/* 🔥 Slider mit Swipe */}
+                  {/* Slider */}
                   <motion.div
                     className="relative aspect-[4/3] bg-gray-100 overflow-hidden cursor-grab active:cursor-grabbing"
                     drag="x"
                     dragConstraints={{ left: 0, right: 0 }}
-                    onDragEnd={(e, info) => {
-                      if (images.length < 2 || !fest._id) return
-
-                      if (info.offset.x < -50) {
-                        setCurrentImageIndex((p) => ({
-                          ...p,
-                          [fest._id]: (currentIndex + 1) % images.length
-                        }))
-                      }
-
-                      if (info.offset.x > 50) {
-                        setCurrentImageIndex((p) => ({
-                          ...p,
-                          [fest._id]: (currentIndex - 1 + images.length) % images.length
-                        }))
-                      }
-                    }}
                   >
                     {images.length > 0 ? (
                       images.map((img: string, i: number) => (
@@ -153,12 +185,6 @@ export default function FesteClient({ feste }: any) {
                     ) : (
                       <div className="flex items-center justify-center h-full text-gray-400 text-sm">
                         Kein Bild vorhanden
-                      </div>
-                    )}
-
-                    {fest?.date && (
-                      <div className="absolute top-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
-                        {new Date(fest.date).toLocaleDateString('de-DE')}
                       </div>
                     )}
                   </motion.div>
@@ -183,7 +209,7 @@ export default function FesteClient({ feste }: any) {
                       </p>
                     )}
 
-                    {/* QuickFacts */}
+                    {/* QuickFacts (nur Hover) */}
                     {hoveredCard === fest._id &&
                       Array.isArray(fest?.quickFacts) && (
                         <div className="flex flex-wrap gap-2 mb-3">
@@ -198,37 +224,39 @@ export default function FesteClient({ feste }: any) {
                         </div>
                       )}
 
-                    {/* Highlights */}
-                    {hoveredCard === fest._id &&
-                      Array.isArray(fest?.highlights) && (
-                        <div className="flex flex-wrap gap-3 mt-2">
-                          {fest.highlights.map((item: any, i: number) => {
-                            if (!item?.url) return null
+                    {/* Buttons IMMER sichtbar */}
+                    {Array.isArray(fest?.highlights) && fest.highlights.length > 0 && (
+                      <div className="flex flex-wrap gap-3 mt-3">
+                        {fest.highlights.map((item: any, i: number) => {
+                          if (!item?.url) return null
 
-                            return (
-                              <a
-                                key={i}
-                                href={item.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="
-                                  inline-flex items-center gap-2
-                                  bg-green-600 hover:bg-green-700
-                                  text-white
-                                  text-sm font-semibold
-                                  px-4 py-2 md:px-5 md:py-2.5
-                                  rounded-xl
-                                  shadow-md hover:shadow-lg
-                                  transition-all duration-200
-                                  hover:scale-105
-                                "
-                              >
-                                {item.text || 'Mehr erfahren'} →
-                              </a>
-                            )
-                          })}
-                        </div>
-                      )}
+                          const meta = getLinkMeta(item.url, item.text)
+                          const Icon = meta.icon
+
+                          return (
+                            <a
+                              key={i}
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`
+                                inline-flex items-center gap-2
+                                text-sm font-semibold
+                                px-4 py-2
+                                rounded-xl
+                                shadow-md hover:shadow-lg
+                                transition-all duration-200
+                                hover:scale-105
+                                ${meta.className}
+                              `}
+                            >
+                              <Icon size={16} />
+                              {meta.label}
+                            </a>
+                          )
+                        })}
+                      </div>
+                    )}
 
                   </div>
                 </motion.div>
@@ -239,7 +267,6 @@ export default function FesteClient({ feste }: any) {
         {/* Lightbox */}
         {lightboxImages && (
           <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
-
             <button onClick={() => setLightboxImages(null)} className="absolute top-5 right-5 text-white">
               <X size={32} />
             </button>
