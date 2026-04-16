@@ -19,7 +19,6 @@ function getTimeLeft(targetDate: string) {
 export default function NextFestHero({ feste }: any) {
   if (!Array.isArray(feste) || feste.length === 0) return null
 
-  // 👉 erstes Fest = nächstes (kommt schon gefiltert aus page)
   const nextFest = feste[0]
 
   const [time, setTime] = useState(
@@ -36,15 +35,13 @@ export default function NextFestHero({ feste }: any) {
     return () => clearInterval(interval)
   }, [nextFest])
 
-  // 👉 Bild
   const image =
     Array.isArray(nextFest.images) && nextFest.images.length > 0
       ? nextFest.images[0]
       : null
 
-  // 👉 Button aus Highlights (erster Link)
+  // 👉 Button aus Highlights
   let button = null
-
   if (Array.isArray(nextFest.highlights)) {
     const firstLink = nextFest.highlights.find(
       (item: any) => typeof item === 'object' && item?.url
@@ -59,88 +56,108 @@ export default function NextFestHero({ feste }: any) {
   }
 
   return (
-    <section className="relative max-w-4xl ml-auto mr-6 md:mr-16 -mt-28 z-20">
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="relative rounded-2xl overflow-hidden shadow-2xl backdrop-blur-md border border-white/10"
-      >
-        {/* Background */}
-        {image && (
-          <Image
-            src={image}
-            alt={nextFest.name}
-            fill
-            className="object-cover"
-          />
-        )}
+    <section className="relative z-20 -mt-20 md:-mt-32 px-4">
+      
+      {/* 🔥 Desktop zentriert */}
+      <div className="max-w-5xl mx-auto">
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/80" />
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="
+            relative rounded-2xl overflow-hidden
+            shadow-[0_20px_60px_rgba(0,0,0,0.35)]
+            border border-white/10
+          "
+        >
+          {/* Background */}
+          {image && (
+            <Image
+              src={image}
+              alt={nextFest.name}
+              fill
+              className="object-cover"
+            />
+          )}
 
-        {/* Content */}
-        <div className="relative p-6 md:p-10 text-white">
-          <p className="text-green-400 uppercase tracking-widest text-xs mb-2">
-            Nächstes Fest
-          </p>
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/80" />
 
-          <h2 className="text-2xl md:text-4xl font-bold mb-3">
-            {nextFest.name}
-          </h2>
+          {/* Content */}
+          <div className="relative p-5 md:p-10 text-white max-w-xl">
 
-          {/* Datum */}
-          {nextFest.date && (
-            <p className="text-white/80 mb-6 text-sm md:text-base">
-              {new Date(nextFest.date).toLocaleDateString('de-DE', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long'
-              })}
+            <p className="text-green-400 uppercase tracking-widest text-xs mb-2">
+              Nächstes Fest
             </p>
-          )}
 
-          {/* Countdown oder Fallback */}
-          {time && time.total > 0 ? (
-            <div className="grid grid-cols-4 gap-3 max-w-md">
-              {[
-                { label: 'Tage', value: time.days },
-                { label: 'Std', value: time.hours },
-                { label: 'Min', value: time.minutes },
-                { label: 'Sek', value: time.seconds }
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 text-center"
-                >
-                  <div className="text-xl md:text-2xl font-bold">
-                    {item.value}
-                  </div>
-                  <div className="text-[10px] uppercase tracking-wide opacity-70">
-                    {item.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-sm text-white/70">
-              Dieses Fest hat bereits stattgefunden
-            </div>
-          )}
+            <h2 className="text-2xl md:text-4xl font-bold mb-3">
+              {nextFest.name}
+            </h2>
 
-          {/* 🔥 Button */}
-          {button && (
-            <a
-              href={button.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium transition hover:scale-105"
-            >
-              {button.text} →
-            </a>
-          )}
-        </div>
-      </motion.div>
+            {nextFest.date && (
+              <p className="text-white/80 mb-6 text-sm md:text-base">
+                {new Date(nextFest.date).toLocaleDateString('de-DE', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long'
+                })}
+              </p>
+            )}
+
+            {/* Countdown */}
+            {time && time.total > 0 ? (
+              <div className="grid grid-cols-4 gap-3 md:gap-4 max-w-sm md:max-w-md mt-4">
+                {[
+                  { label: 'Tage', value: time.days },
+                  { label: 'Std', value: time.hours },
+                  { label: 'Min', value: time.minutes },
+                  { label: 'Sek', value: time.seconds }
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-2 md:p-3 text-center"
+                  >
+                    <div className="text-lg md:text-2xl font-bold">
+                      {item.value}
+                    </div>
+                    <div className="text-[10px] uppercase tracking-wide opacity-70">
+                      {item.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-white/70">
+                Dieses Fest hat bereits stattgefunden
+              </div>
+            )}
+
+            {/* Button */}
+            {button && (
+              <a
+                href={button.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  mt-6 inline-flex items-center gap-2
+                  bg-green-600 hover:bg-green-700
+                  text-white
+                  text-sm font-semibold
+                  px-4 py-2 md:px-5 md:py-2.5
+                  rounded-xl
+                  shadow-md hover:shadow-lg
+                  transition-all duration-200
+                  hover:scale-105
+                "
+              >
+                {button.text} →
+              </a>
+            )}
+          </div>
+        </motion.div>
+
+      </div>
     </section>
   )
 }
