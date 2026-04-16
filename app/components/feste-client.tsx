@@ -62,23 +62,23 @@ export default function FesteClient({ feste }: any) {
   }
 
   return (
-    <section id="feste" className="py-20">
-      <div className="max-w-7xl mx-auto px-4">
+    <section id="feste" className="py-16 md:py-20">
+      <div className="max-w-7xl mx-auto px-3 md:px-4">
 
         {/* Header */}
         <motion.div
           ref={ref}
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
-          className="text-center mb-12"
+          className="text-center mb-10 md:mb-12"
         >
-          <h2 className="text-5xl font-bold">
+          <h2 className="text-3xl md:text-5xl font-bold">
             Unsere <span className="text-green-600">Feste</span>
           </h2>
         </motion.div>
 
         {/* Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {Array.isArray(feste) &&
             feste.map((fest: any, index: number) => {
               if (!fest) return null
@@ -113,7 +113,7 @@ export default function FesteClient({ feste }: any) {
 
                   {/* 🔥 Slider mit Swipe */}
                   <motion.div
-                    className="relative aspect-[4/3] bg-gray-100 overflow-hidden"
+                    className="relative aspect-[4/3] bg-gray-100 overflow-hidden cursor-grab active:cursor-grabbing"
                     drag="x"
                     dragConstraints={{ left: 0, right: 0 }}
                     onDragEnd={(e, info) => {
@@ -145,7 +145,7 @@ export default function FesteClient({ feste }: any) {
                             setLightboxImages(images)
                             setLightboxIndex(i)
                           }}
-                          className={`absolute inset-0 object-cover transition-opacity duration-500 ${
+                          className={`absolute inset-0 object-cover object-top scale-105 transition-opacity duration-500 ${
                             i === currentIndex ? 'opacity-100' : 'opacity-0'
                           }`}
                         />
@@ -164,7 +164,7 @@ export default function FesteClient({ feste }: any) {
                   </motion.div>
 
                   {/* Content */}
-                  <div className="p-5">
+                  <div className="p-4 md:p-5">
 
                     {fest?.region && (
                       <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
@@ -198,7 +198,7 @@ export default function FesteClient({ feste }: any) {
                         </div>
                       )}
 
-                    {/* Highlights → BUTTONS */}
+                    {/* Highlights */}
                     {hoveredCard === fest._id &&
                       Array.isArray(fest?.highlights) && (
                         <div className="flex flex-wrap gap-3 mt-2">
@@ -216,7 +216,7 @@ export default function FesteClient({ feste }: any) {
                                   bg-green-600 hover:bg-green-700
                                   text-white
                                   text-sm font-semibold
-                                  px-5 py-2.5
+                                  px-4 py-2 md:px-5 md:py-2.5
                                   rounded-xl
                                   shadow-md hover:shadow-lg
                                   transition-all duration-200
