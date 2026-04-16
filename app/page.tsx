@@ -11,26 +11,25 @@ import Footer from './components/footer'
 import { getFeste } from '@/lib/queries'
 
 export default async function Home() {
-const feste = await getFeste()
+  const feste = await getFeste()
 
-return ( <main className="relative"> <Hero />
+  return (
+    <main className="relative">
+      <Hero />
 
-```
-  {/* 🔥 Countdown / nächstes Fest */}
-  <NextFestHero feste={feste} />
+      {/* 🔥 Countdown / nächstes Fest */}
+      <NextFestHero feste={feste} />
 
-  <SAG />
+      <SAG />
 
-  {/* 🔥 Fest-Karten */}
-  <FesteClient feste={feste} />
+      {/* 🔥 Fest-Karten */}
+      <FesteClient feste={feste} />
 
-  <Vereine />
-  <Termine />
-  <Ortsverwaltung />
-  <ContactForm />
-  <Footer />
-</main>
-```
-
-)
+      <Vereine />
+      <Termine />
+      <Ortsverwaltung />
+      <ContactForm />
+      <Footer />
+    </main>
+  )
 }
