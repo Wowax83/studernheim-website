@@ -57,8 +57,6 @@ export default function NextFestHero({ feste }: any) {
 
   return (
     <section className="relative z-20 -mt-20 md:-mt-32 px-4">
-      
-      {/* 🔥 Desktop zentriert */}
       <div className="max-w-5xl mx-auto">
 
         <motion.div
@@ -69,20 +67,39 @@ export default function NextFestHero({ feste }: any) {
             relative rounded-2xl overflow-hidden
             shadow-[0_20px_60px_rgba(0,0,0,0.35)]
             border border-white/10
+            min-h-[320px] md:min-h-[380px]
           "
         >
-          {/* Background */}
+
+          {/* 🔥 Background + Bild */}
           {image && (
-            <Image
-              src={image}
-              alt={nextFest.name}
-              fill
-              className="object-cover"
-            />
+            <>
+              {/* Blur Background */}
+              <div className="absolute inset-0">
+                <Image
+                  src={image}
+                  alt=""
+                  fill
+                  className="object-cover blur-2xl scale-110 opacity-40"
+                />
+              </div>
+
+              {/* Hauptbild (komplett sichtbar) */}
+              <div className="absolute inset-0 flex items-center justify-center p-6">
+                <div className="relative w-full h-full max-w-3xl">
+                  <Image
+                    src={image}
+                    alt={nextFest.name}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            </>
           )}
 
           {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/80" />
+          <div className="absolute inset-0 bg-black/40" />
 
           {/* Content */}
           <div className="relative p-5 md:p-10 text-white max-w-xl">
@@ -155,6 +172,7 @@ export default function NextFestHero({ feste }: any) {
               </a>
             )}
           </div>
+
         </motion.div>
 
       </div>
