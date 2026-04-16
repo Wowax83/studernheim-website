@@ -49,12 +49,12 @@ export default function NextFestHero({ feste }: any) {
       : null
 
   return (
-    <section className="relative max-w-7xl mx-auto px-4 -mt-24 z-20">
+    <section className="relative max-w-4xl ml-auto mr-6 md:mr-16 -mt-28 z-20">
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
+        initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="relative rounded-2xl overflow-hidden shadow-2xl"
+        className="relative rounded-2xl overflow-hidden shadow-2xl backdrop-blur-md border border-white/10"
       >
         {/* Background */}
         {image && (
@@ -67,19 +67,19 @@ export default function NextFestHero({ feste }: any) {
         )}
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/80 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/80" />
 
         {/* Content */}
-        <div className="relative p-8 md:p-12 text-white">
-          <p className="text-green-400 uppercase tracking-widest text-sm mb-3">
+        <div className="relative p-6 md:p-10 text-white">
+          <p className="text-green-400 uppercase tracking-widest text-xs mb-2">
             Nächstes Fest
           </p>
 
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
+          <h2 className="text-2xl md:text-4xl font-bold mb-3">
             {nextFest.name}
           </h2>
 
-          <p className="text-white/80 mb-8">
+          <p className="text-white/80 mb-6 text-sm md:text-base">
             {new Date(nextFest.date).toLocaleDateString('de-DE', {
               weekday: 'long',
               day: 'numeric',
@@ -89,7 +89,7 @@ export default function NextFestHero({ feste }: any) {
 
           {/* Countdown */}
           {time && time.total > 0 && (
-            <div className="grid grid-cols-4 gap-4 max-w-lg">
+            <div className="grid grid-cols-4 gap-3 max-w-md">
               {[
                 { label: 'Tage', value: time.days },
                 { label: 'Std', value: time.hours },
@@ -98,18 +98,28 @@ export default function NextFestHero({ feste }: any) {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-4 text-center"
+                  className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 text-center"
                 >
-                  <div className="text-2xl md:text-4xl font-bold">
+                  <div className="text-xl md:text-2xl font-bold">
                     {item.value}
                   </div>
-                  <div className="text-xs uppercase tracking-wide opacity-70">
+                  <div className="text-[10px] uppercase tracking-wide opacity-70">
                     {item.label}
                   </div>
                 </div>
               ))}
             </div>
           )}
+
+          {/* 🔥 Button */}
+          <button
+            onClick={() => {
+              document.getElementById('feste')?.scrollIntoView({ behavior: 'smooth' })
+            }}
+            className="mt-6 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium transition hover:scale-105"
+          >
+            Zu den Highlights →
+          </button>
         </div>
       </motion.div>
     </section>
