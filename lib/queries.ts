@@ -63,13 +63,16 @@ export async function getUpcomingFeste(limit = 4) {
  */
 export async function getVereine() {
   return await client.fetch(
-    `*[_type == "verein"] | order(title asc){
+    `*[_type == "verein"] | order(name asc){
       _id,
-      title,
+      name,
       description,
-      category,
-      contact,
-      "image": image.asset->url,
+      region,
+
+      // 🔥 wichtig für deinen Slider
+      "images": images[].asset->url,
+
+      quickFacts,
       highlights
     }`,
     {},
