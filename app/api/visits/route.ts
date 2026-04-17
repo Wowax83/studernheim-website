@@ -17,21 +17,46 @@ function writeData(data: any) {
 }
 
 export async function GET(req: Request) {
-  const data = readData()
+  try {
+    const data = readData()
 
-  // 👉 IP holen (funktioniert auch hinter Proxy)
-  const ip =
-    req.headers.get('x-forwarded-for')?.split(',')[0] ||
-    'unknown'
+    const headers = req.headers
 
-  const today = new Date().toISOString().slice(0, 10)
+    // 👉 Cookie lesen
+    const cookieHeader = headers.get('cookie') || ''
+    const visitorCookie = cookieHeader
+      .split('; ')
+      .find(c => c.startsWith('visitorId='))
+      ?.split('=')[1]
 
-  // 👉 hat der User heute schon gezählt?
-  if (!data.visitors[ip] || data.visitors[ip] !== today) {
-    data.count++
-    data.visitors[ip] = today
-    writeData(data)
+    // 👉 neue ID wenn kein Cookie
+    const visitorId =
+      visitorCookie ||
+      `${Date.now()}-${Math.random().toString(36).substring(2, 10)}`
+
+    const today = new Date().toISOString().slice(0, 10)
+
+    // 👉 nur 1x pro Tag zählen
+    if (!data.visitors[visitorId] || data.visitors[visitorId] !== today) {
+      data.count++
+      data.visitors[visitorId] = today
+      writeData(data)
+    }
+
+    const response = NextResponse.json({ count: data.count })
+
+    // 👉 Cookie setzen (1 Jahr gültig)
+    if (!visitorCookie) {
+      response.headers.set(
+        'Set-Cookie',
+        `visitorId=${visitorId}; Path=/; Max-Age=31536000; SameSite=Lax`
+      )
+    }
+
+    return response
+  } catch (error) {
+    console.error('Visit counter error:', error)
+
+    return NextResponse.json({ count: 0 })
   }
-
-  return NextResponse.json({ count: data.count })
 }
