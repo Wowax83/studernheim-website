@@ -69,8 +69,7 @@ export async function getVereine() {
       description,
       region,
 
-      // 🔥 wichtig für deinen Slider
-      "images": images[].asset->url,
+      "images": coalesce(images[].asset->url, [image.asset->url], []),
 
       quickFacts,
       highlights
