@@ -15,11 +15,14 @@ export async function getFeste() {
       vibe,
       organizer,
 
+      // 🔥 Bilder (mit Fallback)
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
+      // 🔥 gemeinsame Struktur
       quickFacts,
       highlights,
 
+      // 🔥 für Sortierung
       "isUpcoming": date >= now()
     }
     | order(isUpcoming desc, date asc)`,
@@ -39,19 +42,17 @@ export async function getUpcomingFeste(limit = 4) {
       name,
       description,
       date,
-      "region": region,
+      region,
       vibe,
       organizer,
 
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
-      highlights,
-      quickFacts
+      quickFacts,
+      highlights
     }`,
     {},
-    {
-      cache: "no-store"
-    }
+    { cache: "no-store" }
   )
 }
 
@@ -66,6 +67,7 @@ export async function getVereine() {
       description,
       region,
 
+      // 🔥 gleiche Bildlogik wie Feste
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
       quickFacts,
@@ -75,8 +77,10 @@ export async function getVereine() {
     { cache: "no-store" }
   )
 }
+
 /**
  * 🔥 ALLE EVENTS (Feste + Termine kombiniert)
+ * 👉 Für Startseite / Übersicht
  */
 export async function getAllEvents(limit = 4) {
   return await client.fetch(
@@ -95,8 +99,8 @@ export async function getAllEvents(limit = 4) {
 
           "images": coalesce(images[].asset->url, [image.asset->url], []),
 
-          highlights,
-          quickFacts
+          quickFacts,
+          highlights
         },
 
         // 🔥 TERMINE
@@ -115,8 +119,6 @@ export async function getAllEvents(limit = 4) {
       ]
     }.events | order(date asc)[0...${limit}]`,
     {},
-    {
-      cache: "no-store"
-    }
+    { cache: "no-store" }
   )
 }
