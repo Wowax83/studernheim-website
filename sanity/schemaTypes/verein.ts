@@ -1,49 +1,72 @@
-// /sanity/schemaTypes/verein.ts
-
 export default {
   name: 'verein',
-  title: 'Vereine',
   type: 'document',
+  title: 'Verein',
   fields: [
+    { name: 'name', type: 'string', title: 'Name' },
+
     {
-      name: 'name',
-      title: 'Name',
-      type: 'string',
-      validation: Rule => Rule.required()
+      name: 'slug',
+      type: 'slug',
+      options: { source: 'name' }
     },
-    {
-      name: 'region',
-      title: 'Region',
-      type: 'string'
-    },
-    {
-      name: 'description',
-      title: 'Beschreibung',
-      type: 'text'
-    },
+
+    { name: 'description', type: 'text', title: 'Beschreibung' },
+
+    { name: 'region', type: 'string', title: 'Ort' },
+
+    // optional (nur wenn du willst)
+    { name: 'category', type: 'string', title: 'Kategorie' },
+    { name: 'contact', type: 'string', title: 'Kontakt' },
+
+    // 🔥 Bilder (gleich wie bei Fest)
     {
       name: 'images',
       title: 'Bilder',
       type: 'array',
-      of: [{ type: 'image' }]
+      of: [
+        {
+          type: 'image',
+          options: { hotspot: true }
+        }
+      ],
+      description: 'Erstes Bild = Startbild'
     },
 
-    // 🔥 QuickFacts
+    // 🔥 Fallback (gleich wie Fest)
+    {
+      name: 'image',
+      type: 'image',
+      title: 'Altes Einzelbild (Fallback)',
+      hidden: true
+    },
+
+    // 🔥 BADGES (gleich wie Fest)
     {
       name: 'quickFacts',
-      title: 'Quick Facts',
+      title: 'Kurzinfos (Badges)',
       type: 'array',
-      of: [{ type: 'string' }]
+      of: [
+        {
+          type: 'string'
+        }
+      ]
     },
 
-    // 🔥 Highlights (Buttons)
+    // 🔥 LINKS (IDENTISCH zu Fest)
     {
       name: 'highlights',
-      title: 'Highlights / Links',
+      title: 'Links / Highlights',
       type: 'array',
       of: [
         {
           type: 'object',
+          preview: {
+            select: {
+              title: 'text',
+              subtitle: 'url'
+            }
+          },
           fields: [
             {
               name: 'text',
@@ -52,16 +75,13 @@ export default {
             },
             {
               name: 'url',
-              title: 'URL',
-              type: 'url',
-              validation: Rule =>
-                Rule.uri({
-                  scheme: ['http', 'https']
-                })
+              title: 'Link',
+              type: 'url'
             }
           ]
         }
-      ]
+      ],
+      description: 'z.B. Website, Instagram, WhatsApp'
     }
   ]
 }
