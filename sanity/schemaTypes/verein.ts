@@ -1,22 +1,19 @@
+// /sanity/schemaTypes/verein.ts
+
 export default {
   name: 'verein',
   title: 'Vereine',
   type: 'document',
   fields: [
     {
-      name: 'title',
+      name: 'name',
       title: 'Name',
-      type: 'string'
+      type: 'string',
+      validation: Rule => Rule.required()
     },
     {
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: { source: 'title' }
-    },
-    {
-      name: 'category',
-      title: 'Kategorie',
+      name: 'region',
+      title: 'Region',
       type: 'string'
     },
     {
@@ -25,25 +22,28 @@ export default {
       type: 'text'
     },
     {
-      name: 'image',
-      title: 'Bild',
-      type: 'image'
+      name: 'images',
+      title: 'Bilder',
+      type: 'array',
+      of: [{ type: 'image' }]
     },
 
-    // 👉 HIER NEU
+    // 🔥 QuickFacts
+    {
+      name: 'quickFacts',
+      title: 'Quick Facts',
+      type: 'array',
+      of: [{ type: 'string' }]
+    },
+
+    // 🔥 Highlights (Buttons)
     {
       name: 'highlights',
-      title: 'Highlights',
+      title: 'Highlights / Links',
       type: 'array',
       of: [
         {
           type: 'object',
-          preview: {
-            select: {
-              title: 'text',
-              subtitle: 'url'
-            }
-          },
           fields: [
             {
               name: 'text',
@@ -52,22 +52,15 @@ export default {
             },
             {
               name: 'url',
-              title: 'Link',
-              type: 'url'
+              title: 'URL',
+              type: 'url',
+              validation: Rule =>
+                Rule.uri({
+                  scheme: ['http', 'https']
+                })
             }
           ]
         }
-      ]
-    },
-
-    {
-      name: 'contact',
-      title: 'Kontakt',
-      type: 'object',
-      fields: [
-        { name: 'name', title: 'Ansprechpartner', type: 'string' },
-        { name: 'email', title: 'E-Mail', type: 'string' },
-        { name: 'phone', title: 'Telefon', type: 'string' }
       ]
     }
   ]
