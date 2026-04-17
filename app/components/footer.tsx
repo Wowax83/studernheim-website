@@ -1,8 +1,18 @@
 'use client'
 
 import { Heart } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 export default function Footer() {
+  const [visits, setVisits] = useState<number | null>(null)
+
+  useEffect(() => {
+    fetch('/api/visits')
+      .then(res => res.json())
+      .then(data => setVisits(data.count))
+      .catch(() => setVisits(null))
+  }, [])
+
   return (
     <footer className="bg-gradient-to-b from-gray-900 to-black text-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -48,14 +58,17 @@ export default function Footer() {
               <li>Oggersheimer Str. 14</li>
               <li>67227 Frankenthal (Pfalz)</li>
               <li>
-                <a href="mailto:studernheim.ag@gmail.com" className="hover:text-green-400 transition-colors">
+                <a
+                  href="mailto:studernheim.ag@gmail.com"
+                  className="hover:text-green-400 transition-colors"
+                >
                   studernheim.ag@gmail.com
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* 👉 NEU: Rechtliches */}
+          {/* Rechtliches */}
           <div>
             <h4 className="font-heading font-bold text-lg mb-4">Rechtliches</h4>
             <ul className="space-y-2">
@@ -83,13 +96,25 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} Studernheim. Alle Rechte vorbehalten.
-          </p>
-          
+
+          {/* Left */}
+          <div className="flex flex-col sm:flex-row items-center gap-2 text-gray-400 text-sm">
+            <span>
+              © {new Date().getFullYear()} Studernheim. Alle Rechte vorbehalten.
+            </span>
+
+            {visits !== null && (
+              <span className="text-green-400 font-semibold">
+                • Besucher: {visits}
+              </span>
+            )}
+          </div>
+
+          {/* Right */}
           <p className="flex items-center gap-2 text-gray-400 text-sm">
             Gemacht mit <Heart size={16} className="text-red-500" /> für unser Dorf
           </p>
+
         </div>
       </div>
     </footer>
