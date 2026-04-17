@@ -33,6 +33,9 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 
+# 🔥 NEU: Counter Datei
+COPY --from=builder /app/visits.json ./visits.json
+
 EXPOSE 3000
 
 CMD ["npm", "start"]
