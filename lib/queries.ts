@@ -11,23 +11,20 @@ export async function getFeste() {
       name,
       description,
       date,
-      "region": region,
+      region,
       vibe,
       organizer,
 
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
-      highlights,
       quickFacts,
+      highlights,
 
-      // ✅ wichtig für Sortierung
       "isUpcoming": date >= now()
     }
     | order(isUpcoming desc, date asc)`,
     {},
-    {
-      cache: "no-store"
-    }
+    { cache: "no-store" }
   )
 }
 
@@ -75,12 +72,9 @@ export async function getVereine() {
       highlights
     }`,
     {},
-    {
-      cache: "no-store"
-    }
+    { cache: "no-store" }
   )
 }
-
 /**
  * 🔥 ALLE EVENTS (Feste + Termine kombiniert)
  */
