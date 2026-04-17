@@ -132,7 +132,7 @@ export async function POST(req: Request) {
 
           <p style="margin-top:20px;">
             Mit freundlichen Grüßen<br/>
-            Ortsverwaltung Studernheim
+            eure SAG
           </p>
 
           <hr style="margin:20px 0"/>
