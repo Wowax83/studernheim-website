@@ -3,7 +3,7 @@ export default function Impressum() {
     <main className="max-w-4xl mx-auto px-4 py-20">
       <h1 className="text-4xl font-bold mb-8">Impressum</h1>
 
-      <div className="space-y-6 text-gray-700 leading-relaxed">
+      <div className="space-y-8 text-gray-700 leading-relaxed">
 
         {/* 1 */}
         <section>
@@ -38,11 +38,40 @@ export default function Impressum() {
         <section>
           <h2 className="text-xl font-semibold">Kontakt</h2>
           <p>
-            E-Mail: studernheim.ag@gmail.com
+            E-Mail:{' '}
+            <a
+              href="mailto:studernheim.ag@gmail.com"
+              className="text-green-600 hover:underline"
+            >
+              studernheim.ag@gmail.com
+            </a>
           </p>
         </section>
 
         {/* 5 */}
+        <section>
+          <h2 className="text-xl font-semibold">Social Media</h2>
+          <p className="space-y-1">
+            <a
+              href="https://www.instagram.com/sag.studernheim?igsh=MWV0a3lzbm5temwyNA%3D%3D"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:underline block"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://facebook.com/deinprofil"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:underline block"
+            >
+              Facebook
+            </a>
+          </p>
+        </section>
+
+        {/* 6 */}
         <section>
           <h2 className="text-xl font-semibold">
             Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV
@@ -54,7 +83,7 @@ export default function Impressum() {
           </p>
         </section>
 
-        {/* 6 */}
+        {/* 7 */}
         <section>
           <h2 className="text-xl font-semibold">Haftung für Inhalte</h2>
           <p>
@@ -68,7 +97,7 @@ export default function Impressum() {
           </p>
         </section>
 
-        {/* 7 */}
+        {/* 8 */}
         <section>
           <h2 className="text-xl font-semibold">Haftung für Links</h2>
           <p>
@@ -81,7 +110,7 @@ export default function Impressum() {
           </p>
         </section>
 
-        {/* 8 */}
+        {/* 9 */}
         <section>
           <h2 className="text-xl font-semibold">Urheberrecht</h2>
           <p>
