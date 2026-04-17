@@ -3,6 +3,10 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import {
+  MapPin,
+  X,
+  ChevronLeft,
+  ChevronRight,
   Globe,
   MessageCircle,
   Instagram,
@@ -10,7 +14,7 @@ import {
   ClipboardList
 } from 'lucide-react'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function getLinkMeta(url: string, text?: string) {
   const u = url.toLowerCase()
@@ -33,13 +37,83 @@ function getLinkMeta(url: string, text?: string) {
 
 export default function VereineClient({ vereine }: any) {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 })
+
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const [pausedCards, setPausedCards] = useState<{ [key: string]: boolean }>({})
+  const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: string]: number }>({})
+
+  const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
+
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const minSwipeDistance = 50
+
+  // 🔥 Auto Slider
+  useEffect(() => {
+    if (!Array.isArray(vereine)) return
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => {
+        const updated: any = { ...prev }
+
+        vereine.forEach((verein: any) => {
+          if (!verein?._id) return
+
+          const images = Array.isArray(verein?.images)
+            ? verein.images.filter(Boolean)
+            : []
+
+          if (pausedCards[verein._id]) return
+
+          if (images.length > 1) {
+            const current = prev[verein._id] || 0
+            updated[verein._id] = (current + 1) % images.length
+          }
+        })
+
+        return updated
+      })
+    }, 3500)
+
+    return () => clearInterval(interval)
+  }, [vereine, pausedCards])
+
+  // 👉 Swipe
+  const handleSwipe = (vereinId: string, imagesLength: number, currentIndex: number) => {
+    if (touchStart === null || touchEnd === null) return
+
+    const distance = touchStart - touchEnd
+
+    if (distance > minSwipeDistance) {
+      setCurrentImageIndex((p) => ({
+        ...p,
+        [vereinId]: (currentIndex + 1) % imagesLength
+      }))
+    }
+
+    if (distance < -minSwipeDistance) {
+      setCurrentImageIndex((p) => ({
+        ...p,
+        [vereinId]: (currentIndex - 1 + imagesLength) % imagesLength
+      }))
+    }
+  }
+
+  const nextImage = () => {
+    if (!lightboxImages) return
+    setLightboxIndex((prev) => (prev + 1) % lightboxImages.length)
+  }
+
+  const prevImage = () => {
+    if (!lightboxImages) return
+    setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length)
+  }
 
   return (
     <section id="vereine" className="py-16 md:py-20">
       <div className="max-w-7xl mx-auto px-3 md:px-4">
 
-        {/* Header */}
         <motion.div
           ref={ref}
           initial={{ opacity: 0 }}
@@ -51,20 +125,22 @@ export default function VereineClient({ vereine }: any) {
           </h2>
         </motion.div>
 
-        {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {Array.isArray(vereine) &&
             vereine.map((verein: any, index: number) => {
               if (!verein) return null
 
-              // 🔥 SPLIT LOGIK
-              const facts = Array.isArray(verein.highlights)
-                ? verein.highlights.filter((item: any) => typeof item === 'string')
+              const images = Array.isArray(verein.images)
+                ? verein.images.filter((img: any) => typeof img === 'string')
                 : []
 
-              const links = Array.isArray(verein.highlights)
-                ? verein.highlights.filter((item: any) => item?.url)
-                : []
+              const currentIndex =
+                images.length > 0
+                  ? (currentImageIndex[verein._id] || 0) % images.length
+                  : 0
+
+              const isActive =
+                hoveredCard === verein._id || pausedCards[verein._id]
 
               return (
                 <motion.div
@@ -72,29 +148,66 @@ export default function VereineClient({ vereine }: any) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={inView ? { opacity: 1, y: 0 } : {}}
                   transition={{ delay: index * 0.1 }}
-                  onMouseEnter={() => setHoveredCard(verein._id)}
-                  onMouseLeave={() => setHoveredCard(null)}
+                  onMouseEnter={() => {
+                    setHoveredCard(verein._id)
+                    setPausedCards((p) => ({ ...p, [verein._id]: true }))
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredCard(null)
+                    setPausedCards((p) => ({ ...p, [verein._id]: false }))
+                  }}
                   className="group bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition"
                 >
 
-                  {/* Bild */}
-                  {verein?.image && (
-                    <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
-                      <Image
-                        src={verein.image}
-                        alt={verein.title}
-                        fill
-                        className="object-cover object-top scale-105"
-                      />
-                    </div>
-                  )}
+                  {/* Slider */}
+                  <div
+                    className="relative aspect-[4/3] bg-gray-100 overflow-hidden touch-pan-y"
+                    onTouchStart={(e) => {
+                      setTouchEnd(null)
+                      setTouchStart(e.targetTouches[0].clientX)
+                    }}
+                    onTouchMove={(e) => {
+                      setTouchEnd(e.targetTouches[0].clientX)
+                    }}
+                    onTouchEnd={() =>
+                      handleSwipe(verein._id, images.length, currentIndex)
+                    }
+                  >
+                    {images.length > 0 ? (
+                      images.map((img: string, i: number) => (
+                        <Image
+                          key={i}
+                          src={img}
+                          alt={verein?.name || 'Verein'}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          onClick={() => {
+                            setLightboxImages(images)
+                            setLightboxIndex(i)
+                          }}
+                          className={`absolute inset-0 object-cover object-top scale-105 transition-opacity duration-700 ${
+                            i === currentIndex ? 'opacity-100' : 'opacity-0'
+                          }`}
+                        />
+                      ))
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                        Kein Bild vorhanden
+                      </div>
+                    )}
+                  </div>
 
                   {/* Content */}
                   <div className="p-4 md:p-5">
 
-                    <h3 className="font-bold text-lg mb-2">
-                      {verein?.title}
-                    </h3>
+                    {verein?.region && (
+                      <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                        <MapPin size={14} />
+                        {verein.region}
+                      </div>
+                    )}
+
+                    <h3 className="font-bold text-lg mb-2">{verein?.name}</h3>
 
                     {verein?.description && (
                       <p className="text-gray-600 text-sm mb-3">
@@ -102,10 +215,10 @@ export default function VereineClient({ vereine }: any) {
                       </p>
                     )}
 
-                    {/* 🔥 QuickFacts → NUR HOVER + nur Desktop */}
-                    {hoveredCard === verein._id && facts.length > 0 && (
-                      <div className="hidden md:flex flex-wrap gap-2 mb-3">
-                        {facts.map((fact: string, i: number) => (
+                    {/* QuickFacts */}
+                    {isActive && Array.isArray(verein?.quickFacts) && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {verein.quickFacts.map((fact: any, i: number) => (
                           <span
                             key={i}
                             className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"
@@ -116,10 +229,11 @@ export default function VereineClient({ vereine }: any) {
                       </div>
                     )}
 
-                    {/* 🔥 Buttons → IMMER sichtbar */}
-                    {links.length > 0 && (
+                    {/* Highlights */}
+                    {Array.isArray(verein?.highlights) && (
                       <div className="flex flex-wrap gap-3 mt-3">
-                        {links.map((item: any, i: number) => {
+                        {verein.highlights.map((item: any, i: number) => {
+                          if (!item?.url) return null
                           const meta = getLinkMeta(item.url, item.text)
                           const Icon = meta.icon
 
@@ -129,16 +243,7 @@ export default function VereineClient({ vereine }: any) {
                               href={item.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className={`
-                                inline-flex items-center gap-2
-                                text-sm font-semibold
-                                px-4 py-2
-                                rounded-xl
-                                shadow-md hover:shadow-lg
-                                transition-all duration-200
-                                hover:scale-105
-                                ${meta.className}
-                              `}
+                              className={`inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl shadow-md hover:shadow-lg transition hover:scale-105 ${meta.className}`}
                             >
                               <Icon size={16} />
                               {meta.label}
@@ -154,6 +259,30 @@ export default function VereineClient({ vereine }: any) {
             })}
         </div>
 
+        {/* Lightbox */}
+        {lightboxImages && (
+          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+            <button onClick={() => setLightboxImages(null)} className="absolute top-5 right-5 text-white">
+              <X size={32} />
+            </button>
+
+            <button onClick={prevImage} className="absolute left-5 text-white">
+              <ChevronLeft size={32} />
+            </button>
+
+            <button onClick={nextImage} className="absolute right-5 text-white">
+              <ChevronRight size={32} />
+            </button>
+
+            <Image
+              src={lightboxImages[lightboxIndex]}
+              alt="Bild"
+              width={1400}
+              height={900}
+              className="max-h-[90vh] object-contain"
+            />
+          </div>
+        )}
       </div>
     </section>
   )
