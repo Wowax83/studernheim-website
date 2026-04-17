@@ -3,18 +3,18 @@ export default function Datenschutz() {
     <main className="max-w-4xl mx-auto px-4 py-20">
       <h1 className="text-4xl font-bold mb-8">Datenschutzerklärung</h1>
 
-      <div className="space-y-6 text-gray-700 leading-relaxed">
+      <div className="space-y-8 text-gray-700 leading-relaxed">
 
         {/* 1 */}
         <section>
           <h2 className="text-xl font-semibold">1. Allgemeine Hinweise</h2>
           <p>
-            Der Schutz Ihrer persönlichen Daten ist uns ein besonderes Anliegen. 
-            Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend 
+            Der Schutz Ihrer persönlichen Daten ist uns ein besonderes Anliegen.
+            Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend
             den gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung.
           </p>
           <p>
-            Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert 
+            Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert
             werden können.
           </p>
         </section>
@@ -26,7 +26,14 @@ export default function Datenschutz() {
             Studernheimer Arbeitsgemeinschaft (SAG) e.V.<br />
             Oggersheimer Str. 14<br />
             67227 Frankenthal<br />
-            E-Mail: studernheim.ag@gmail.com
+            Deutschland<br />
+            E-Mail:{' '}
+            <a
+              href="mailto:studernheim.ag@gmail.com"
+              className="text-green-600 hover:underline"
+            >
+              studernheim.ag@gmail.com
+            </a>
           </p>
         </section>
 
@@ -42,12 +49,12 @@ export default function Datenschutz() {
             91710 Gunzenhausen
           </p>
           <p>
-            Beim Besuch dieser Website erfasst der Hostinganbieter automatisch Daten 
-            (z. B. IP-Adresse, Browsertyp, Uhrzeit). Diese Daten sind erforderlich, 
-            um die Website technisch bereitzustellen.
+            Beim Besuch dieser Website erfasst der Hostinganbieter automatisch Daten
+            (z. B. IP-Adresse, Browsertyp, Betriebssystem, Uhrzeit).
           </p>
           <p>
-            Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
+            Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO
+            (berechtigtes Interesse an einer sicheren und stabilen Bereitstellung).
           </p>
         </section>
 
@@ -55,11 +62,11 @@ export default function Datenschutz() {
         <section>
           <h2 className="text-xl font-semibold">4. Server-Log-Dateien</h2>
           <p>
-            Der Provider erhebt und speichert automatisch Informationen in sogenannten 
-            Server-Log-Dateien, die Ihr Browser automatisch übermittelt.
+            Der Provider erhebt und speichert automatisch Informationen in sogenannten
+            Server-Log-Dateien.
           </p>
           <p>
-            Diese Daten sind nicht bestimmten Personen zuordenbar und werden nicht mit 
+            Diese Daten sind nicht bestimmten Personen zuordenbar und werden nicht mit
             anderen Datenquellen zusammengeführt.
           </p>
         </section>
@@ -68,11 +75,11 @@ export default function Datenschutz() {
         <section>
           <h2 className="text-xl font-semibold">5. Kontaktaufnahme</h2>
           <p>
-            Wenn Sie uns per E-Mail kontaktieren, werden Ihre Angaben zur Bearbeitung 
+            Wenn Sie uns per E-Mail kontaktieren, werden Ihre Angaben zur Bearbeitung
             der Anfrage gespeichert.
           </p>
           <p>
-            Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO sowie Art. 6 Abs. 1 lit. f DSGVO.
+            Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertrag/Anfrage).
           </p>
         </section>
 
@@ -80,37 +87,65 @@ export default function Datenschutz() {
         <section>
           <h2 className="text-xl font-semibold">6. Kontaktformular</h2>
           <p>
-            Wenn Sie uns über das Kontaktformular Anfragen senden, werden Ihre Angaben 
+            Wenn Sie uns über das Kontaktformular Anfragen senden, werden Ihre Angaben
             (Name, E-Mail-Adresse und Nachricht) zur Bearbeitung Ihrer Anfrage gespeichert.
           </p>
           <p>
-            Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO.
+            Für den Versand nutzen wir den Dienst{' '}
+            <strong>Resend (Resend Inc., USA)</strong>.
           </p>
           <p>
-            Für den Versand der Nachrichten nutzen wir den Dienst <strong>Resend</strong> 
-            (Resend Inc., USA). Dabei können Daten auf Server außerhalb der EU übertragen werden.
+            Dabei kann es zur Übertragung personenbezogener Daten in die USA kommen.
+            Die Übermittlung erfolgt auf Grundlage geeigneter Garantien gemäß Art. 46 DSGVO.
           </p>
           <p>
-            Die Nutzung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO.
+            Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
           </p>
         </section>
 
         {/* 7 */}
         <section>
-          <h2 className="text-xl font-semibold">7. WhatsApp-Kanal</h2>
+          <h2 className="text-xl font-semibold">7. Externe Links & Social Media</h2>
           <p>
-            Auf unserer Website verlinken wir auf unseren WhatsApp-Kanal. Wenn Sie diesen Link anklicken, 
-            werden Sie zu WhatsApp weitergeleitet.
+            Auf unserer Website befinden sich Links zu externen Plattformen wie
+            Instagram, Facebook und WhatsApp.
           </p>
           <p>
-            Dabei können personenbezogene Daten an WhatsApp bzw. Meta Platforms Ireland Ltd. übertragen werden.
+            Beim Anklicken dieser Links verlassen Sie unsere Website. Es gelten dann
+            die Datenschutzbestimmungen des jeweiligen Anbieters.
           </p>
-          <p>
-            Weitere Informationen finden Sie hier:
-            https://www.whatsapp.com/legal/privacy-policy-eea
-          </p>
-          <p>
-            Die Nutzung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO.
+
+          <div className="mt-3 space-y-1">
+            <a
+              href="https://instagram.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:underline block"
+            >
+              Instagram
+            </a>
+
+            <a
+              href="https://facebook.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:underline block"
+            >
+              Facebook
+            </a>
+
+            <a
+              href="https://www.whatsapp.com/legal/privacy-policy-eea"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:underline block"
+            >
+              WhatsApp Datenschutz
+            </a>
+          </div>
+
+          <p className="mt-3">
+            Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
           </p>
         </section>
 
@@ -118,7 +153,7 @@ export default function Datenschutz() {
         <section>
           <h2 className="text-xl font-semibold">8. Cookies</h2>
           <p>
-            Diese Website verwendet ausschließlich technisch notwendige Cookies, 
+            Diese Website verwendet ausschließlich technisch notwendige Cookies,
             um die Funktionalität sicherzustellen.
           </p>
         </section>
@@ -126,25 +161,25 @@ export default function Datenschutz() {
         {/* 9 */}
         <section>
           <h2 className="text-xl font-semibold">9. Ihre Rechte</h2>
-          <p>Sie haben jederzeit das Recht auf:</p>
-          <ul className="list-disc ml-6">
+          <ul className="list-disc ml-6 space-y-1">
             <li>Auskunft über Ihre gespeicherten Daten</li>
             <li>Berichtigung unrichtiger Daten</li>
             <li>Löschung Ihrer Daten</li>
             <li>Einschränkung der Verarbeitung</li>
+            <li>Datenübertragbarkeit</li>
             <li>Widerruf einer Einwilligung</li>
           </ul>
-          <p>
-            Außerdem haben Sie ein Beschwerderecht bei der zuständigen Aufsichtsbehörde.
-          </p>
         </section>
 
         {/* 10 */}
         <section>
-          <h2 className="text-xl font-semibold">10. Widerruf Ihrer Einwilligung</h2>
+          <h2 className="text-xl font-semibold">10. Beschwerderecht</h2>
           <p>
-            Viele Datenverarbeitungsvorgänge sind nur mit Ihrer ausdrücklichen Einwilligung möglich. 
-            Sie können eine bereits erteilte Einwilligung jederzeit widerrufen.
+            Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren.
+          </p>
+          <p>
+            Zuständig ist z. B.:<br />
+            Landesbeauftragter für den Datenschutz Rheinland-Pfalz
           </p>
         </section>
 
@@ -152,9 +187,8 @@ export default function Datenschutz() {
         <section>
           <h2 className="text-xl font-semibold">11. Widerspruchsrecht</h2>
           <p>
-            Wenn die Datenverarbeitung auf Grundlage von Art. 6 Abs. 1 lit. e oder f DSGVO erfolgt, 
-            haben Sie jederzeit das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, 
-            Widerspruch einzulegen.
+            Wenn die Verarbeitung auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO erfolgt,
+            haben Sie das Recht, Widerspruch einzulegen.
           </p>
         </section>
 
