@@ -12,49 +12,23 @@ import {
 import Image from 'next/image'
 import { useState } from 'react'
 
-/**
- * 🔥 Smart Link Buttons (identisch zu Feste)
- */
 function getLinkMeta(url: string, text?: string) {
   const u = url.toLowerCase()
 
   if (u.includes('helferliste')) {
-    return {
-      label: text || 'Helferliste',
-      icon: ClipboardList,
-      className: 'bg-emerald-600 hover:bg-emerald-700 text-white'
-    }
+    return { label: text || 'Helferliste', icon: ClipboardList, className: 'bg-emerald-600 hover:bg-emerald-700 text-white' }
   }
-
   if (u.includes('wa.me') || u.includes('whatsapp')) {
-    return {
-      label: text || 'WhatsApp',
-      icon: MessageCircle,
-      className: 'bg-green-500 hover:bg-green-600 text-white'
-    }
+    return { label: text || 'WhatsApp', icon: MessageCircle, className: 'bg-green-500 hover:bg-green-600 text-white' }
   }
-
   if (u.includes('instagram')) {
-    return {
-      label: text || 'Instagram',
-      icon: Instagram,
-      className: 'bg-pink-500 hover:bg-pink-600 text-white'
-    }
+    return { label: text || 'Instagram', icon: Instagram, className: 'bg-pink-500 hover:bg-pink-600 text-white' }
   }
-
   if (u.includes('facebook')) {
-    return {
-      label: text || 'Facebook',
-      icon: Facebook,
-      className: 'bg-blue-600 hover:bg-blue-700 text-white'
-    }
+    return { label: text || 'Facebook', icon: Facebook, className: 'bg-blue-600 hover:bg-blue-700 text-white' }
   }
 
-  return {
-    label: text || 'Website',
-    icon: Globe,
-    className: 'bg-gray-800 hover:bg-gray-900 text-white'
-  }
+  return { label: text || 'Website', icon: Globe, className: 'bg-gray-800 hover:bg-gray-900 text-white' }
 }
 
 export default function VereineClient({ vereine }: any) {
@@ -82,6 +56,15 @@ export default function VereineClient({ vereine }: any) {
           {Array.isArray(vereine) &&
             vereine.map((verein: any, index: number) => {
               if (!verein) return null
+
+              // 🔥 SPLIT LOGIK
+              const facts = Array.isArray(verein.highlights)
+                ? verein.highlights.filter((item: any) => typeof item === 'string')
+                : []
+
+              const links = Array.isArray(verein.highlights)
+                ? verein.highlights.filter((item: any) => item?.url)
+                : []
 
               return (
                 <motion.div
@@ -119,27 +102,24 @@ export default function VereineClient({ vereine }: any) {
                       </p>
                     )}
 
-                    {/* QuickFacts nur Hover (Desktop) */}
-                    {hoveredCard === verein._id &&
-                      Array.isArray(verein?.quickFacts) && (
-                        <div className="hidden md:flex flex-wrap gap-2 mb-3">
-                          {verein.quickFacts.map((fact: any, i: number) => (
-                            <span
-                              key={i}
-                              className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"
-                            >
-                              {fact}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                    {/* 🔥 QuickFacts → NUR HOVER + nur Desktop */}
+                    {hoveredCard === verein._id && facts.length > 0 && (
+                      <div className="hidden md:flex flex-wrap gap-2 mb-3">
+                        {facts.map((fact: string, i: number) => (
+                          <span
+                            key={i}
+                            className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"
+                          >
+                            {fact}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
-                    {/* Buttons IMMER sichtbar */}
-                    {Array.isArray(verein?.highlights) && verein.highlights.length > 0 && (
+                    {/* 🔥 Buttons → IMMER sichtbar */}
+                    {links.length > 0 && (
                       <div className="flex flex-wrap gap-3 mt-3">
-                        {verein.highlights.map((item: any, i: number) => {
-                          if (!item?.url) return null
-
+                        {links.map((item: any, i: number) => {
                           const meta = getLinkMeta(item.url, item.text)
                           const Icon = meta.icon
 
