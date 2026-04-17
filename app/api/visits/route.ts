@@ -20,16 +20,15 @@ export async function GET(req: Request) {
   try {
     const data = readData()
 
-    const headers = req.headers
+    const cookieHeader = req.headers.get('cookie') || ''
 
-    // 👉 Cookie lesen
-    const cookieHeader = headers.get('cookie') || ''
+    // 👉 Cookie auslesen
     const visitorCookie = cookieHeader
       .split('; ')
       .find(c => c.startsWith('visitorId='))
       ?.split('=')[1]
 
-    // 👉 neue ID wenn kein Cookie
+    // 👉 neue ID wenn kein Cookie vorhanden
     const visitorId =
       visitorCookie ||
       `${Date.now()}-${Math.random().toString(36).substring(2, 10)}`
@@ -43,20 +42,19 @@ export async function GET(req: Request) {
       writeData(data)
     }
 
-    const response = NextResponse.json({ count: data.count })
+    const res = NextResponse.json({ count: data.count })
 
-    // 👉 Cookie setzen (1 Jahr gültig)
+    // 👉 Cookie setzen (wichtig!)
     if (!visitorCookie) {
-      response.headers.set(
+      res.headers.set(
         'Set-Cookie',
         `visitorId=${visitorId}; Path=/; Max-Age=31536000; SameSite=Lax`
       )
     }
 
-    return response
+    return res
   } catch (error) {
     console.error('Visit counter error:', error)
-
     return NextResponse.json({ count: 0 })
   }
 }
