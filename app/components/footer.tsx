@@ -4,14 +4,45 @@ import { Heart } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export default function Footer() {
-  const [visits, setVisits] = useState<number | null>(null)
+  const [total, setTotal] = useState(0)
+  const [today, setToday] = useState(0)
+
+  const [displayTotal, setDisplayTotal] = useState(0)
+  const [displayToday, setDisplayToday] = useState(0)
 
   useEffect(() => {
     fetch('/api/visits')
       .then(res => res.json())
-      .then(data => setVisits(data.count))
-      .catch(() => setVisits(null))
+      .then(data => {
+        setTotal(data.total || 0)
+        setToday(data.today || 0)
+      })
+      .catch(() => {
+        setTotal(0)
+        setToday(0)
+      })
   }, [])
+
+  // 🔥 leichte Animation
+  useEffect(() => {
+    let i = 0
+
+    const interval = setInterval(() => {
+      i++
+
+      setDisplayTotal(prev =>
+        prev < total ? Math.min(prev + Math.ceil(total / 20), total) : total
+      )
+
+      setDisplayToday(prev =>
+        prev < today ? Math.min(prev + 1, today) : today
+      )
+
+      if (i > 20) clearInterval(interval)
+    }, 30)
+
+    return () => clearInterval(interval)
+  }, [total, today])
 
   return (
     <footer className="bg-gradient-to-b from-gray-900 to-black text-white py-12">
@@ -103,11 +134,9 @@ export default function Footer() {
               © {new Date().getFullYear()} Studernheim. Alle Rechte vorbehalten.
             </span>
 
-            {visits !== null && (
-              <span className="text-green-400 font-semibold">
-                • Besucher: {visits}
-              </span>
-            )}
+            <span className="text-green-400 font-semibold">
+              • Heute: {displayToday} • Gesamt: {displayTotal}
+            </span>
           </div>
 
           {/* Right */}
