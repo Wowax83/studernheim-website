@@ -13,6 +13,10 @@ function escapeHtml(str: string) {
     .replace(/'/g, '&#039;')
 }
 
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
 /* ---------------- ROUTE ---------------- */
 
 export async function POST(req: Request) {
@@ -20,9 +24,9 @@ export async function POST(req: Request) {
     const body = await req.json()
 
     const name = body.name || 'Unbekannt'
-    const email = body.email || 'Keine E-Mail'
+    const email = body.email || ''
     const message = body.message || 'Keine Nachricht'
-    const interests = body.interests || []
+    const interests = Array.isArray(body.interests) ? body.interests : []
     const company = body.company // Honeypot
     const formStartTime = body.formStartTime
 
@@ -40,9 +44,12 @@ export async function POST(req: Request) {
       return Response.json({ success: true })
     }
 
-    // Email basic check
-    if (!email.includes('@')) {
-      return Response.json({ error: 'Ungültige E-Mail-Adresse' }, { status: 400 })
+    // Email Validation
+    if (!isValidEmail(email)) {
+      return Response.json(
+        { error: 'Ungültige E-Mail-Adresse' },
+        { status: 400 }
+      )
     }
 
     /* ---------------- ESCAPE ---------------- */
@@ -50,13 +57,17 @@ export async function POST(req: Request) {
     const safeName = escapeHtml(name)
     const safeEmail = escapeHtml(email)
     const safeMessage = escapeHtml(message)
+    const safeInterests = interests.map((i: string) => escapeHtml(i)).join(', ')
 
     /* ---------------- ADMIN MAIL ---------------- */
 
     const adminResult = await resend.emails.send({
-      from: 'Studernheim <noreply@studrum.de>', // Domain muss verifiziert sein!
+      from: 'Studernheim <noreply@studrum.de>',
       to: 'studernheim.ag@gmail.com',
+
+      // 🔥 WICHTIG: reply_to nur wenn valid
       reply_to: email,
+
       subject: `📩 Neue Nachricht von ${safeName}`,
 
       html: `
@@ -68,26 +79,21 @@ export async function POST(req: Request) {
           <p><strong>E-Mail:</strong><br/>${safeEmail}</p>
 
           ${
-            interests.length > 0
-              ? `<p><strong>Interessen:</strong><br/>${interests.join(', ')}</p>`
+            safeInterests
+              ? `<p><strong>Interessen:</strong><br/>${safeInterests}</p>`
               : ''
           }
 
           <p><strong>Nachricht:</strong></p>
 
-          <div style="
-            background:#f3f4f6;
-            padding:12px;
-            border-radius:8px;
-            margin-top:8px;
-          ">
+          <div style="background:#f3f4f6;padding:12px;border-radius:8px;">
             ${safeMessage}
           </div>
 
           <hr style="margin:20px 0"/>
 
           <p style="font-size:12px;color:#888">
-            Diese Nachricht wurde über das Kontaktformular der Studernheim Website gesendet.
+            Diese Nachricht wurde über die Studernheim Website gesendet.
           </p>
 
         </div>
@@ -102,7 +108,7 @@ export async function POST(req: Request) {
       )
     }
 
-    /* ---------------- USER BESTÄTIGUNG ---------------- */
+    /* ---------------- USER MAIL ---------------- */
 
     await resend.emails.send({
       from: 'Studernheim <noreply@studrum.de>',
@@ -117,15 +123,10 @@ export async function POST(req: Request) {
           <p>Hallo ${safeName},</p>
 
           <p>
-            wir haben Ihre Anfrage erhalten und werden uns schnellstmöglich bei Ihnen melden.
+            wir haben Ihre Anfrage erhalten und melden uns schnellstmöglich.
           </p>
 
-          <div style="
-            background:#f3f4f6;
-            padding:12px;
-            border-radius:8px;
-            margin-top:12px;
-          ">
+          <div style="background:#f3f4f6;padding:12px;border-radius:8px;">
             <strong>Ihre Nachricht:</strong><br/>
             ${safeMessage}
           </div>
@@ -138,7 +139,7 @@ export async function POST(req: Request) {
           <hr style="margin:20px 0"/>
 
           <p style="font-size:12px;color:#888">
-            Dies ist eine automatische Bestätigung Ihrer Anfrage.
+            Automatische Bestätigung.
           </p>
 
         </div>
