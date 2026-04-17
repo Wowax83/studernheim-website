@@ -1,41 +1,37 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import fs from 'fs'
+import path from 'path'
 
-export async function GET() {
+const filePath = path.join(process.cwd(), 'visits.json')
+
+function readData() {
   try {
-    // 👉 bestehenden Counter holen
-    let visit = await prisma.visit.findUnique({
-      where: { id: 1 }
-    })
-
-    // 👉 wenn noch nicht existiert → erstellen
-    if (!visit) {
-      visit = await prisma.visit.create({
-        data: {
-          id: 1,
-          count: 1
-        }
-      })
-    } else {
-      // 👉 sonst erhöhen
-      visit = await prisma.visit.update({
-        where: { id: 1 },
-        data: {
-          count: {
-            increment: 1
-          }
-        }
-      })
-    }
-
-    return NextResponse.json({ count: visit.count })
-
-  } catch (error) {
-    console.error('Visit counter error:', error)
-
-    return NextResponse.json(
-      { error: 'Failed to update counter' },
-      { status: 500 }
-    )
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+  } catch {
+    return { count: 0, visitors: {} }
   }
+}
+
+function writeData(data: any) {
+  fs.writeFileSync(filePath, JSON.stringify(data))
+}
+
+export async function GET(req: Request) {
+  const data = readData()
+
+  // 👉 IP holen (funktioniert auch hinter Proxy)
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0] ||
+    'unknown'
+
+  const today = new Date().toISOString().slice(0, 10)
+
+  // 👉 hat der User heute schon gezählt?
+  if (!data.visitors[ip] || data.visitors[ip] !== today) {
+    data.count++
+    data.visitors[ip] = today
+    writeData(data)
+  }
+
+  return NextResponse.json({ count: data.count })
 }
