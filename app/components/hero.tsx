@@ -4,52 +4,20 @@ import { useRef } from 'react'
 import {
   motion,
   useScroll,
-  useTransform,
-  useMotionValue,
-  useSpring
+  useTransform
 } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null)
-
   const { scrollY } = useScroll()
 
-  // 🔥 Scroll Effects (etwas weniger stark)
-  const y = useTransform(scrollY, [0, 500], [0, 80])
-  const x = useTransform(scrollY, [0, 500], [0, 30])
-  const scale = useTransform(scrollY, [0, 500], [1, 1.03])
-
-  // 🔥 Blur (dezenter)
-  const blur = useTransform(scrollY, [0, 300], [0, 1.5])
-  const blurPx = useTransform(blur, (v) => `blur(${v}px)`)
-
-  // 🔥 sanfter Fade
+  // 🔥 Scroll Effekte (leicht)
+  const y = useTransform(scrollY, [0, 500], [0, 60])
+  const scale = useTransform(scrollY, [0, 500], [1, 1.02])
   const opacity = useTransform(scrollY, [0, 400], [1, 0])
 
-  // 🔥 Mouse Movement (leicht reduziert)
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const { innerWidth, innerHeight } = window
-
-    const moveX = (e.clientX / innerWidth - 0.5) * 15
-    const moveY = (e.clientY / innerHeight - 0.5) * 15
-
-    mouseX.set(moveX)
-    mouseY.set(moveY)
-  }
-
-  // 🔥 Combine Scroll + Mouse
-  const xTotal = useTransform([x, mouseX], (v: number[]) => v[0] + v[1])
-  const yTotal = useTransform([y, mouseY], (v: number[]) => v[0] + v[1])
-
-  const smoothX = useSpring(xTotal, { stiffness: 40, damping: 20 })
-  const smoothY = useSpring(yTotal, { stiffness: 40, damping: 20 })
-
-  // 🔥 Scroll Offset Fix
   const scrollToNext = () => {
     const element = document.getElementById('sag')
     if (!element) return
@@ -66,26 +34,23 @@ export default function Hero() {
   return (
     <section
       ref={containerRef}
-      onMouseMove={handleMouseMove}
       className="relative h-screen w-full overflow-hidden"
     >
-      {/* 🎬 Background */}
+      {/* 🎬 Background (leichte Bewegung bleibt) */}
       <motion.div
         animate={{
-          x: [0, 8, -8, 0],
-          y: [0, -4, 4, 0]
+          x: [0, 6, -6, 0],
+          y: [0, -3, 3, 0]
         }}
         transition={{
-          duration: 20,
+          duration: 18,
           repeat: Infinity,
           ease: 'easeInOut'
         }}
         style={{
-          x: smoothX,
-          y: smoothY,
+          y,
           scale,
-          filter: blurPx,
-          willChange: 'transform, filter'
+          willChange: 'transform'
         }}
         className="absolute -inset-10"
       >
@@ -94,33 +59,31 @@ export default function Hero() {
           alt="Studernheim Landschaft"
           fill
           priority
-          quality={75}
+          quality={70}
           sizes="100vw"
-          placeholder="blur"
-          blurDataURL="/hero.webp"
           className="object-cover"
         />
 
-        {/* 🌑 Overlay (leicht optimiert) */}
+        {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/25 to-black/70" />
       </motion.div>
 
-      {/* Aurora */}
-      <div className="absolute inset-0 aurora pointer-events-none" />
+      {/* Aurora bleibt optional leicht */}
+      <div className="absolute inset-0 aurora pointer-events-none opacity-70" />
 
       {/* Content */}
       <motion.div
         style={{
           opacity,
-          y: useTransform(scrollY, [0, 300], [-60, -120]) // 🔥 sauber + weniger aggressiv
+          y: useTransform(scrollY, [0, 300], [-40, -100])
         }}
         className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center"
       >
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="font-heading text-5xl sm:text-6xl md:text-8xl font-bold text-white mb-6 drop-shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
+          transition={{ duration: 0.6 }}
+          className="font-heading text-5xl sm:text-6xl md:text-8xl font-bold text-white mb-6"
         >
           Studernheim
         </motion.h1>
@@ -128,24 +91,24 @@ export default function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-lg sm:text-xl md:text-2xl text-white/90 mb-12 max-w-2xl drop-shadow-lg"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-lg sm:text-xl md:text-2xl text-white/90 mb-12 max-w-2xl"
         >
           Ein Dorf voller Leben, Tradition und Gemeinschaft
         </motion.p>
 
         {/* Scroll Button */}
-        <motion.button
+        <button
           onClick={scrollToNext}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/80 hover:text-white hover:scale-110 transition-all"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/80 hover:text-white transition"
         >
           <motion.div
-            animate={{ y: [0, 10, 0] }}
+            animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            <ChevronDown size={36} />
+            <ChevronDown size={32} />
           </motion.div>
-        </motion.button>
+        </button>
       </motion.div>
     </section>
   )
