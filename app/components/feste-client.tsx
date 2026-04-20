@@ -15,6 +15,7 @@ import {
 import Image from 'next/image'
 import { useState, memo } from 'react'
 
+/* 🔗 Link Meta */
 function getLinkMeta(url: string, text?: string) {
   const u = url.toLowerCase()
 
@@ -34,8 +35,8 @@ function getLinkMeta(url: string, text?: string) {
   return { label: text || 'Website', icon: Globe, className: 'bg-gray-800 text-white' }
 }
 
-/* 🔥 einzelne Karte optimiert */
-const FestCard = memo(function FestCard({ fest }: any) {
+/* 🔥 EINZELNE KARTE (optimiert) */
+const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
   const images = fest?.images || []
   const [index, setIndex] = useState(0)
 
@@ -61,7 +62,7 @@ const FestCard = memo(function FestCard({ fest }: any) {
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition">
 
-      {/* Bild */}
+      {/* Bild / Slider */}
       <div
         className="relative aspect-[4/3] bg-gray-100 overflow-hidden touch-pan-y"
         onTouchStart={(e) => {
@@ -81,7 +82,8 @@ const FestCard = memo(function FestCard({ fest }: any) {
             loading="lazy"
             sizes="(max-width: 768px) 100vw, 33vw"
             quality={60}
-            className="object-cover"
+            className="object-cover cursor-zoom-in"
+            onClick={() => openLightbox(images, index)}
           />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400 text-sm">
@@ -89,7 +91,7 @@ const FestCard = memo(function FestCard({ fest }: any) {
           </div>
         )}
 
-        {/* Buttons nur Desktop */}
+        {/* Desktop Buttons */}
         {images.length > 1 && (
           <>
             <button
@@ -169,11 +171,14 @@ const FestCard = memo(function FestCard({ fest }: any) {
 export default function FesteClient({ feste }: any) {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
 
+  const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
+
   return (
     <section id="feste" className="py-16 md:py-20">
       <div className="max-w-7xl mx-auto px-3 md:px-4">
 
-        {/* 🔥 KEIN framer-motion wrapper mehr */}
+        {/* Titel */}
         <div
           ref={ref}
           className={`text-center mb-10 md:mb-12 transition-opacity duration-700 ${
@@ -185,13 +190,69 @@ export default function FesteClient({ feste }: any) {
           </h2>
         </div>
 
+        {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {feste?.map((fest: any) => (
-            <FestCard key={fest._id} fest={fest} />
+            <FestCard
+              key={fest._id}
+              fest={fest}
+              openLightbox={(images: string[], index: number) => {
+                setLightboxImages(images)
+                setLightboxIndex(index)
+              }}
+            />
           ))}
         </div>
 
       </div>
+
+      {/* 🔥 LIGHTBOX */}
+      {lightboxImages && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+
+          {/* Close */}
+          <button
+            onClick={() => setLightboxImages(null)}
+            className="absolute top-5 right-5 text-white"
+          >
+            <X size={32} />
+          </button>
+
+          {/* Prev */}
+          <button
+            onClick={() =>
+              setLightboxIndex((i) =>
+                (i - 1 + lightboxImages.length) % lightboxImages.length
+              )
+            }
+            className="absolute left-5 text-white"
+          >
+            <ChevronLeft size={32} />
+          </button>
+
+          {/* Next */}
+          <button
+            onClick={() =>
+              setLightboxIndex((i) =>
+                (i + 1) % lightboxImages.length
+              )
+            }
+            className="absolute right-5 text-white"
+          >
+            <ChevronRight size={32} />
+          </button>
+
+          {/* Bild */}
+          <Image
+            src={lightboxImages[lightboxIndex]}
+            alt="Bild"
+            width={1200}
+            height={800}
+            priority
+            className="max-h-[90vh] object-contain"
+          />
+        </div>
+      )}
     </section>
   )
 }
