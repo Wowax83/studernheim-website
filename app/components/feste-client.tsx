@@ -35,7 +35,7 @@ function getLinkMeta(url: string, text?: string) {
   return { label: text || 'Website', icon: Globe, className: 'bg-gray-800 text-white' }
 }
 
-/* 🔥 EINZELNE KARTE (optimiert) */
+/* 🔥 EINZELNE KARTE */
 const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
   const images = fest?.images || []
   const [index, setIndex] = useState(0)
@@ -60,9 +60,9 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
   const currentImage = images[index]
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition">
+    <div className="group bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition">
 
-      {/* Bild / Slider */}
+      {/* Bild */}
       <div
         className="relative aspect-[4/3] bg-gray-100 overflow-hidden touch-pan-y"
         onTouchStart={(e) => {
@@ -129,10 +129,14 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
           </p>
         )}
 
+        {/* 🔥 BADGES (Hover + Mobile sichtbar) */}
         {Array.isArray(fest?.quickFacts) && (
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap gap-2 mb-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:translate-y-1 md:group-hover:translate-y-0 transition-all duration-300">
             {fest.quickFacts.map((fact: any, i: number) => (
-              <span key={i} className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
+              <span
+                key={i}
+                className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"
+              >
                 {fact}
               </span>
             ))}
