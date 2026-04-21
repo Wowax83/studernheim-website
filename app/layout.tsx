@@ -6,8 +6,10 @@ import ConditionalWhatsApp from '@/app/components/ConditionalWhatsApp'
 
 export const dynamic = 'force-dynamic'
 
+const baseUrl = 'https://studernheim.com'
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXTAUTH_URL ?? 'https://studrum.de'),
+  metadataBase: new URL(baseUrl),
 
   title: {
     default: 'Studernheim – Feste, Vereine & Dorfleben',
@@ -23,7 +25,7 @@ export const metadata: Metadata = {
     'Kerwe Studernheim',
     'Maibaumstellen',
     'Veranstaltungen Frankenthal',
-    'Dorfleben Pfalz'
+    'Dorfleben Pfalz',
   ],
 
   authors: [{ name: 'Studernheim' }],
@@ -41,11 +43,11 @@ export const metadata: Metadata = {
       'Alle Veranstaltungen, Feste und Vereine in Studernheim. Jetzt entdecken!',
     type: 'website',
     locale: 'de_DE',
-    url: 'https://studrum.de',
+    url: baseUrl,
     siteName: 'Studernheim',
     images: [
       {
-        url: '/og-image.webp',
+        url: `${baseUrl}/og-image.webp`,
         width: 1200,
         height: 630,
         alt: 'Studernheim Dorfleben',
@@ -58,7 +60,7 @@ export const metadata: Metadata = {
     title: 'Studernheim – Feste & Dorfleben',
     description:
       'Alle Veranstaltungen und Feste in Studernheim auf einen Blick.',
-    images: ['/og-image.webp'],
+    images: [`${baseUrl}/og-image.webp`],
   },
 
   robots: {
@@ -71,7 +73,7 @@ export const metadata: Metadata = {
   },
 
   alternates: {
-    canonical: 'https://studrum.de',
+    canonical: baseUrl,
   },
 }
 
@@ -84,7 +86,7 @@ export default function RootLayout({
     <html lang="de" className="scroll-smooth">
       <body className="font-body antialiased bg-white text-gray-900">
 
-        {/* 🔥 STRUCTURED DATA */}
+        {/* 🔥 STRUCTURED DATA: PLACE */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -97,12 +99,12 @@ export default function RootLayout({
                 "addressLocality": "Frankenthal",
                 "addressCountry": "DE"
               },
-              "url": "https://studrum.de"
+              "url": baseUrl
             })
           }}
         />
 
-        {/* 🔥 ORGANIZATION SCHEMA */}
+        {/* 🔥 STRUCTURED DATA: ORGANIZATION */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -110,21 +112,21 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "Studernheim",
-              "url": "https://studrum.de",
-              "logo": "https://studrum.de/og-image.png"
+              "url": baseUrl,
+              "logo": `${baseUrl}/og-image.webp`
             })
           }}
         />
 
-        {/* Navbar */}
+        {/* Navigation */}
         <Navbar />
 
-        {/* Inhalt */}
+        {/* Content */}
         <main className="pt-20">
           {children}
         </main>
 
-        {/* ✅ WhatsApp nur außerhalb Studio */}
+        {/* WhatsApp (conditional) */}
         <ConditionalWhatsApp />
 
         {/* Cookie Banner */}
