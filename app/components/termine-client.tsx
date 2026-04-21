@@ -1,9 +1,39 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Calendar, Clock, MapPin, User } from 'lucide-react'
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  User,
+  Globe,
+  MessageCircle,
+  Instagram,
+  Facebook,
+  ClipboardList
+} from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 import { useState } from 'react'
+
+/* 🔗 LINK META (aus Feste übernommen) */
+function getLinkMeta(url: string, text?: string) {
+  const u = url.toLowerCase()
+
+  if (u.includes('helferliste')) {
+    return { label: text || 'Helferliste', icon: ClipboardList, className: 'bg-emerald-600 text-white' }
+  }
+  if (u.includes('wa.me') || u.includes('whatsapp')) {
+    return { label: text || 'WhatsApp', icon: MessageCircle, className: 'bg-green-500 text-white' }
+  }
+  if (u.includes('instagram')) {
+    return { label: text || 'Instagram', icon: Instagram, className: 'bg-pink-500 text-white' }
+  }
+  if (u.includes('facebook')) {
+    return { label: text || 'Facebook', icon: Facebook, className: 'bg-blue-600 text-white' }
+  }
+
+  return { label: text || 'Website', icon: Globe, className: 'bg-gray-800 text-white' }
+}
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString('de-DE')
@@ -44,7 +74,7 @@ export default function TermineClient({ events }: { events: any[] }) {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="font-heading text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             Aktuelle <span className="gradient-text">Termine</span>
           </h2>
         </motion.div>
@@ -53,6 +83,7 @@ export default function TermineClient({ events }: { events: any[] }) {
           {Object.entries(grouped).map(([month, monthEvents]: any, groupIndex) => (
             <div key={month}>
 
+              {/* Monatsüberschrift */}
               <motion.h3
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -65,11 +96,6 @@ export default function TermineClient({ events }: { events: any[] }) {
               <div className="space-y-4">
                 {monthEvents.map((event: any, index: number) => {
                   const dateObj = new Date(event.date)
-
-                  // 🔥 Helferliste finden
-                  const helferLink = event.highlights?.find((item: any) =>
-                    item?.url?.toLowerCase().includes('helferliste.online')
-                  )
 
                   return (
                     <motion.div
@@ -95,9 +121,9 @@ export default function TermineClient({ events }: { events: any[] }) {
 
                         {/* Content */}
                         <div className="flex-1">
-                          
+
                           <div className="flex items-center gap-3 mb-3">
-                            <h3 className="font-heading text-2xl font-bold text-gray-900">
+                            <h3 className="text-2xl font-bold text-gray-900">
                               {event.title}
                             </h3>
 
@@ -112,7 +138,7 @@ export default function TermineClient({ events }: { events: any[] }) {
                             </p>
                           )}
 
-                          {/* 🔥 DETAILS + BUTTON */}
+                          {/* Details + Links */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm items-center">
 
                             <div className="flex items-center gap-2 text-gray-600">
@@ -141,54 +167,32 @@ export default function TermineClient({ events }: { events: any[] }) {
                               </div>
                             )}
 
-                            {/* 🔥 JETZT HELFEN BUTTON */}
-                            {helferLink && (
-                              <a
-                                href={helferLink.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-700 hover:scale-105 transition shadow-md"
-                              >
-                                <span className="text-lg">📝</span>
-                                Jetzt helfen
-                              </a>
-                            )}
-                          </div>
-
-                          {/* 🔥 ANDERE LINKS (Hover) */}
-                          {hoveredEvent === event._id &&
-                            event.highlights && (
-                              <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className="border-t border-gray-200 pt-4 mt-4 flex flex-wrap gap-2"
-                              >
+                            {/* 🔥 ALLE LINKS ALS BUTTONS */}
+                            {Array.isArray(event.highlights) && (
+                              <div className="flex flex-wrap gap-2 col-span-full lg:col-span-1">
                                 {event.highlights.map((item: any, i: number) => {
+                                  if (!item?.url) return null
 
-                                  if (typeof item === 'string') return null
-
-                                  const url = item.url?.toLowerCase() || ''
-
-                                  // ❌ Helferliste hier NICHT nochmal anzeigen
-                                  if (url.includes('helferliste.online')) return null
-
-                                  let icon = '🌐'
-                                  let style = 'bg-blue-100 text-blue-700'
+                                  const meta = getLinkMeta(item.url, item.text)
+                                  const Icon = meta.icon
 
                                   return (
                                     <a
                                       key={i}
                                       href={item.url}
                                       target="_blank"
-                                      className={`text-xs px-4 py-2 rounded-lg ${style}`}
+                                      rel="noopener noreferrer"
+                                      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold hover:scale-105 transition shadow-md ${meta.className}`}
                                     >
-                                      {icon} {item.text}
+                                      <Icon size={16} />
+                                      {meta.label}
                                     </a>
                                   )
                                 })}
-                              </motion.div>
+                              </div>
                             )}
 
+                          </div>
                         </div>
                       </div>
                     </motion.div>
