@@ -11,6 +11,10 @@ const baseUrl = 'https://studernheim.com'
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
 
+  alternates: {
+    canonical: '/', // 🔥 wichtig: dynamisch pro Seite
+  },
+
   title: {
     default: 'Studernheim – Feste, Vereine & Dorfleben',
     template: '%s | Studernheim',
@@ -70,10 +74,6 @@ export const metadata: Metadata = {
       index: true,
       follow: true,
     },
-  },
-
-  alternates: {
-    canonical: baseUrl,
   },
 }
 
