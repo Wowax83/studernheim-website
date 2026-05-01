@@ -1,28 +1,12 @@
 import { client } from './sanity'
 
-/* ---------------- KONSTANTEN ---------------- */
-
-// 🔥 7 Tage in Millisekunden
-const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7
-
-// 🔥 zentrale "aktiv" Bedingung (Event bleibt 7 Tage sichtbar)
-const ACTIVE_FEST_FILTER = `
-dateTime(date) + ${SEVEN_DAYS_MS} >= now()
-`
-
-/* ---------------- FESTE ---------------- */
-
 /**
- * 🔥 ALLE FESTE
- * 👉 kommende + bis 7 Tage vergangene oben
+ * 🔥 FESTE (alle)
+ * 👉 Zukünftige zuerst, dann vergangene
  */
 export async function getFeste() {
   return await client.fetch(
-    `*[_type == "fest"]
-    | order(
-        ${ACTIVE_FEST_FILTER} desc,
-        date asc
-      ){
+    `*[_type == "fest"]{
       _id,
       name,
       description,
@@ -31,23 +15,28 @@ export async function getFeste() {
       vibe,
       organizer,
 
+      // 🔥 Bilder (mit Fallback)
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
+      // 🔥 gemeinsame Struktur
       quickFacts,
-      highlights
-    }`,
+      highlights,
+
+      // 🔥 für Sortierung
+      "isUpcoming": date >= now()
+    }
+    | order(isUpcoming desc, date asc)`,
     {},
     { cache: "no-store" }
   )
 }
 
 /**
- * 🔥 NUR AKTIVE FESTE
- * 👉 kommende + bis 7 Tage nach Event
+ * 🔥 NUR zukünftige Feste
  */
 export async function getUpcomingFeste(limit = 4) {
   return await client.fetch(
-    `*[_type == "fest" && ${ACTIVE_FEST_FILTER}]
+    `*[_type == "fest" && date >= now()]
       | order(date asc)[0...${limit}]{
       _id,
       name,
@@ -67,8 +56,9 @@ export async function getUpcomingFeste(limit = 4) {
   )
 }
 
-/* ---------------- VEREINE ---------------- */
-
+/**
+ * 🔥 VEREINE
+ */
 export async function getVereine() {
   return await client.fetch(
     `*[_type == "verein"] | order(name asc){
@@ -77,6 +67,7 @@ export async function getVereine() {
       description,
       region,
 
+      // 🔥 gleiche Bildlogik wie Feste
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
       quickFacts,
@@ -87,18 +78,17 @@ export async function getVereine() {
   )
 }
 
-/* ---------------- EVENTS (STARTSEITE) ---------------- */
-
 /**
- * 🔥 FESTE + TERMINE kombiniert
+ * 🔥 ALLE EVENTS (Feste + Termine kombiniert)
+ * 👉 Für Startseite / Übersicht
  */
 export async function getAllEvents(limit = 4) {
   return await client.fetch(
     `{
       "events": [
 
-        // 🔥 FESTE (mit 7-Tage Logik)
-        ...*[_type == "fest" && ${ACTIVE_FEST_FILTER}]{
+        // 🔥 FESTE (nur kommende)
+        ...*[_type == "fest" && date >= now()]{
           _id,
           "title": name,
           description,
@@ -113,7 +103,7 @@ export async function getAllEvents(limit = 4) {
           highlights
         },
 
-        // 🔥 TERMINE (nur Zukunft)
+        // 🔥 TERMINE
         ...*[_type == "termine" && date >= now()]{
           _id,
           title,
