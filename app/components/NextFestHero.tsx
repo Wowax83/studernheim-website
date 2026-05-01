@@ -22,7 +22,6 @@ function getTimeLeft(targetDate: string) {
 }
 
 function getFestRange(fest: any) {
-  // Wenn Start- und Endzeit existieren → nutzen
   if (fest.startDate && fest.endDate) {
     return {
       start: new Date(fest.startDate),
@@ -30,7 +29,6 @@ function getFestRange(fest: any) {
     }
   }
 
-  // Fallback: ganzer Tag
   const baseDate = new Date(fest.date)
 
   const start = new Date(baseDate)
@@ -60,23 +58,51 @@ function getFestStatus(fest: any) {
 export default function NextFestHero({ feste }: any) {
   if (!Array.isArray(feste) || feste.length === 0) return null
 
-  const nextFest = feste[0]
+  const now = new Date()
+
+  // 🔥 1. aktuelles Fest finden
+  const currentFest = feste.find((fest: any) => {
+    const { start, end } = getFestRange(fest)
+    return now >= start && now <= end
+  })
+
+  // 🔥 2. nächstes Fest finden
+  const upcomingFest = feste
+    .filter((fest: any) => {
+      const { start } = getFestRange(fest)
+      return start > now
+    })
+    .sort((a: any, b: any) => {
+      return (
+        getFestRange(a).start.getTime() -
+        getFestRange(b).start.getTime()
+      )
+    })[0]
+
+  // 🔥 FINAL
+  const nextFest = currentFest || upcomingFest
+
+  if (!nextFest) return null
+
+  // 🔥 Countdown Ziel (Startzeit bevorzugen)
+  const targetDate =
+    nextFest.startDate || nextFest.date
 
   const [time, setTime] = useState(
-    nextFest?.date ? getTimeLeft(nextFest.date) : null
+    targetDate ? getTimeLeft(targetDate) : null
   )
 
-  const festStatus = nextFest ? getFestStatus(nextFest) : null
+  const festStatus = getFestStatus(nextFest)
 
   useEffect(() => {
-    if (!nextFest?.date) return
+    if (!targetDate) return
 
     const interval = setInterval(() => {
-      setTime(getTimeLeft(nextFest.date))
+      setTime(getTimeLeft(targetDate))
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [nextFest])
+  }, [targetDate])
 
   const image =
     Array.isArray(nextFest.images) && nextFest.images.length > 0
@@ -149,7 +175,7 @@ export default function NextFestHero({ feste }: any) {
               </p>
             )}
 
-            {/* STATUS LOGIK */}
+            {/* STATUS */}
             {festStatus === 'live' ? (
               <div className="text-lg font-semibold text-green-400">
                 🎉 Heute ist das Fest!
