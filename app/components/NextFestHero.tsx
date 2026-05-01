@@ -4,8 +4,13 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
+/* ---------------- TIME HELPERS ---------------- */
+
 function getTimeLeft(targetDate: string) {
-  const total = new Date(targetDate).getTime() - new Date().getTime()
+  const total = Math.max(
+    new Date(targetDate).getTime() - new Date().getTime(),
+    0
+  )
 
   return {
     total,
@@ -16,6 +21,42 @@ function getTimeLeft(targetDate: string) {
   }
 }
 
+function getFestRange(fest: any) {
+  // Wenn Start- und Endzeit existieren → nutzen
+  if (fest.startDate && fest.endDate) {
+    return {
+      start: new Date(fest.startDate),
+      end: new Date(fest.endDate)
+    }
+  }
+
+  // Fallback: ganzer Tag
+  const baseDate = new Date(fest.date)
+
+  const start = new Date(baseDate)
+  start.setHours(0, 0, 0, 0)
+
+  const end = new Date(baseDate)
+  end.setHours(23, 59, 59, 999)
+
+  return { start, end }
+}
+
+function getFestStatus(fest: any) {
+  const now = new Date()
+  const { start, end } = getFestRange(fest)
+
+  const afterglowEnd = new Date(end)
+  afterglowEnd.setDate(afterglowEnd.getDate() + 2)
+
+  if (now < start) return 'upcoming'
+  if (now >= start && now <= end) return 'live'
+  if (now > end && now <= afterglowEnd) return 'afterglow'
+  return 'past'
+}
+
+/* ---------------- COMPONENT ---------------- */
+
 export default function NextFestHero({ feste }: any) {
   if (!Array.isArray(feste) || feste.length === 0) return null
 
@@ -24,6 +65,8 @@ export default function NextFestHero({ feste }: any) {
   const [time, setTime] = useState(
     nextFest?.date ? getTimeLeft(nextFest.date) : null
   )
+
+  const festStatus = nextFest ? getFestStatus(nextFest) : null
 
   useEffect(() => {
     if (!nextFest?.date) return
@@ -40,7 +83,7 @@ export default function NextFestHero({ feste }: any) {
       ? nextFest.images[0]
       : null
 
-  // 👉 Button aus Highlights
+  // Button aus Highlights
   let button = null
   if (Array.isArray(nextFest.highlights)) {
     const firstLink = nextFest.highlights.find(
@@ -71,7 +114,7 @@ export default function NextFestHero({ feste }: any) {
           "
         >
 
-          {/* 🔥 Background Bild (FIXED) */}
+          {/* Background */}
           {image && (
             <Image
               src={image}
@@ -82,8 +125,8 @@ export default function NextFestHero({ feste }: any) {
             />
           )}
 
-          {/* 🔥 Gradient Overlay (wichtig für Lesbarkeit) */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/20" />
 
           {/* Content */}
           <div className="relative p-5 md:p-10 text-white max-w-xl">
@@ -106,8 +149,16 @@ export default function NextFestHero({ feste }: any) {
               </p>
             )}
 
-            {/* Countdown */}
-            {time && time.total > 0 ? (
+            {/* STATUS LOGIK */}
+            {festStatus === 'live' ? (
+              <div className="text-lg font-semibold text-green-400">
+                🎉 Heute ist das Fest!
+              </div>
+            ) : festStatus === 'afterglow' ? (
+              <div className="text-lg font-semibold text-green-300">
+                🥳 Wir feiern noch :)
+              </div>
+            ) : festStatus === 'upcoming' && time && time.total > 0 ? (
               <div className="grid grid-cols-4 gap-3 md:gap-4 max-w-sm md:max-w-md mt-4">
                 {[
                   { label: 'Tage', value: time.days },
@@ -117,12 +168,12 @@ export default function NextFestHero({ feste }: any) {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-2 md:p-3 text-center"
+                    className="bg-black/40 backdrop-blur-lg border border-white/20 rounded-xl p-2 md:p-3 text-center"
                   >
-                    <div className="text-lg md:text-2xl font-bold">
+                    <div className="text-xl md:text-3xl font-extrabold drop-shadow-lg">
                       {item.value}
                     </div>
-                    <div className="text-[10px] uppercase tracking-wide opacity-70">
+                    <div className="text-xs uppercase tracking-wider text-white/80">
                       {item.label}
                     </div>
                   </div>
@@ -155,10 +206,9 @@ export default function NextFestHero({ feste }: any) {
                 {button.text} →
               </a>
             )}
+
           </div>
-
         </motion.div>
-
       </div>
     </section>
   )
