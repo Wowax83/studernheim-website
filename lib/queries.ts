@@ -1,14 +1,26 @@
 import { client } from './sanity'
 
+/* ---------------- KONSTANTEN ---------------- */
+
+// 🔥 7 Tage in Millisekunden
+const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7
+
+// 🔥 zentrale "aktiv" Bedingung (Event bleibt 7 Tage sichtbar)
+const ACTIVE_FEST_FILTER = `
+dateTime(date) + ${SEVEN_DAYS_MS} >= now()
+`
+
+/* ---------------- FESTE ---------------- */
+
 /**
- * 🔥 FESTE (alle)
- * 👉 Zukünftige zuerst, dann vergangene
+ * 🔥 ALLE FESTE
+ * 👉 kommende + bis 7 Tage vergangene oben
  */
 export async function getFeste() {
   return await client.fetch(
     `*[_type == "fest"]
     | order(
-        dateTime(date) + 1000 * 60 * 60 * 24 * 7 >= now() desc,
+        ${ACTIVE_FEST_FILTER} desc,
         date asc
       ){
       _id,
@@ -28,9 +40,14 @@ export async function getFeste() {
     { cache: "no-store" }
   )
 }
+
+/**
+ * 🔥 NUR AKTIVE FESTE
+ * 👉 kommende + bis 7 Tage nach Event
+ */
 export async function getUpcomingFeste(limit = 4) {
   return await client.fetch(
-    `*[_type == "fest" && date >= now()]
+    `*[_type == "fest" && ${ACTIVE_FEST_FILTER}]
       | order(date asc)[0...${limit}]{
       _id,
       name,
@@ -50,9 +67,8 @@ export async function getUpcomingFeste(limit = 4) {
   )
 }
 
-/**
- * 🔥 VEREINE
- */
+/* ---------------- VEREINE ---------------- */
+
 export async function getVereine() {
   return await client.fetch(
     `*[_type == "verein"] | order(name asc){
@@ -61,7 +77,6 @@ export async function getVereine() {
       description,
       region,
 
-      // 🔥 gleiche Bildlogik wie Feste
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
       quickFacts,
@@ -72,17 +87,18 @@ export async function getVereine() {
   )
 }
 
+/* ---------------- EVENTS (STARTSEITE) ---------------- */
+
 /**
- * 🔥 ALLE EVENTS (Feste + Termine kombiniert)
- * 👉 Für Startseite / Übersicht
+ * 🔥 FESTE + TERMINE kombiniert
  */
 export async function getAllEvents(limit = 4) {
   return await client.fetch(
     `{
       "events": [
 
-        // 🔥 FESTE (nur kommende)
-        ...*[_type == "fest" && date >= now()]{
+        // 🔥 FESTE (mit 7-Tage Logik)
+        ...*[_type == "fest" && ${ACTIVE_FEST_FILTER}]{
           _id,
           "title": name,
           description,
@@ -97,7 +113,7 @@ export async function getAllEvents(limit = 4) {
           highlights
         },
 
-        // 🔥 TERMINE
+        // 🔥 TERMINE (nur Zukunft)
         ...*[_type == "termine" && date >= now()]{
           _id,
           title,
