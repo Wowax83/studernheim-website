@@ -6,7 +6,11 @@ import { client } from './sanity'
  */
 export async function getFeste() {
   return await client.fetch(
-    `*[_type == "fest"]{
+    `*[_type == "fest"]
+    | order(
+        dateTime(date) + 1000 * 60 * 60 * 24 * 7 >= now() desc,
+        date asc
+      ){
       _id,
       name,
       description,
@@ -15,25 +19,15 @@ export async function getFeste() {
       vibe,
       organizer,
 
-      // 🔥 Bilder (mit Fallback)
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
-      // 🔥 gemeinsame Struktur
       quickFacts,
-      highlights,
-
-      // 🔥 für Sortierung
-      "isUpcoming": date >= now()
-    }
-    | order(isUpcoming desc, date asc)`,
+      highlights
+    }`,
     {},
     { cache: "no-store" }
   )
 }
-
-/**
- * 🔥 NUR zukünftige Feste
- */
 export async function getUpcomingFeste(limit = 4) {
   return await client.fetch(
     `*[_type == "fest" && date >= now()]
