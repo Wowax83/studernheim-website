@@ -1,18 +1,16 @@
 import { client } from './sanity'
 
 /**
- * 🔥 FESTE (alle)
- * 👉 Chronologisch sortiert (startDate bevorzugt)
+ * 🔥 FESTE (alle – chronologisch)
  */
 export async function getFeste() {
   return await client.fetch(
-    `*[_type == "fest"] 
+    `*[_type == "fest"]
     | order(coalesce(startDate, date) asc){
       _id,
       name,
       description,
 
-      // 🔥 Zeitfelder
       date,
       startDate,
       endDate,
@@ -21,7 +19,6 @@ export async function getFeste() {
       vibe,
       organizer,
 
-      // 🔥 Bilder (Fallback sicher)
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
       quickFacts,
@@ -33,12 +30,12 @@ export async function getFeste() {
 }
 
 /**
- * 🔥 NUR zukünftige Feste
+ * 🔥 NUR relevante Feste (laufend + kommende)
  */
-export async function getUpcomingFeste(limit = 4) {
+export async function getRelevantFeste(limit = 10) {
   return await client.fetch(
-    `*[_type == "fest" && coalesce(startDate, date) >= now()]
-      | order(coalesce(startDate, date) asc)[0...${limit}]{
+    `*[_type == "fest" && coalesce(endDate, startDate, date) >= now()]
+    | order(coalesce(startDate, date) asc)[0...${limit}]{
       _id,
       name,
       description,
@@ -62,20 +59,24 @@ export async function getUpcomingFeste(limit = 4) {
 }
 
 /**
- * 🔥 VEREINE
+ * 🔥 TERMINE (nur kommende + heute)
  */
-export async function getVereine() {
+export async function getTermine(limit = 10) {
   return await client.fetch(
-    `*[_type == "verein"] 
-    | order(name asc){
+    `*[_type == "termine" && date >= now()]
+    | order(date asc)[0...${limit}]{
       _id,
-      name,
+      title,
       description,
-      region,
 
-      "images": coalesce(images[].asset->url, [image.asset->url], []),
+      date,
+      "startDate": date,
 
-      quickFacts,
+      time,
+      location,
+      organizer,
+      "type": coalesce(type, "termin"),
+
       highlights
     }`,
     {},
@@ -85,14 +86,15 @@ export async function getVereine() {
 
 /**
  * 🔥 ALLE EVENTS (Feste + Termine kombiniert)
+ * 👉 perfekt für Startseite
  */
-export async function getAllEvents(limit = 4) {
+export async function getAllEvents(limit = 10) {
   return await client.fetch(
     `{
       "events": [
 
-        // 🔥 FESTE
-        ...*[_type == "fest"]{
+        // 🔥 FESTE (laufend + kommende)
+        ...*[_type == "fest" && coalesce(endDate, startDate, date) >= now()]{
           _id,
           "title": name,
           description,
@@ -111,12 +113,15 @@ export async function getAllEvents(limit = 4) {
           highlights
         },
 
-        // 🔥 TERMINE
-        ...*[_type == "termine"]{
+        // 🔥 TERMINE (kommend)
+        ...*[_type == "termine" && date >= now()]{
           _id,
           title,
           description,
+
           date,
+          "startDate": date,
+
           time,
           location,
           organizer,
@@ -125,8 +130,30 @@ export async function getAllEvents(limit = 4) {
           highlights
         }
       ]
-    }.events 
+    }.events
     | order(coalesce(startDate, date) asc)[0...${limit}]`,
+    {},
+    { cache: "no-store" }
+  )
+}
+
+/**
+ * 🔥 VEREINE
+ */
+export async function getVereine() {
+  return await client.fetch(
+    `*[_type == "verein"]
+    | order(name asc){
+      _id,
+      name,
+      description,
+      region,
+
+      "images": coalesce(images[].asset->url, [image.asset->url], []),
+
+      quickFacts,
+      highlights
+    }`,
     {},
     { cache: "no-store" }
   )
