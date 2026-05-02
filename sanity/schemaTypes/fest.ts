@@ -1,3 +1,5 @@
+import { Rule } from 'sanity'
+
 export default {
   name: 'fest',
   type: 'document',
@@ -22,32 +24,33 @@ export default {
       title: 'Beschreibung'
     },
 
-    // 🔥 NEU: START
+    // 🔥 START
     {
       name: 'startDate',
       title: 'Start (Datum & Uhrzeit)',
       type: 'datetime',
       description: 'Wann beginnt das Fest?',
-      validation: Rule => Rule.required()
+      validation: (Rule: Rule) => Rule.required()
     },
 
-    // 🔥 NEU: ENDE
+    // 🔥 ENDE
     {
       name: 'endDate',
       title: 'Ende (Datum & Uhrzeit)',
       type: 'datetime',
       description: 'Wann endet das Fest?',
-      validation: Rule =>
-        Rule.required().custom((end, context) => {
+      validation: (Rule: Rule) =>
+        Rule.required().custom((end: any, context: any) => {
           const start = context.document?.startDate
           if (!start || !end) return true
+
           return new Date(end) > new Date(start)
             ? true
             : 'Ende muss nach Start liegen'
         })
     },
 
-    // 🔥 OPTIONAL (für alte Daten)
+    // 🔥 FALLBACK
     {
       name: 'date',
       title: 'Fallback Datum',
@@ -116,8 +119,16 @@ export default {
             }
           },
           fields: [
-            { name: 'text', type: 'string', title: 'Text' },
-            { name: 'url', type: 'url', title: 'Link' }
+            {
+              name: 'text',
+              type: 'string',
+              title: 'Text'
+            },
+            {
+              name: 'url',
+              type: 'url',
+              title: 'Link'
+            }
           ]
         }
       ]
