@@ -4,10 +4,23 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
+/* ---------------- TYPES ---------------- */
+
+type Fest = {
+  _id: string
+  name: string
+  description?: string
+  date?: string
+  startDate?: string
+  endDate?: string
+  images?: string[]
+  highlights?: any[]
+}
+
 /* ---------------- TIME HELPERS ---------------- */
 
-// 🔥 Fix für YYYY-MM-DD (kein UTC Bug mehr)
-function toDateSafe(input: string) {
+// 🔥 sicherer Parser (kein UTC Bug)
+function toDateSafe(input?: string | null): Date | null {
   if (!input) return null
 
   if (/^\d{4}-\d{2}-\d{2}$/.test(input)) {
@@ -17,9 +30,21 @@ function toDateSafe(input: string) {
   return new Date(input)
 }
 
-function getTimeLeft(targetDate: string) {
+function getTimeLeft(targetDate?: string | null) {
+  const target = toDateSafe(targetDate)
+
+  if (!target) {
+    return {
+      total: 0,
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    }
+  }
+
   const total = Math.max(
-    toDateSafe(targetDate).getTime() - new Date().getTime(),
+    target.getTime() - new Date().getTime(),
     0
   )
 
@@ -32,15 +57,22 @@ function getTimeLeft(targetDate: string) {
   }
 }
 
-function getFestRange(fest: any) {
+function getFestRange(fest: Fest) {
   if (fest.startDate && fest.endDate) {
-    return {
-      start: toDateSafe(fest.startDate),
-      end: toDateSafe(fest.endDate)
+    const start = toDateSafe(fest.startDate)
+    const end = toDateSafe(fest.endDate)
+
+    if (start && end) {
+      return { start, end }
     }
   }
 
   const base = toDateSafe(fest.date)
+
+  if (!base) {
+    const now = new Date()
+    return { start: now, end: now }
+  }
 
   const start = new Date(base)
   start.setHours(0, 0, 0, 0)
@@ -51,7 +83,7 @@ function getFestRange(fest: any) {
   return { start, end }
 }
 
-function getFestStatus(fest: any) {
+function getFestStatus(fest: Fest) {
   const now = new Date()
   const { start, end } = getFestRange(fest)
 
@@ -66,12 +98,12 @@ function getFestStatus(fest: any) {
 
 /* ---------------- COMPONENT ---------------- */
 
-export default function NextFestHero({ feste }: any) {
+export default function NextFestHero({ feste }: { feste: Fest[] }) {
   if (!Array.isArray(feste) || feste.length === 0) return null
 
   const now = new Date()
 
-  // 🔥 1. ALLES sauber sortieren
+  // 🔥 sauber sortieren
   const festeSorted = [...feste].sort((a, b) => {
     return (
       getFestRange(a).start.getTime() -
@@ -79,29 +111,28 @@ export default function NextFestHero({ feste }: any) {
     )
   })
 
-  // 🔥 2. aktuelles Fest
-  const currentFest = festeSorted.find((fest: any) => {
+  // 🔥 aktuelles Fest
+  const currentFest = festeSorted.find((fest) => {
     const { start, end } = getFestRange(fest)
     return now >= start && now <= end
   })
 
-  // 🔥 3. nächstes Fest
-  const upcomingFest = festeSorted.find((fest: any) => {
+  // 🔥 nächstes Fest
+  const upcomingFest = festeSorted.find((fest) => {
     const { start } = getFestRange(fest)
     return start > now
   })
 
-  // 🔥 FINAL
   const nextFest = currentFest || upcomingFest
 
   if (!nextFest) return null
 
   // 🔥 Countdown Ziel
   const targetDate =
-    nextFest.startDate || nextFest.date
+    nextFest.startDate || nextFest.date || null
 
   const [time, setTime] = useState(
-    targetDate ? getTimeLeft(targetDate) : null
+    getTimeLeft(targetDate)
   )
 
   const festStatus = getFestStatus(nextFest)
@@ -121,8 +152,9 @@ export default function NextFestHero({ feste }: any) {
       ? nextFest.images[0]
       : null
 
-  // 🔥 Button aus Highlights
-  let button = null
+  // 🔥 Button
+  let button: { text: string; url: string } | null = null
+
   if (Array.isArray(nextFest.highlights)) {
     const firstLink = nextFest.highlights.find(
       (item: any) => typeof item === 'object' && item?.url
@@ -179,7 +211,7 @@ export default function NextFestHero({ feste }: any) {
 
             {nextFest.date && (
               <p className="text-white/80 mb-6 text-sm md:text-base">
-                {toDateSafe(nextFest.date).toLocaleDateString('de-DE', {
+                {toDateSafe(nextFest.date)?.toLocaleDateString('de-DE', {
                   weekday: 'long',
                   day: 'numeric',
                   month: 'long'
@@ -196,7 +228,7 @@ export default function NextFestHero({ feste }: any) {
               <div className="text-lg font-semibold text-green-300">
                 🥳 Wir feiern noch :)
               </div>
-            ) : festStatus === 'upcoming' && time && time.total > 0 ? (
+            ) : festStatus === 'upcoming' && time.total > 0 ? (
               <div className="grid grid-cols-4 gap-3 md:gap-4 max-w-sm md:max-w-md mt-4">
                 {[
                   { label: 'Tage', value: time.days },
