@@ -6,9 +6,20 @@ import { motion } from 'framer-motion'
 
 /* ---------------- TIME HELPERS ---------------- */
 
+// 🔥 Fix für YYYY-MM-DD (kein UTC Bug mehr)
+function toDateSafe(input: string) {
+  if (!input) return null
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(input)) {
+    return new Date(input + 'T00:00:00')
+  }
+
+  return new Date(input)
+}
+
 function getTimeLeft(targetDate: string) {
   const total = Math.max(
-    new Date(targetDate).getTime() - new Date().getTime(),
+    toDateSafe(targetDate).getTime() - new Date().getTime(),
     0
   )
 
@@ -24,17 +35,17 @@ function getTimeLeft(targetDate: string) {
 function getFestRange(fest: any) {
   if (fest.startDate && fest.endDate) {
     return {
-      start: new Date(fest.startDate),
-      end: new Date(fest.endDate)
+      start: toDateSafe(fest.startDate),
+      end: toDateSafe(fest.endDate)
     }
   }
 
-  const baseDate = new Date(fest.date)
+  const base = toDateSafe(fest.date)
 
-  const start = new Date(baseDate)
+  const start = new Date(base)
   start.setHours(0, 0, 0, 0)
 
-  const end = new Date(baseDate)
+  const end = new Date(base)
   end.setHours(23, 59, 59, 999)
 
   return { start, end }
@@ -60,31 +71,32 @@ export default function NextFestHero({ feste }: any) {
 
   const now = new Date()
 
-  // 🔥 1. aktuelles Fest finden
-  const currentFest = feste.find((fest: any) => {
+  // 🔥 1. ALLES sauber sortieren
+  const festeSorted = [...feste].sort((a, b) => {
+    return (
+      getFestRange(a).start.getTime() -
+      getFestRange(b).start.getTime()
+    )
+  })
+
+  // 🔥 2. aktuelles Fest
+  const currentFest = festeSorted.find((fest: any) => {
     const { start, end } = getFestRange(fest)
     return now >= start && now <= end
   })
 
-  // 🔥 2. nächstes Fest finden
-  const upcomingFest = feste
-    .filter((fest: any) => {
-      const { start } = getFestRange(fest)
-      return start > now
-    })
-    .sort((a: any, b: any) => {
-      return (
-        getFestRange(a).start.getTime() -
-        getFestRange(b).start.getTime()
-      )
-    })[0]
+  // 🔥 3. nächstes Fest
+  const upcomingFest = festeSorted.find((fest: any) => {
+    const { start } = getFestRange(fest)
+    return start > now
+  })
 
   // 🔥 FINAL
   const nextFest = currentFest || upcomingFest
 
   if (!nextFest) return null
 
-  // 🔥 Countdown Ziel (Startzeit bevorzugen)
+  // 🔥 Countdown Ziel
   const targetDate =
     nextFest.startDate || nextFest.date
 
@@ -109,7 +121,7 @@ export default function NextFestHero({ feste }: any) {
       ? nextFest.images[0]
       : null
 
-  // Button aus Highlights
+  // 🔥 Button aus Highlights
   let button = null
   if (Array.isArray(nextFest.highlights)) {
     const firstLink = nextFest.highlights.find(
@@ -167,7 +179,7 @@ export default function NextFestHero({ feste }: any) {
 
             {nextFest.date && (
               <p className="text-white/80 mb-6 text-sm md:text-base">
-                {new Date(nextFest.date).toLocaleDateString('de-DE', {
+                {toDateSafe(nextFest.date).toLocaleDateString('de-DE', {
                   weekday: 'long',
                   day: 'numeric',
                   month: 'long'
