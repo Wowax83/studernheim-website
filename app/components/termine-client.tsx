@@ -15,7 +15,7 @@ import {
 import { useInView } from 'react-intersection-observer'
 import { useState } from 'react'
 
-/* 🔗 LINK META (aus Feste übernommen) */
+/* 🔗 LINK META */
 function getLinkMeta(url: string, text?: string) {
   const u = url.toLowerCase()
 
@@ -35,7 +35,14 @@ function getLinkMeta(url: string, text?: string) {
   return { label: text || 'Website', icon: Globe, className: 'bg-gray-800 text-white' }
 }
 
-function formatDate(date: string) {
+/* 🔥 DATE HELPERS */
+
+function getEventDate(event: any) {
+  return new Date(event.startDate || event.date)
+}
+
+function formatDate(date?: string) {
+  if (!date) return ''
   return new Date(date).toLocaleDateString('de-DE')
 }
 
@@ -47,18 +54,35 @@ function getMonthLabel(date: string) {
   })
 }
 
+/* ---------------- COMPONENT ---------------- */
+
 export default function TermineClient({ events }: { events: any[] }) {
   const { ref, inView } = useInView({ triggerOnce: true })
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
 
-  const sortedEvents = [...events]
-    .filter(e => e.date)
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  // 🔥 HEUTE MIT EINBEZIEHEN (00:00)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
 
+  // 🔥 FILTER + SORT
+  const sortedEvents = [...events]
+    .filter(e => {
+      if (!e.startDate && !e.date) return false
+      const date = getEventDate(e)
+      return date >= today
+    })
+    .sort((a, b) => {
+      return getEventDate(a).getTime() - getEventDate(b).getTime()
+    })
+
+  // 🔥 GRUPPIERUNG
   const grouped = sortedEvents.reduce((acc: any, event: any) => {
-    const key = getMonthLabel(event.date)
+    const date = event.startDate || event.date
+    const key = getMonthLabel(date)
+
     if (!acc[key]) acc[key] = []
     acc[key].push(event)
+
     return acc
   }, {})
 
@@ -95,7 +119,7 @@ export default function TermineClient({ events }: { events: any[] }) {
 
               <div className="space-y-4">
                 {monthEvents.map((event: any, index: number) => {
-                  const dateObj = new Date(event.date)
+                  const dateObj = getEventDate(event)
 
                   return (
                     <motion.div
@@ -138,12 +162,12 @@ export default function TermineClient({ events }: { events: any[] }) {
                             </p>
                           )}
 
-                          {/* Details + Links */}
+                          {/* Details */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm items-center">
 
                             <div className="flex items-center gap-2 text-gray-600">
                               <Calendar size={16} className="text-green-600" />
-                              <span>{formatDate(event.date)}</span>
+                              <span>{formatDate(event.startDate || event.date)}</span>
                             </div>
 
                             {event.time && (
@@ -167,7 +191,7 @@ export default function TermineClient({ events }: { events: any[] }) {
                               </div>
                             )}
 
-                            {/* 🔥 ALLE LINKS ALS BUTTONS */}
+                            {/* Links */}
                             {Array.isArray(event.highlights) && (
                               <div className="flex flex-wrap gap-2 col-span-full lg:col-span-1">
                                 {event.highlights.map((item: any, i: number) => {
