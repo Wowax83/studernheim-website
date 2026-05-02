@@ -149,7 +149,7 @@ export default function NextFestHero({ feste }: { feste: Fest[] }) {
   }
 
   return (
-    <section className="relative z-20 -mt-15 md:-mt-18 px-4">
+    <section className="relative z-20 -mt-16 md:-mt-24 px-4">
       <div className="max-w-3xl mx-auto">
 
         <motion.div
