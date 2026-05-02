@@ -149,8 +149,8 @@ export default function NextFestHero({ feste }: { feste: Fest[] }) {
   }
 
   return (
-    <section className="relative z-20 -mt-20 md:-mt-32 px-4">
-      <div className="max-w-5xl mx-auto">
+    <section className="relative z-20 -mt-15 md:-mt-18 px-4">
+      <div className="max-w-3xl mx-auto">
 
         <motion.div
           initial={{ opacity: 0, y: 60 }}
