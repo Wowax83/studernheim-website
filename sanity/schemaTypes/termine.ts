@@ -8,16 +8,31 @@ export default {
       title: 'Titel',
       type: 'string',
     },
+
+    // 🔥 NEU: echtes Datum + Uhrzeit
+    {
+      name: 'startDate',
+      title: 'Startdatum & Uhrzeit',
+      type: 'datetime',
+    },
+
+    {
+      name: 'endDate',
+      title: 'Enddatum & Uhrzeit',
+      type: 'datetime',
+    },
+
+    // 🔥 Fallback (für alte Daten)
     {
       name: 'date',
-      title: 'Datum',
-      type: 'date',
+      title: 'Datum (Fallback)',
+      type: 'datetime',
+      description: 'Nur verwenden, wenn kein Startdatum gesetzt ist',
     },
-    {
-      name: 'time',
-      title: 'Uhrzeit',
-      type: 'string',
-    },
+
+    // ❌ ALT (nicht mehr nötig)
+    // time wird nicht mehr gebraucht, weil datetime alles kann
+
     {
       name: 'description',
       title: 'Beschreibung',
@@ -29,7 +44,7 @@ export default {
       type: 'string',
     },
 
-    // ✅ Typ (Fest oder Termin)
+    // ✅ Typ (Termin oder Fest)
     {
       name: 'type',
       title: 'Typ',
@@ -44,7 +59,7 @@ export default {
       initialValue: 'termin',
     },
 
-    // 🔥 IDENTISCH wie bei Vereinen
+    // 🔥 Highlights (nur bei Fest sichtbar)
     {
       name: 'highlights',
       title: 'Highlights',
@@ -72,8 +87,6 @@ export default {
           ]
         }
       ],
-
-      // 👉 nur bei Fest anzeigen
       hidden: ({ document }: { document?: any }) => document?.type !== 'fest',
     },
   ],
