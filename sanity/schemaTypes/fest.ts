@@ -13,7 +13,25 @@ export default {
 
     { name: 'description', type: 'text', title: 'Beschreibung' },
 
-    { name: 'date', title: 'Datum', type: 'date' },
+    // 🔥 NEU: Start & Ende (statt nur date)
+    {
+      name: 'startDate',
+      title: 'Startdatum & Uhrzeit',
+      type: 'datetime'
+    },
+    {
+      name: 'endDate',
+      title: 'Enddatum & Uhrzeit',
+      type: 'datetime'
+    },
+
+    // 🔥 OPTIONAL: Fallback für alte Daten
+    {
+      name: 'date',
+      title: 'Datum (Fallback)',
+      type: 'datetime',
+      description: 'Nur verwenden, wenn kein Start/Ende gesetzt ist'
+    },
 
     { name: 'region', type: 'string', title: 'Ort' },
 
@@ -42,19 +60,15 @@ export default {
       hidden: true
     },
 
-    // 🔥 BADGES (kurze Infos)
+    // 🔥 BADGES
     {
       name: 'quickFacts',
       title: 'Kurzinfos (Badges)',
       type: 'array',
-      of: [
-        {
-          type: 'string'
-        }
-      ]
+      of: [{ type: 'string' }]
     },
 
-    // 🔥 NEU: LINKS (WICHTIG)
+    // 🔥 LINKS / HIGHLIGHTS
     {
       name: 'highlights',
       title: 'Links / Highlights',
