@@ -45,7 +45,6 @@ function getTimeLeft(targetDate?: string | null) {
   }
 }
 
-// 🔥 WICHTIG: echte Zeiten verwenden!
 function getFestRange(fest: Fest) {
   if (fest.startDate && fest.endDate) {
     return {
@@ -69,10 +68,20 @@ function getFestRange(fest: Fest) {
   return { start, end }
 }
 
-// 🔥 KEIN AFTERGLOW
+function isSameDay(a: Date, b: Date) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  )
+}
+
 function getFestStatus(fest: Fest) {
   const now = new Date()
   const { start, end } = getFestRange(fest)
+
+  // 👉 ganzer Tag zählt als "live"
+  if (isSameDay(now, start)) return 'live'
 
   if (now >= start && now <= end) return 'live'
   if (now < start) return 'upcoming'
@@ -90,16 +99,15 @@ export default function NextFestHero({ feste }: { feste: Fest[] }) {
     (a, b) => getFestRange(a).start.getTime() - getFestRange(b).start.getTime()
   )
 
-  // 🔥 aktuelles Fest
-  const currentFest = festeSorted.find((fest) => {
-    const { start, end } = getFestRange(fest)
-    return now >= start && now <= end
-  })
+  // 👉 aktuelles Fest (inkl. "heute")
+  const currentFest = festeSorted.find(
+    (fest) => getFestStatus(fest) === 'live'
+  )
 
-  // 🔥 nächstes Fest
-  const upcomingFest = festeSorted.find((fest) => {
-    return getFestRange(fest).start > now
-  })
+  // 👉 nächstes Fest
+  const upcomingFest = festeSorted.find(
+    (fest) => getFestRange(fest).start > now
+  )
 
   const nextFest = currentFest || upcomingFest
 
@@ -161,7 +169,8 @@ export default function NextFestHero({ feste }: { feste: Fest[] }) {
             />
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/20" />
+          {/* 🔥 HELLERES OVERLAY */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
 
           <div className="relative p-5 md:p-10 text-white max-w-xl">
 
@@ -169,14 +178,14 @@ export default function NextFestHero({ feste }: { feste: Fest[] }) {
               Nächstes Fest
             </p>
 
-            <h2 className="text-2xl md:text-4xl font-bold mb-3">
+            <h2 className="text-2xl md:text-4xl font-bold mb-3 drop-shadow-lg">
               {nextFest.name}
             </h2>
 
             {/* STATUS */}
             {festStatus === 'live' ? (
-              <div className="text-lg font-semibold text-green-400">
-                🎉 Läuft gerade!
+              <div className="text-lg font-semibold text-green-400 drop-shadow">
+                🎉 Heute ist das Fest!
               </div>
             ) : festStatus === 'upcoming' && time.total > 0 ? (
               <div className="grid grid-cols-4 gap-3 mt-4">
@@ -186,9 +195,16 @@ export default function NextFestHero({ feste }: { feste: Fest[] }) {
                   { label: 'Min', value: time.minutes },
                   { label: 'Sek', value: time.seconds }
                 ].map((item, i) => (
-                  <div key={i} className="bg-black/40 rounded-xl p-3 text-center">
-                    <div className="text-2xl font-bold">{item.value}</div>
-                    <div className="text-xs">{item.label}</div>
+                  <div
+                    key={i}
+                    className="bg-black/30 backdrop-blur-md rounded-xl p-3 text-center border border-white/10"
+                  >
+                    <div className="text-2xl font-bold drop-shadow">
+                      {item.value}
+                    </div>
+                    <div className="text-xs text-white/80">
+                      {item.label}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -203,7 +219,7 @@ export default function NextFestHero({ feste }: { feste: Fest[] }) {
                 href={button.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-6 inline-flex bg-green-600 px-4 py-2 rounded-xl"
+                className="mt-6 inline-flex bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl shadow-md transition"
               >
                 {button.text} →
               </a>
