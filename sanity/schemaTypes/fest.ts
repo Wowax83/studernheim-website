@@ -2,8 +2,13 @@ export default {
   name: 'fest',
   type: 'document',
   title: 'Fest',
+
   fields: [
-    { name: 'name', type: 'string', title: 'Name' },
+    {
+      name: 'name',
+      type: 'string',
+      title: 'Name'
+    },
 
     {
       name: 'slug',
@@ -11,34 +16,64 @@ export default {
       options: { source: 'name' }
     },
 
-    { name: 'description', type: 'text', title: 'Beschreibung' },
+    {
+      name: 'description',
+      type: 'text',
+      title: 'Beschreibung'
+    },
 
-    // 🔥 NEU: Start & Ende (statt nur date)
+    // 🔥 NEU: START
     {
       name: 'startDate',
-      title: 'Startdatum & Uhrzeit',
-      type: 'datetime'
+      title: 'Start (Datum & Uhrzeit)',
+      type: 'datetime',
+      description: 'Wann beginnt das Fest?',
+      validation: Rule => Rule.required()
     },
+
+    // 🔥 NEU: ENDE
     {
       name: 'endDate',
-      title: 'Enddatum & Uhrzeit',
-      type: 'datetime'
+      title: 'Ende (Datum & Uhrzeit)',
+      type: 'datetime',
+      description: 'Wann endet das Fest?',
+      validation: Rule =>
+        Rule.required().custom((end, context) => {
+          const start = context.document?.startDate
+          if (!start || !end) return true
+          return new Date(end) > new Date(start)
+            ? true
+            : 'Ende muss nach Start liegen'
+        })
     },
 
-    // 🔥 OPTIONAL: Fallback für alte Daten
+    // 🔥 OPTIONAL (für alte Daten)
     {
       name: 'date',
-      title: 'Datum (Fallback)',
+      title: 'Fallback Datum',
       type: 'datetime',
-      description: 'Nur verwenden, wenn kein Start/Ende gesetzt ist'
+      description: 'Nur verwenden wenn kein Start/Ende gesetzt ist'
     },
 
-    { name: 'region', type: 'string', title: 'Ort' },
+    {
+      name: 'region',
+      type: 'string',
+      title: 'Ort'
+    },
 
-    { name: 'vibe', type: 'string', title: 'Stimmung / Vibe' },
-    { name: 'organizer', type: 'string', title: 'Veranstalter' },
+    {
+      name: 'vibe',
+      type: 'string',
+      title: 'Stimmung / Vibe'
+    },
 
-    // 🔥 Bilder (Slider)
+    {
+      name: 'organizer',
+      type: 'string',
+      title: 'Veranstalter'
+    },
+
+    // 🔥 Bilder
     {
       name: 'images',
       title: 'Bilder',
@@ -48,27 +83,25 @@ export default {
           type: 'image',
           options: { hotspot: true }
         }
-      ],
-      description: 'Erstes Bild = Startbild im Slider'
+      ]
     },
 
-    // 🔥 Fallback (alt)
     {
       name: 'image',
       type: 'image',
-      title: 'Altes Einzelbild (Fallback)',
+      title: 'Fallback Bild',
       hidden: true
     },
 
-    // 🔥 BADGES
+    // 🔥 Badges
     {
       name: 'quickFacts',
-      title: 'Kurzinfos (Badges)',
+      title: 'Kurzinfos',
       type: 'array',
       of: [{ type: 'string' }]
     },
 
-    // 🔥 LINKS / HIGHLIGHTS
+    // 🔥 Links
     {
       name: 'highlights',
       title: 'Links / Highlights',
@@ -83,20 +116,11 @@ export default {
             }
           },
           fields: [
-            {
-              name: 'text',
-              title: 'Text',
-              type: 'string'
-            },
-            {
-              name: 'url',
-              title: 'Link',
-              type: 'url'
-            }
+            { name: 'text', type: 'string', title: 'Text' },
+            { name: 'url', type: 'url', title: 'Link' }
           ]
         }
-      ],
-      description: 'z.B. Homepage oder Helferliste'
+      ]
     }
   ]
 }
