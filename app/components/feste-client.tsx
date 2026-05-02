@@ -76,21 +76,48 @@ function getLinkMeta(url: string, text?: string) {
 
 /* ---------------- FEST CARD ---------------- */
 
-const FestCard = memo(function FestCard({
-  fest,
-  openLightbox
-}: any) {
+const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
   const images = fest?.images || []
   const [index, setIndex] = useState(0)
+
+  // 🔥 SWIPE STATE
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
 
   const status = getFestStatus(fest)
   const currentImage = images[index]
 
+  function handleSwipe() {
+    if (touchStart === null || touchEnd === null) return
+    if (images.length <= 1) return
+
+    const distance = touchStart - touchEnd
+
+    if (Math.abs(distance) < 60) return
+
+    if (distance > 0) {
+      setIndex((i) => (i + 1) % images.length)
+    } else {
+      setIndex((i) => (i - 1 + images.length) % images.length)
+    }
+  }
+
   return (
     <div className="group bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition">
 
-      {/* Bild */}
-      <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
+      {/* 🔥 IMAGE WRAPPER (FIXED) */}
+      <div
+        className="relative aspect-[4/3] bg-gray-100 overflow-hidden"
+        style={{ touchAction: 'pan-y' }} // 🔥 entscheidend!
+        onTouchStart={(e) => {
+          setTouchEnd(null)
+          setTouchStart(e.targetTouches[0].clientX)
+        }}
+        onTouchMove={(e) => {
+          setTouchEnd(e.targetTouches[0].clientX)
+        }}
+        onTouchEnd={handleSwipe}
+      >
 
         {/* BADGES */}
         {status === 'live' && (
@@ -125,6 +152,7 @@ const FestCard = memo(function FestCard({
           </div>
         )}
 
+        {/* Desktop Buttons */}
         {images.length > 1 && (
           <>
             <button
