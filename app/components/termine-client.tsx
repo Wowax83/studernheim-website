@@ -13,7 +13,6 @@ import {
   ClipboardList
 } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
-import { useState } from 'react'
 
 /* 🔗 LINK META */
 function getLinkMeta(url: string, text?: string) {
@@ -35,10 +34,21 @@ function getLinkMeta(url: string, text?: string) {
   return { label: text || 'Website', icon: Globe, className: 'bg-gray-800 text-white' }
 }
 
-/* 🔥 DATE HELPERS */
+/* 🔥 HELPERS */
 
-function getEventDate(event: any) {
-  return new Date(event.startDate || event.date)
+function getEventRange(event: any) {
+  const start = new Date(event.startDate || event.date)
+  const end = event.endDate ? new Date(event.endDate) : start
+  return { start, end }
+}
+
+function getEventStatus(event: any) {
+  const now = new Date()
+  const { start, end } = getEventRange(event)
+
+  if (now >= start && now <= end) return 'live'
+  if (now < start) return 'upcoming'
+  return 'past'
 }
 
 function formatDate(date?: string) {
@@ -46,185 +56,157 @@ function formatDate(date?: string) {
   return new Date(date).toLocaleDateString('de-DE')
 }
 
-function getMonthLabel(date: string) {
-  const d = new Date(date)
-  return d.toLocaleDateString('de-DE', {
-    month: 'long',
-    year: 'numeric',
-  })
-}
-
 /* ---------------- COMPONENT ---------------- */
 
 export default function TermineClient({ events }: { events: any[] }) {
   const { ref, inView } = useInView({ triggerOnce: true })
-  const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
 
-  // 🔥 HEUTE MIT EINBEZIEHEN (00:00)
+  const now = new Date()
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  // 🔥 FILTER + SORT
-  const sortedEvents = [...events]
+  // 🔥 FILTER + SORT + LIMIT
+  const filteredEvents = [...events]
     .filter(e => {
-      if (!e.startDate && !e.date) return false
-      const date = getEventDate(e)
-      return date >= today
+      const { start, end } = getEventRange(e)
+
+      // anzeigen wenn:
+      // - läuft gerade
+      // - oder heute / zukünftig
+      return end >= now || start >= today
     })
     .sort((a, b) => {
-      return getEventDate(a).getTime() - getEventDate(b).getTime()
+      const aStatus = getEventStatus(a)
+      const bStatus = getEventStatus(b)
+
+      const order = {
+        live: 0,
+        upcoming: 1,
+        past: 2
+      }
+
+      if (order[aStatus] !== order[bStatus]) {
+        return order[aStatus] - order[bStatus]
+      }
+
+      return new Date(a.startDate || a.date).getTime() -
+             new Date(b.startDate || b.date).getTime()
     })
-
-  // 🔥 GRUPPIERUNG
-  const grouped = sortedEvents.reduce((acc: any, event: any) => {
-    const date = event.startDate || event.date
-    const key = getMonthLabel(date)
-
-    if (!acc[key]) acc[key] = []
-    acc[key].push(event)
-
-    return acc
-  }, {})
+    .slice(0, 4) // 🔥 nur 4 anzeigen
 
   return (
-    <section id="termine" className="py-20 sm:py-28 bg-gradient-to-b from-emerald-50/30 to-white">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="termine" className="py-20 bg-white">
+      <div className="max-w-4xl mx-auto px-4">
 
-        {/* Header */}
         <motion.div
           ref={ref}
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            Aktuelle <span className="gradient-text">Termine</span>
+          <h2 className="text-4xl font-bold">
+            Aktuelle <span className="text-green-600">Termine</span>
           </h2>
         </motion.div>
 
-        <div className="space-y-12">
-          {Object.entries(grouped).map(([month, monthEvents]: any, groupIndex) => (
-            <div key={month}>
+        <div className="space-y-4">
+          {filteredEvents.map((event: any) => {
+            const { start } = getEventRange(event)
+            const status = getEventStatus(event)
 
-              {/* Monatsüberschrift */}
-              <motion.h3
-                initial={{ opacity: 0, y: 20 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: groupIndex * 0.1 }}
-                className="text-2xl font-bold text-gray-800 mb-6 border-l-4 border-green-600 pl-4"
+            return (
+              <div
+                key={event._id}
+                className="bg-white rounded-xl p-5 shadow hover:shadow-lg transition"
               >
-                {month}
-              </motion.h3>
+                <div className="flex flex-col md:flex-row gap-4">
 
-              <div className="space-y-4">
-                {monthEvents.map((event: any, index: number) => {
-                  const dateObj = getEventDate(event)
+                  {/* Datum */}
+                  <div className="w-20 h-20 bg-green-600 text-white rounded-lg flex flex-col items-center justify-center">
+                    <div className="text-xl font-bold">{start.getDate()}</div>
+                    <div className="text-xs">
+                      {start.toLocaleDateString('de-DE', { month: 'short' })}
+                    </div>
+                  </div>
 
-                  return (
-                    <motion.div
-                      key={event._id}
-                      initial={{ opacity: 0, x: -30 }}
-                      animate={inView ? { opacity: 1, x: 0 } : {}}
-                      transition={{ delay: index * 0.05 }}
-                      onMouseEnter={() => setHoveredEvent(event._id)}
-                      onMouseLeave={() => setHoveredEvent(null)}
-                      className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
-                    >
-                      <div className="flex flex-col md:flex-row gap-6">
+                  {/* Content */}
+                  <div className="flex-1">
 
-                        {/* Datum */}
-                        <div className="flex-shrink-0 w-24 h-24 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex flex-col items-center justify-center text-white shadow-lg">
-                          <div className="text-3xl font-bold">
-                            {dateObj.getDate()}
-                          </div>
-                          <div className="text-xs uppercase">
-                            {dateObj.toLocaleDateString('de-DE', { month: 'short' })}
-                          </div>
-                        </div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-xl font-bold">{event.title}</h3>
 
-                        {/* Content */}
-                        <div className="flex-1">
+                      {status === 'live' && (
+                        <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">
+                          🔥 Heute
+                        </span>
+                      )}
+                    </div>
 
-                          <div className="flex items-center gap-3 mb-3">
-                            <h3 className="text-2xl font-bold text-gray-900">
-                              {event.title}
-                            </h3>
+                    {event.description && (
+                      <p className="text-gray-600 mb-3">
+                        {event.description}
+                      </p>
+                    )}
 
-                            <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
-                              {event.type === 'fest' ? '🎉 Fest' : '📅 Termin'}
-                            </span>
-                          </div>
+                    <div className="flex flex-wrap gap-3 text-sm text-gray-600">
 
-                          {event.description && (
-                            <p className="text-gray-600 mb-4">
-                              {event.description}
-                            </p>
-                          )}
-
-                          {/* Details */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm items-center">
-
-                            <div className="flex items-center gap-2 text-gray-600">
-                              <Calendar size={16} className="text-green-600" />
-                              <span>{formatDate(event.startDate || event.date)}</span>
-                            </div>
-
-                            {event.time && (
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <Clock size={16} className="text-green-600" />
-                                <span>{event.time}</span>
-                              </div>
-                            )}
-
-                            {event.location && (
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <MapPin size={16} className="text-green-600" />
-                                <span>{event.location}</span>
-                              </div>
-                            )}
-
-                            {event.organizer && (
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <User size={16} className="text-green-600" />
-                                <span>{event.organizer}</span>
-                              </div>
-                            )}
-
-                            {/* Links */}
-                            {Array.isArray(event.highlights) && (
-                              <div className="flex flex-wrap gap-2 col-span-full lg:col-span-1">
-                                {event.highlights.map((item: any, i: number) => {
-                                  if (!item?.url) return null
-
-                                  const meta = getLinkMeta(item.url, item.text)
-                                  const Icon = meta.icon
-
-                                  return (
-                                    <a
-                                      key={i}
-                                      href={item.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold hover:scale-105 transition shadow-md ${meta.className}`}
-                                    >
-                                      <Icon size={16} />
-                                      {meta.label}
-                                    </a>
-                                  )
-                                })}
-                              </div>
-                            )}
-
-                          </div>
-                        </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar size={14} />
+                        {formatDate(event.startDate || event.date)}
                       </div>
-                    </motion.div>
-                  )
-                })}
+
+                      {event.time && (
+                        <div className="flex items-center gap-1">
+                          <Clock size={14} />
+                          {event.time}
+                        </div>
+                      )}
+
+                      {event.location && (
+                        <div className="flex items-center gap-1">
+                          <MapPin size={14} />
+                          {event.location}
+                        </div>
+                      )}
+
+                      {event.organizer && (
+                        <div className="flex items-center gap-1">
+                          <User size={14} />
+                          {event.organizer}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Links */}
+                    {Array.isArray(event.highlights) && (
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {event.highlights.map((item: any, i: number) => {
+                          if (!item?.url) return null
+
+                          const meta = getLinkMeta(item.url, item.text)
+                          const Icon = meta.icon
+
+                          return (
+                            <a
+                              key={i}
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${meta.className}`}
+                            >
+                              <Icon size={14} />
+                              {meta.label}
+                            </a>
+                          )
+                        })}
+                      </div>
+                    )}
+
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
       </div>
