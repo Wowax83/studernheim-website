@@ -2,30 +2,31 @@ import { client } from './sanity'
 
 /**
  * 🔥 FESTE (alle)
- * 👉 Zukünftige zuerst, dann vergangene
+ * 👉 Chronologisch sortiert (startDate bevorzugt)
  */
 export async function getFeste() {
   return await client.fetch(
-    `*[_type == "fest"]{
+    `*[_type == "fest"] 
+    | order(coalesce(startDate, date) asc){
       _id,
       name,
       description,
+
+      // 🔥 Zeitfelder
       date,
+      startDate,
+      endDate,
+
       region,
       vibe,
       organizer,
 
-      // 🔥 Bilder (mit Fallback)
+      // 🔥 Bilder (Fallback sicher)
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
-      // 🔥 gemeinsame Struktur
       quickFacts,
-      highlights,
-
-      // 🔥 für Sortierung
-      "isUpcoming": date >= now()
-    }
-    | order(isUpcoming desc, date asc)`,
+      highlights
+    }`,
     {},
     { cache: "no-store" }
   )
@@ -36,12 +37,16 @@ export async function getFeste() {
  */
 export async function getUpcomingFeste(limit = 4) {
   return await client.fetch(
-    `*[_type == "fest" && date >= now()]
-      | order(date asc)[0...${limit}]{
+    `*[_type == "fest" && coalesce(startDate, date) >= now()]
+      | order(coalesce(startDate, date) asc)[0...${limit}]{
       _id,
       name,
       description,
+
       date,
+      startDate,
+      endDate,
+
       region,
       vibe,
       organizer,
@@ -61,13 +66,13 @@ export async function getUpcomingFeste(limit = 4) {
  */
 export async function getVereine() {
   return await client.fetch(
-    `*[_type == "verein"] | order(name asc){
+    `*[_type == "verein"] 
+    | order(name asc){
       _id,
       name,
       description,
       region,
 
-      // 🔥 gleiche Bildlogik wie Feste
       "images": coalesce(images[].asset->url, [image.asset->url], []),
 
       quickFacts,
@@ -80,19 +85,22 @@ export async function getVereine() {
 
 /**
  * 🔥 ALLE EVENTS (Feste + Termine kombiniert)
- * 👉 Für Startseite / Übersicht
  */
 export async function getAllEvents(limit = 4) {
   return await client.fetch(
     `{
       "events": [
 
-        // 🔥 FESTE (nur kommende)
-        ...*[_type == "fest" && date >= now()]{
+        // 🔥 FESTE
+        ...*[_type == "fest"]{
           _id,
           "title": name,
           description,
+
           date,
+          startDate,
+          endDate,
+
           "location": region,
           organizer,
           "type": "fest",
@@ -104,20 +112,21 @@ export async function getAllEvents(limit = 4) {
         },
 
         // 🔥 TERMINE
-        ...*[_type == "termine" && date >= now()]{
+        ...*[_type == "termine"]{
           _id,
           title,
           description,
           date,
+          time,
           location,
           organizer,
-          time,
           "type": coalesce(type, "termin"),
 
           highlights
         }
       ]
-    }.events | order(date asc)[0...${limit}]`,
+    }.events 
+    | order(coalesce(startDate, date) asc)[0...${limit}]`,
     {},
     { cache: "no-store" }
   )
