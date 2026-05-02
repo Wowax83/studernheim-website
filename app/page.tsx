@@ -4,9 +4,9 @@ import NextFestHero from './components/NextFestHero'
 import SAG from './components/sag'
 import Footer from './components/footer'
 
-import { getFeste, getUpcomingFeste } from '@/lib/queries'
+import { getFeste } from '@/lib/queries'
 
-// 🔥 Lazy Loaded Sections (großer Performance Boost)
+// 🔥 Lazy Loaded Sections
 const FesteClient = dynamic(() => import('./components/feste-client'), {
   ssr: false,
   loading: () => <div className="py-20 text-center text-gray-500">Lade Feste...</div>
@@ -33,23 +33,22 @@ const ContactForm = dynamic(() => import('./components/contact-form'), {
 })
 
 export default async function Home() {
-  // 🔥 optional: limit später möglich → getFeste(6)
   const feste = await getFeste()
-  const upcoming = await getUpcomingFeste(1)
 
   return (
     <main className="relative">
 
-      {/* 🔥 ABOVE THE FOLD (immer direkt laden) */}
+      {/* HERO */}
       <Hero />
 
-      {Array.isArray(upcoming) && upcoming.length > 0 && (
-        <NextFestHero feste={upcoming} />
+      {/* 🔥 WICHTIG: direkt ALLE Feste übergeben */}
+      {Array.isArray(feste) && feste.length > 0 && (
+        <NextFestHero feste={feste} />
       )}
 
       <SAG />
 
-      {/* 🔥 SEO STRUKTUR (sehr wichtig für Google) */}
+      {/* FESTE */}
       <section id="feste">
         <h2 className="sr-only">Feste in Studernheim</h2>
 
@@ -62,29 +61,31 @@ export default async function Home() {
         )}
       </section>
 
+      {/* VEREINE */}
       <section id="vereine">
         <h2 className="sr-only">Vereine in Studernheim</h2>
         <Vereine />
       </section>
 
+      {/* TERMINE */}
       <section id="termine">
         <h2 className="sr-only">Termine in Studernheim</h2>
         <Termine />
       </section>
 
+      {/* ORTSVERWALTUNG */}
       <section id="ortsverwaltung">
         <h2 className="sr-only">Ortsverwaltung Studernheim</h2>
         <Ortsverwaltung />
       </section>
 
+      {/* KONTAKT */}
       <section id="kontakt">
         <h2 className="sr-only">Kontakt Studernheim</h2>
         <ContactForm />
       </section>
 
-      {/* 🔥 Footer bleibt leicht */}
       <Footer />
-
     </main>
   )
 }
