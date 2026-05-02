@@ -21,7 +21,15 @@ function getEventDate(fest: any) {
   return new Date(fest.startDate || fest.date)
 }
 
+// 🔥 jetzt echte Zeiten!
 function getFestRange(fest: any) {
+  if (fest.startDate && fest.endDate) {
+    return {
+      start: new Date(fest.startDate),
+      end: new Date(fest.endDate)
+    }
+  }
+
   const base = getEventDate(fest)
 
   const start = new Date(base)
@@ -33,15 +41,12 @@ function getFestRange(fest: any) {
   return { start, end }
 }
 
+// 🔥 KEIN AFTERGLOW MEHR
 function getFestStatus(fest: any) {
   const now = new Date()
   const { start, end } = getFestRange(fest)
 
-  const afterglowEnd = new Date(end)
-  afterglowEnd.setDate(afterglowEnd.getDate() + 2)
-
   if (now >= start && now <= end) return 'live'
-  if (now > end && now <= afterglowEnd) return 'afterglow'
   if (now < start) return 'upcoming'
   return 'past'
 }
@@ -73,7 +78,6 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
   const [index, setIndex] = useState(0)
 
   const status = getFestStatus(fest)
-
   const currentImage = images[index]
 
   return (
@@ -85,13 +89,7 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
         {/* 🔥 STATUS BADGE */}
         {status === 'live' && (
           <div className="absolute top-3 left-3 z-10 bg-green-600 text-white text-xs px-3 py-1 rounded-full shadow">
-            🎉 Heute
-          </div>
-        )}
-
-        {status === 'afterglow' && (
-          <div className="absolute top-3 left-3 z-10 bg-green-400 text-white text-xs px-3 py-1 rounded-full shadow">
-            🥳 Läuft noch
+            🎉 Läuft gerade
           </div>
         )}
 
@@ -192,23 +190,21 @@ export default function FesteClient({ feste }: any) {
   const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  const now = new Date()
-
   const sortedFeste = [...(feste || [])].sort((a, b) => {
-    const aDate = getEventDate(a).getTime()
-    const bDate = getEventDate(b).getTime()
-
     const aStatus = getFestStatus(a)
     const bStatus = getFestStatus(b)
 
-    // 🔥 Reihenfolge: live → upcoming → afterglow → past
-    const order = { live: 0, upcoming: 1, afterglow: 2, past: 3 }
+    const order = {
+      live: 0,
+      upcoming: 1,
+      past: 2
+    }
 
     if (order[aStatus] !== order[bStatus]) {
       return order[aStatus] - order[bStatus]
     }
 
-    return aDate - bDate
+    return getEventDate(a).getTime() - getEventDate(b).getTime()
   })
 
   return (
