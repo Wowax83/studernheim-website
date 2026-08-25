@@ -211,18 +211,25 @@ export default function NextFestHero({ feste }: { feste: Fest[] }) {
             )}
 
             {buttons.length > 0 && (
-              <div className="mt-6 flex flex-wrap gap-3">
-                {buttons.map((btn, i) => (
-                  <a
-                    key={i}
-                    href={btn.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl shadow-md transition"
-                  >
-                    {btn.text} →
-                  </a>
-                ))}
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                {buttons.map((btn, i) => {
+                  const isPrimary = i === 0
+                  return (
+                    <a
+                      key={i}
+                      href={btn.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={
+                        isPrimary
+                          ? "inline-flex bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl shadow-md transition text-sm md:text-base"
+                          : "inline-flex bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 px-3 py-1.5 rounded-lg transition text-xs md:text-sm text-white/90"
+                      }
+                    >
+                      {btn.text} →
+                    </a>
+                  )
+                })}
               </div>
             )}
 
