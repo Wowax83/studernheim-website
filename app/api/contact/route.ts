@@ -1,6 +1,12 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  const key = process.env.RESEND_API_KEY
+  if (!key) {
+    throw new Error('RESEND_API_KEY ist nicht gesetzt')
+  }
+  return new Resend(key)
+}
 
 /* ---------------- HELPERS ---------------- */
 
@@ -61,7 +67,7 @@ export async function POST(req: Request) {
 
     /* ---------------- ADMIN MAIL ---------------- */
 
-    const adminResult = await resend.emails.send({
+    const adminResult = await getResend().emails.send({
       from: 'Studernheim <noreply@studrum.de>',
       to: 'studernheim.ag@gmail.com',
 
@@ -110,7 +116,7 @@ export async function POST(req: Request) {
 
     /* ---------------- USER MAIL ---------------- */
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'Studernheim <noreply@studrum.de>',
       to: email,
       subject: '✅ Ihre Anfrage wurde empfangen',
