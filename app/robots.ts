@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
       },
     ],
-    sitemap: 'https://studernheim.com/sitemap.xml',
+    sitemap: 'https://studernheim.net/sitemap.xml',
   }
 }

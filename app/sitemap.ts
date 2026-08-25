@@ -4,7 +4,7 @@ import { MetadataRoute } from 'next'
 // import { client } from '@/sanity/lib/client'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://studernheim.com'
+  const baseUrl = 'https://studernheim.net'
 
   // 🔹 Statische Seiten
   const staticRoutes = [

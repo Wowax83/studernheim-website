@@ -6,7 +6,7 @@ import ConditionalWhatsApp from '@/app/components/ConditionalWhatsApp'
 
 export const dynamic = 'force-dynamic'
 
-const baseUrl = 'https://studernheim.com'
+const baseUrl = 'https://studernheim.net'
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
