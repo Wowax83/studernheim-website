@@ -133,19 +133,15 @@ export default function NextFestHero({ feste }: { feste: Fest[] }) {
       ? nextFest.images[0]
       : null
 
-  let button: { text: string; url: string } | null = null
+  let buttons: { text: string; url: string }[] = []
 
   if (Array.isArray(nextFest.highlights)) {
-    const firstLink = nextFest.highlights.find(
-      (item: any) => typeof item === 'object' && item?.url
-    )
-
-    if (firstLink) {
-      button = {
-        text: firstLink.text || 'Mehr erfahren',
-        url: firstLink.url
-      }
-    }
+    buttons = nextFest.highlights
+      .filter((item: any) => item && typeof item === 'object' && item.url)
+      .map((item: any) => ({
+        text: item.text || 'Mehr erfahren',
+        url: item.url
+      }))
   }
 
   return (
@@ -214,15 +210,20 @@ export default function NextFestHero({ feste }: { feste: Fest[] }) {
               </div>
             )}
 
-            {button && (
-              <a
-                href={button.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 inline-flex bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl shadow-md transition"
-              >
-                {button.text} →
-              </a>
+            {buttons.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                {buttons.map((btn, i) => (
+                  <a
+                    key={i}
+                    href={btn.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl shadow-md transition"
+                  >
+                    {btn.text} →
+                  </a>
+                ))}
+              </div>
             )}
 
           </div>
