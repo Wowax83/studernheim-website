@@ -96,6 +96,17 @@ export default {
       hidden: true
     },
 
+    // 🎬 Video-Clip (MP4)
+    {
+      name: 'clip',
+      type: 'file',
+      title: 'Video-Clip (MP4)',
+      description: 'Kurzer MP4-Clip, der unter den Bildern angezeigt wird',
+      options: {
+        accept: 'video/mp4'
+      }
+    },
+
     // 🔥 Badges
     {
       name: 'quickFacts',

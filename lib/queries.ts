@@ -14,6 +14,7 @@ export async function getFeste() {
       vibe,
       organizer,
       "images": coalesce(images[].asset->url, [image.asset->url], []),
+      "videoUrl": clip.asset->url,
       quickFacts,
       highlights
     }`,
@@ -38,6 +39,7 @@ export async function getAllEvents(limit = 10) {
           organizer,
           "type": "fest",
           "images": coalesce(images[].asset->url, [image.asset->url], []),
+          "videoUrl": clip.asset->url,
           highlights
         },
 

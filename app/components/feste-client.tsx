@@ -78,6 +78,7 @@ function getLinkMeta(url: string, text?: string) {
 
 const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
   const images = fest?.images || []
+  const videoUrl = fest?.videoUrl
   const [index, setIndex] = useState(0)
 
   // 🔥 SWIPE STATE
@@ -220,6 +221,22 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
                 </a>
               )
             })}
+          </div>
+        )}
+
+        {/* 🎬 Video-Clip (MP4) — unter den Bildern */}
+        {videoUrl && (
+          <div className="mt-3 rounded-lg overflow-hidden bg-black">
+            <video
+              src={videoUrl}
+              controls
+              preload="metadata"
+              playsInline
+              poster={images[0] || undefined}
+              className="w-full h-auto block"
+            >
+              Dein Browser unterstützt das Video-Tag nicht.
+            </video>
           </div>
         )}
 
