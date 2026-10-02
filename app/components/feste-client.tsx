@@ -259,6 +259,71 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
   )
 })
 
+/* ---------------- LIGHTBOX VIDEO SLIDE ---------------- */
+
+function LightboxVideoSlide({
+  src,
+  poster,
+  videoRef,
+}: {
+  src: string
+  poster?: string
+  videoRef: React.RefObject<HTMLVideoElement>
+}) {
+  const [playing, setPlaying] = useState(false)
+  const [ended, setEnded] = useState(false)
+
+  function handlePlayClick() {
+    const v = videoRef.current
+    if (!v) return
+    v.play().then(() => {
+      setPlaying(true)
+      setEnded(false)
+    }).catch(() => {
+      // Autoplay blockiert -> Button bleibt sichtbar
+    })
+  }
+
+  return (
+    <div className="relative max-h-[90vh] max-w-[90vw]">
+      <video
+        ref={videoRef}
+        src={src}
+        controls
+        preload="metadata"
+        playsInline
+        poster={poster}
+        onPlay={() => {
+          setPlaying(true)
+          setEnded(false)
+        }}
+        onPause={() => setPlaying(false)}
+        onEnded={() => {
+          setPlaying(false)
+          setEnded(true)
+        }}
+        className="max-h-[90vh] max-w-[90vw] object-contain"
+      />
+
+      {!playing && (
+        <button
+          onClick={handlePlayClick}
+          className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/30 transition z-10"
+          aria-label="Video abspielen"
+        >
+          <span className="flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/95 text-black shadow-2xl ring-4 ring-white/30">
+            <Play size={48} strokeWidth={2.5} className="ml-1" />
+          </span>
+        </button>
+      )}
+
+      <div className="absolute top-3 left-3 z-20 bg-black/70 text-white text-xs px-2 py-1 rounded shadow flex items-center gap-1">
+        <Play size={12} /> Video{ended ? ' (zu Ende)' : ''}
+      </div>
+    </div>
+  )
+}
+
 /* ---------------- MAIN ---------------- */
 
 export default function FesteClient({ feste }: any) {
@@ -359,7 +424,7 @@ export default function FesteClient({ feste }: any) {
               </>
             )}
 
-            {slide?.kind === 'image' ? (
+            {slide?.kind === 'image' && (
               <Image
                 src={slide.url}
                 alt="Fest Bild"
@@ -367,23 +432,15 @@ export default function FesteClient({ feste }: any) {
                 height={1200}
                 className="max-h-[90vh] max-w-[90vw] object-contain"
               />
-            ) : slide?.kind === 'video' ? (
-              <video
-                ref={lightboxVideoRef}
-                src={slide.url}
-                controls
-                preload="metadata"
-                playsInline
-                poster={slide.poster}
-                className="max-h-[90vh] max-w-[90vw] object-contain"
-              />
-            ) : null}
+            )}
 
-            {/* 🎬 Video-Indikator + Play-Hinweis im Video-Slide */}
             {slide?.kind === 'video' && (
-              <div className="absolute top-5 left-5 z-20 bg-black/70 text-white text-xs px-2 py-1 rounded shadow flex items-center gap-1">
-                <Play size={12} /> Video
-              </div>
+              <LightboxVideoSlide
+                key={slide.url}
+                src={slide.url}
+                poster={slide.poster}
+                videoRef={lightboxVideoRef}
+              />
             )}
           </div>
         )
