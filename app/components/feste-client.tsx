@@ -79,6 +79,14 @@ function getLinkMeta(url: string, text?: string) {
 const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
   const images = fest?.images || []
   const videoUrl = fest?.videoUrl
+
+  // 🎬 Swiper-Medien = Bilder gefolgt von (optional) Video als synthetischer Slide
+  type Slide = { kind: 'image'; url: string } | { kind: 'video'; url: string; poster?: string }
+  const slides: Slide[] = [
+    ...images.map((url: string): Slide => ({ kind: 'image', url })),
+    ...(videoUrl ? [{ kind: 'video' as const, url: videoUrl, poster: images[0] }] : []),
+  ]
+  const slideCount = slides.length
   const [index, setIndex] = useState(0)
 
   // 🔥 SWIPE STATE
@@ -86,20 +94,20 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
 
   const status = getFestStatus(fest)
-  const currentImage = images[index]
+  const currentSlide = slides[index] || null
 
   function handleSwipe() {
     if (touchStart === null || touchEnd === null) return
-    if (images.length <= 1) return
+    if (slideCount <= 1) return
 
     const distance = touchStart - touchEnd
 
     if (Math.abs(distance) < 60) return
 
     if (distance > 0) {
-      setIndex((i) => (i + 1) % images.length)
+      setIndex((i) => (i + 1) % slideCount)
     } else {
-      setIndex((i) => (i - 1 + images.length) % images.length)
+      setIndex((i) => (i - 1 + slideCount) % slideCount)
     }
   }
 
@@ -139,33 +147,54 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
           </div>
         )}
 
-        {currentImage ? (
+        {currentSlide?.kind === 'image' ? (
           <Image
-            src={currentImage}
+            src={currentSlide.url}
             alt={fest?.name || 'Fest'}
             fill
             className="object-cover cursor-zoom-in"
             onClick={() => openLightbox(images, index)}
           />
+        ) : currentSlide?.kind === 'video' ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-black">
+            <video
+              key={currentSlide.url}
+              src={currentSlide.url}
+              controls
+              preload="metadata"
+              playsInline
+              poster={currentSlide.poster}
+              className="w-full h-full object-contain"
+            >
+              Dein Browser unterstützt das Video-Tag nicht.
+            </video>
+          </div>
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400 text-sm">
             Kein Bild vorhanden
           </div>
         )}
 
+        {/* 🎬 Video-Indikator im letzten Slide */}
+        {currentSlide?.kind === 'video' && (
+          <div className="absolute top-3 right-3 z-10 bg-black/70 text-white text-xs px-2 py-1 rounded shadow flex items-center gap-1">
+            ▶ Video
+          </div>
+        )}
+
         {/* Desktop Buttons */}
-        {images.length > 1 && (
+        {slideCount > 1 && (
           <>
             <button
-              onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1 rounded"
+              onClick={() => setIndex((i) => (i - 1 + slideCount) % slideCount)}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1 rounded z-20"
             >
               <ChevronLeft size={18} />
             </button>
 
             <button
-              onClick={() => setIndex((i) => (i + 1) % images.length)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1 rounded"
+              onClick={() => setIndex((i) => (i + 1) % slideCount)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1 rounded z-20"
             >
               <ChevronRight size={18} />
             </button>
@@ -221,22 +250,6 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
                 </a>
               )
             })}
-          </div>
-        )}
-
-        {/* 🎬 Video-Clip (MP4) — unter den Bildern */}
-        {videoUrl && (
-          <div className="mt-3 rounded-lg overflow-hidden bg-black">
-            <video
-              src={videoUrl}
-              controls
-              preload="metadata"
-              playsInline
-              poster={images[0] || undefined}
-              className="w-full h-auto block"
-            >
-              Dein Browser unterstützt das Video-Tag nicht.
-            </video>
           </div>
         )}
 
