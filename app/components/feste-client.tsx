@@ -393,14 +393,14 @@ export default function FesteClient({ feste }: any) {
         const prev = () =>
           setLightboxIndex((i) => (i - 1 + slideCount) % slideCount)
         const next = () => setLightboxIndex((i) => (i + 1) % slideCount)
-        // 🔥 SWIPE STATE (Lightbox)
-        const [lbTouchStart, setLbTouchStart] = useState<number | null>(null)
-        const [lbTouchEnd, setLbTouchEnd] = useState<number | null>(null)
+        // 🔥 SWIPE (Lightbox): plain object statt useState, weil wir in
+        // einer IIFE sind (Rules of Hooks wuerden 'Application Error' werfen).
+        const lbSwipe: { start: number | null; end: number | null } = { start: null, end: null }
 
         function lbHandleSwipe() {
-          if (lbTouchStart === null || lbTouchEnd === null) return
+          if (lbSwipe.start === null || lbSwipe.end === null) return
           if (slideCount <= 1) return
-          const distance = lbTouchStart - lbTouchEnd
+          const distance = lbSwipe.start - lbSwipe.end
           if (Math.abs(distance) < 40) return
           if (distance > 0) next()
           else prev()
@@ -411,11 +411,11 @@ export default function FesteClient({ feste }: any) {
             className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
             style={{ touchAction: 'manipulation' }}
             onTouchStart={(e) => {
-              setLbTouchEnd(null)
-              setLbTouchStart(e.touches[0].clientX)
+              lbSwipe.end = null
+              lbSwipe.start = e.touches[0].clientX
             }}
             onTouchMove={(e) => {
-              setLbTouchEnd(e.touches[0].clientX)
+              lbSwipe.end = e.touches[0].clientX
             }}
             onTouchEnd={lbHandleSwipe}
           >
