@@ -103,7 +103,7 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
 
     const distance = touchStart - touchEnd
 
-    if (Math.abs(distance) < 60) return
+    if (Math.abs(distance) < 40) return
 
     if (distance > 0) {
       setIndex((i) => (i + 1) % slideCount)
@@ -118,7 +118,7 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
       {/* 🔥 IMAGE WRAPPER (FIXED) */}
       <div
         className="relative aspect-[4/3] bg-gray-100 overflow-hidden"
-        style={{ touchAction: 'pan-y' }} // 🔥 entscheidend!
+        style={{ touchAction: 'manipulation' }} // 🔥 horizontales Swipe durchlassen
         onTouchStart={(e) => {
           setTouchEnd(null)
           setTouchStart(e.targetTouches[0].clientX)
