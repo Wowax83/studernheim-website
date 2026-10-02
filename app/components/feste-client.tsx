@@ -393,8 +393,32 @@ export default function FesteClient({ feste }: any) {
         const prev = () =>
           setLightboxIndex((i) => (i - 1 + slideCount) % slideCount)
         const next = () => setLightboxIndex((i) => (i + 1) % slideCount)
+        // 🔥 SWIPE STATE (Lightbox)
+        const [lbTouchStart, setLbTouchStart] = useState<number | null>(null)
+        const [lbTouchEnd, setLbTouchEnd] = useState<number | null>(null)
+
+        function lbHandleSwipe() {
+          if (lbTouchStart === null || lbTouchEnd === null) return
+          if (slideCount <= 1) return
+          const distance = lbTouchStart - lbTouchEnd
+          if (Math.abs(distance) < 40) return
+          if (distance > 0) next()
+          else prev()
+        }
+
         return (
-          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+          <div
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
+            style={{ touchAction: 'manipulation' }}
+            onTouchStart={(e) => {
+              setLbTouchEnd(null)
+              setLbTouchStart(e.touches[0].clientX)
+            }}
+            onTouchMove={(e) => {
+              setLbTouchEnd(e.touches[0].clientX)
+            }}
+            onTouchEnd={lbHandleSwipe}
+          >
 
             <button
               onClick={close}
