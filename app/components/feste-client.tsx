@@ -10,10 +10,11 @@ import {
   MessageCircle,
   Instagram,
   Facebook,
-  ClipboardList
+  ClipboardList,
+  Play
 } from 'lucide-react'
 import Image from 'next/image'
-import { useState, memo } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 
 /* ---------------- HELPERS ---------------- */
 
@@ -153,7 +154,7 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
             alt={fest?.name || 'Fest'}
             fill
             className="object-cover cursor-zoom-in"
-            onClick={() => openLightbox(images, index)}
+            onClick={() => openLightbox(slides, index)}
           />
         ) : currentSlide?.kind === 'video' ? (
           <div className="absolute inset-0 flex items-center justify-center bg-black">
@@ -263,8 +264,18 @@ const FestCard = memo(function FestCard({ fest, openLightbox }: any) {
 export default function FesteClient({ feste }: any) {
   const [ref, inView] = useInView({ triggerOnce: true })
 
-  const [lightboxImages, setLightboxImages] = useState<string[] | null>(null)
+  const [lightboxSlides, setLightboxSlides] = useState<any[] | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState(0)
+  const lightboxVideoRef = useRef<HTMLVideoElement | null>(null)
+
+  // ⏸ Pause video when slide changes or lightbox closes
+  useEffect(() => {
+    const v = lightboxVideoRef.current
+    if (v) {
+      v.pause()
+      v.currentTime = 0
+    }
+  }, [lightboxIndex, lightboxSlides])
 
   const sortedFeste = [...(feste || [])].sort((a, b) => {
     const aStatus = getFestStatus(a)
@@ -299,8 +310,8 @@ export default function FesteClient({ feste }: any) {
             <FestCard
               key={fest._id}
               fest={fest}
-              openLightbox={(images: string[], index: number) => {
-                setLightboxImages(images)
+              openLightbox={(slides: any[], index: number) => {
+                setLightboxSlides(slides)
                 setLightboxIndex(index)
               }}
             />
@@ -310,47 +321,73 @@ export default function FesteClient({ feste }: any) {
       </div>
 
       {/* LIGHTBOX */}
-      {lightboxImages && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+      {lightboxSlides && lightboxSlides.length > 0 && (() => {
+        const slide = lightboxSlides[lightboxIndex]
+        const slideCount = lightboxSlides.length
+        const close = () => setLightboxSlides(null)
+        const prev = () =>
+          setLightboxIndex((i) => (i - 1 + slideCount) % slideCount)
+        const next = () => setLightboxIndex((i) => (i + 1) % slideCount)
+        return (
+          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
 
-          <button
-            onClick={() => setLightboxImages(null)}
-            className="absolute top-5 right-5 text-white"
-          >
-            <X size={32} />
-          </button>
+            <button
+              onClick={close}
+              className="absolute top-5 right-5 text-white z-20"
+              aria-label="Schliessen"
+            >
+              <X size={32} />
+            </button>
 
-          <button
-            onClick={() =>
-              setLightboxIndex((i) =>
-                (i - 1 + lightboxImages.length) % lightboxImages.length
-              )
-            }
-            className="absolute left-5 text-white"
-          >
-            <ChevronLeft size={32} />
-          </button>
+            {slideCount > 1 && (
+              <>
+                <button
+                  onClick={prev}
+                  className="absolute left-5 text-white z-20"
+                  aria-label="Vorheriges"
+                >
+                  <ChevronLeft size={32} />
+                </button>
 
-          <button
-            onClick={() =>
-              setLightboxIndex((i) =>
-                (i + 1) % lightboxImages.length
-              )
-            }
-            className="absolute right-5 text-white"
-          >
-            <ChevronRight size={32} />
-          </button>
+                <button
+                  onClick={next}
+                  className="absolute right-5 text-white z-20"
+                  aria-label="Naechstes"
+                >
+                  <ChevronRight size={32} />
+                </button>
+              </>
+            )}
 
-          <Image
-            src={lightboxImages[lightboxIndex]}
-            alt="Bild"
-            width={1200}
-            height={800}
-            className="max-h-[90vh] object-contain"
-          />
-        </div>
-      )}
+            {slide?.kind === 'image' ? (
+              <Image
+                src={slide.url}
+                alt="Fest Bild"
+                width={1600}
+                height={1200}
+                className="max-h-[90vh] max-w-[90vw] object-contain"
+              />
+            ) : slide?.kind === 'video' ? (
+              <video
+                ref={lightboxVideoRef}
+                src={slide.url}
+                controls
+                preload="metadata"
+                playsInline
+                poster={slide.poster}
+                className="max-h-[90vh] max-w-[90vw] object-contain"
+              />
+            ) : null}
+
+            {/* 🎬 Video-Indikator + Play-Hinweis im Video-Slide */}
+            {slide?.kind === 'video' && (
+              <div className="absolute top-5 left-5 z-20 bg-black/70 text-white text-xs px-2 py-1 rounded shadow flex items-center gap-1">
+                <Play size={12} /> Video
+              </div>
+            )}
+          </div>
+        )
+      })()}
     </section>
   )
 }
