@@ -6,7 +6,7 @@ Webauftritt des Studernheims. Next.js 14 (App Router) + Tailwind + Sanity CMS + 
 > Deployment via Docker auf Hetzner, Updates per `git push` + automatisierter `docker compose up -d --build`.
 
 **Repo:** <https://github.com/Wowax83/studernheim-website>
-**Lokaler Stand:** `/store/KI/KI Projekt/Projekte/Clone/Webseite-Studernheim/`
+**Lokaler Stand:** `/store/KI/KI Projekt/Projekt/Studernheim-Website/`
 **Sanity Studio:** <https://studernheim.net/studio>
 
 ---
@@ -58,7 +58,7 @@ cp .env.example .env
 # 2. Abhaengigkeiten installieren
 # ACHTUNG: /store unterstuetzt keine Symlinks. Wenn npm install mit
 # "EIO: i/o error, symlink" abbricht, von /opt/data aus arbeiten:
-#   cp -r "/store/KI/KI Projekt/Projekte/Clone/Webseite-Studernheim" /opt/data/
+#   cp -r "/store/KI/KI Projekt/Projekt/Studernheim-Website" /opt/data/
 #   cd /opt/data/Webseite-Studernheim
 #   npm install
 npm install
@@ -83,7 +83,7 @@ Die Seite läuft auf einem **Hetzner Cloud Server** (`ubuntu-4gb-nbg1-1`, IP `17
 ### Manuelles Deployment
 
 ```bash
-# Vom lokalen Repo (z.B. /store/KI/KI Projekt/Projekte/Clone/Webseite-Studernheim/)
+# Vom lokalen Repo (z.B. /store/KI/KI Projekt/Projekt/Studernheim-Website/)
 git push origin main
 
 # Auf dem Hetzner-Server:
@@ -207,21 +207,21 @@ Dieser Workflow dokumentiert den End-to-End-Pfad, wie Aenderungen an diesem Repo
 
 ### Schritte
 
-1. **Lokal patchen** – Dateien im Repo unter `/store/KI/KI Projekt/Projekte/Clone/Webseite-Studernheim/` editieren.
+1. **Lokal patchen** – Dateien im Repo unter `/store/KI/KI Projekt/Projekt/Studernheim-Website/` editieren.
 2. **Sandbox-Workaround** – Hermes' `HERMES_WRITE_SAFE_ROOT=/opt/data` blockt Writes nach `/store/...`. Workaround: modifizierte Dateien zuerst nach `/opt/data/studernheim-patch/` schreiben, dann mit `cp` ins Repo zurueckkopieren. Beispiel:
 
    ```bash
    mkdir -p /opt/data/studernheim-patch/<pfad>
    # Datei in /opt/data/studernheim-patch/... schreiben
    cp /opt/data/studernheim-patch/<pfad>/<datei> \
-      "/store/KI/KI Projekt/Projekte/Clone/Webseite-Studernheim/<pfad>/<datei>"
+      "/store/KI/KI Projekt/Projekt/Studernheim-Website/<pfad>/<datei>"
    ```
 
 3. **Lokal verifizieren** – `git diff` zeigt die Aenderungen; `git diff --stat` muss exakt die gepatchten Dateien treffen.
 4. **Committen & pushen**:
 
    ```bash
-   cd "/store/KI/KI Projekt/Projekte/Clone/Webseite-Studernheim"
+   cd "/store/KI/KI Projekt/Projekt/Studernheim-Website"
    git config user.email "w.merdian@gmail.com"
    git config user.name "Wowax83"
    git add -A
@@ -262,5 +262,5 @@ Dieser Workflow dokumentiert den End-to-End-Pfad, wie Aenderungen an diesem Repo
 
 ## Konvention: KI-Projekt-Wurzel
 
-Dieses Projekt liegt unter `/store/KI/KI Projekt/Projekte/Clone/` (Klon-Bereich der KI-Projekt-Wurzel).
-Siehe `/store/KI/KI Projekt/README.md` fuer die uebergeordnete Konvention (Projekt/ vs Projekte/Clone/, Namensschema, Token-Handling).
+Dieses Projekt liegt unter `/store/KI/KI Projekt/Projekt/Studernheim-Website/` (zentraler Projekt-Ordner).
+Siehe `/store/KI/KI Projekt/README.md` fuer die uebergeordnete Konvention.
