@@ -43,17 +43,8 @@ export default function Hero() {
       ref={containerRef}
       className="relative h-screen w-full overflow-hidden"
     >
-      {/* 🎬 Background */}
+      {/* 🎬 Background: Parallax (Scroll) auf dem äußeren Element */}
       <motion.div
-        animate={{
-          x: [0, 6, -6, 0],
-          y: [0, -3, 3, 0]
-        }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: 'easeInOut'
-        }}
         style={{
           y,
           scale,
@@ -61,17 +52,31 @@ export default function Hero() {
         }}
         className="absolute -inset-10"
       >
-        <Image
-          src="/hero.webp"
-          alt="Studernheim Landschaft"
-          fill
-          priority
-          quality={60}
-          sizes="100vw"
-          className="object-cover"
-        />
+        {/* 🎬 Schweb-Animation auf einem getrennten inneren Element */}
+        <motion.div
+          animate={{
+            x: [0, 6, -6, 0],
+            y: [0, -3, 3, 0]
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+          className="absolute inset-0"
+        >
+          <Image
+            src="/hero.webp"
+            alt="Studernheim Landschaft"
+            fill
+            priority
+            quality={60}
+            sizes="100vw"
+            className="object-cover"
+          />
 
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/25 to-black/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/25 to-black/70" />
+        </motion.div>
       </motion.div>
 
       {/* Aurora */}
