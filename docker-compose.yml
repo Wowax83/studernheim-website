@@ -8,5 +8,3 @@ services:
     environment:
       - NODE_ENV=production
       - RESEND_API_KEY=${RESEND_API_KEY}
-    volumes:
-      - ./visits.json:/app/visits.json
